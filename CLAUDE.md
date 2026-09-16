@@ -2,7 +2,8 @@
 
 Caden's study site: one page per class with rewritten notes, section search, and practice exams.
 
-- GitHub Pages (public): https://caden284.github.io/course-notes/
+- Vercel (public, main URL): https://course-notes-pi.vercel.app (project caden284s-projects/course-notes, auto-deploys every push to `main`)
+- GitHub Pages (public, backup): https://caden284.github.io/course-notes/
 - Claude artifact (private, can generate new exams with Claude): https://claude.ai/artifact/61ZEo2PKHvYyGk7MT1Lda6
 
 ## After every change: rebuild, commit, push, republish
@@ -11,7 +12,7 @@ Caden wants every update pushed automatically, so do all four steps without aski
 
 1. `python3 build.py` (fails loudly if a question points at a missing section)
 2. `git add -A && git commit -m "…"`
-3. `git push` (GitHub Pages redeploys from `main` in about a minute)
+3. `git push` (Vercel and GitHub Pages both redeploy from `main` automatically within a minute; confirm with `npx vercel ls`)
 4. Republish the artifact: Artifact tool with `file_path` = `index.html` and `url` = the artifact URL above. Read it first if this conversation hasn't published it. Omit `favicon` and `capabilities` so the stored ones (📚, `sample`) are kept.
 
 ## Layout

@@ -2,7 +2,7 @@
 
 Study notes and practice exams for my classes, as one static page.
 
-**Live site:** https://caden284.github.io/course-notes/
+**Live site:** https://course-notes-pi.vercel.app (backup: https://caden284.github.io/course-notes/)
 
 | Course | Term | Status |
 | --- | --- | --- |
