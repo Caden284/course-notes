@@ -1,0 +1,608 @@
+<title>Caden's Course Notes</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F1F2EE; --panel:#E4E7E1; --plate:#FBFBF8; --text:#1B2430; --muted:#56606B; --rule:#C9CEC6;
+  --brass:#8A6414; --def:#2F7466; --warn:#9A3434; --ex:#34548F; --exam:#6B4A8C; --code-bg:#E2E5DF;
+  --good:#2F7466; --bad:#9A3434; --on-brass:#FBFBF8;
+  --serif:"Literata", Georgia, "Times New Roman", serif;
+  --cond:"Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15202E; --panel:#1C2A3A; --plate:#EEF0EA; --text:#E6E1D5; --muted:#A3ADB7; --rule:#2F4054;
+    --brass:#D6B062; --def:#79C0AE; --warn:#E08A84; --ex:#9DB6E6; --exam:#C3A6E0; --code-bg:#223347;
+    --good:#79C0AE; --bad:#E08A84; --on-brass:#15202E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15202E; --panel:#1C2A3A; --plate:#EEF0EA; --text:#E6E1D5; --muted:#A3ADB7; --rule:#2F4054;
+  --brass:#D6B062; --def:#79C0AE; --warn:#E08A84; --ex:#9DB6E6; --exam:#C3A6E0; --code-bg:#223347;
+  --good:#79C0AE; --bad:#E08A84; --on-brass:#15202E;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--serif);font-size:18px;line-height:1.7;font-optical-sizing:auto}
+a{color:var(--brass);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,label:focus-within{outline:2px solid var(--brass);outline-offset:3px}
+img,svg{max-width:100%}
+button{font:inherit}
+
+/* ---------- top bar ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px clamp(16px,3vw,28px);background:var(--bg);border-bottom:1px solid var(--rule);font-family:var(--cond)}
+.bar .home{font-weight:700;font-size:21px;color:var(--text);text-decoration:none;letter-spacing:.01em}
+.bar .home span{color:var(--brass)}
+.bar .crumb{color:var(--muted);font-size:18px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .spacer{flex:1}
+.btn{font-family:var(--cond);font-size:17px;font-weight:600;line-height:1.2;padding:7px 14px;border-radius:3px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--brass);background:transparent;color:var(--text)}
+.btn.solid{background:var(--brass);color:var(--on-brass)}
+.btn.quiet{border-color:var(--rule)}
+.btn:hover{border-color:var(--brass)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* ---------- notes layout (from the ITEC 4235 page) ---------- */
+.shell{display:grid;grid-template-columns:290px minmax(0,1fr);min-height:100vh}
+nav.toc{position:sticky;top:52px;height:calc(100vh - 52px);overflow-y:auto;padding:24px 22px 40px;border-right:1px solid var(--rule);background:var(--panel);font-family:var(--cond);font-size:17px;line-height:1.35}
+nav.toc .brand{font-weight:700;font-size:26px;line-height:1.05;margin:0 0 4px}
+nav.toc .sub{color:var(--muted);font-size:15px;margin:0 0 14px}
+nav.toc .actions{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc > ol > li{margin:0 0 14px}
+nav.toc > ol > li > a{font-weight:600;color:var(--text);text-decoration:none;display:block;padding:2px 0}
+nav.toc > ol > li > a .code{color:var(--brass);margin-right:6px}
+nav.toc ol ol{margin:4px 0 0 12px;border-left:1px solid var(--rule);padding-left:10px}
+nav.toc ol ol a{color:var(--muted);text-decoration:none;display:block;padding:2px 0;font-weight:500}
+nav.toc a:hover{color:var(--brass)}
+main{padding:40px clamp(16px,5vw,72px) 120px;max-width:980px;width:100%;min-width:0;margin-inline:auto}
+.prose{max-width:72ch}
+h1,h2,h3,h4{font-family:var(--cond);line-height:1.1;letter-spacing:.005em;text-wrap:balance}
+h1{font-size:clamp(40px,7vw,72px);font-weight:700;margin:0 0 12px}
+h2{font-size:22px;font-weight:600;color:var(--muted);margin:0}
+h3{font-size:34px;font-weight:700;margin:64px 0 8px;padding-top:14px;border-top:2px solid var(--brass)}
+h3 .secnum{color:var(--brass);margin-right:.15em}
+h4{font-size:24px;font-weight:600;margin:34px 0 8px;color:var(--brass)}
+h5{font-family:var(--cond);font-size:20px;font-weight:600;margin:24px 0 6px}
+p{margin:0 0 14px}
+ul,ol{padding-left:1.3em;margin:0 0 14px}
+li{margin:0 0 6px}
+code,kbd{font-family:var(--mono);font-size:.84em;background:var(--code-bg);padding:1px 5px;border-radius:3px;overflow-wrap:anywhere}
+pre.code{font-family:var(--mono);font-size:14.5px;line-height:1.55;background:var(--code-bg);padding:14px 16px;overflow-x:auto;border-radius:4px;margin:0 0 16px}
+pre.code code{background:none;padding:0;font-size:inherit;overflow-wrap:normal}
+.lead{font-size:21px;color:var(--muted);max-width:62ch}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--cond);font-size:17px;color:var(--muted);margin:0 0 8px}
+section.lecture{margin-top:96px}
+.plate{display:grid;grid-template-columns:auto 1fr;gap:6px 26px;align-items:end;padding:26px 0 22px;border-bottom:1px solid var(--rule)}
+.plate .num{font-family:var(--cond);font-weight:700;font-size:clamp(84px,14vw,150px);line-height:.82;color:transparent;-webkit-text-stroke:2px var(--brass);grid-row:span 2}
+.plate .ttl{font-family:var(--cond);font-weight:700;font-size:clamp(30px,4.2vw,46px);line-height:1.02;margin:0}
+.plate .src{color:var(--muted);font-size:16px;margin:0}
+@media (max-width:640px){.plate{grid-template-columns:minmax(0,1fr)}.plate .num{grid-row:auto;font-size:84px}}
+.plate .ttl,.plate .src{min-width:0;overflow-wrap:anywhere}
+@supports not (-webkit-text-stroke:2px black){.plate .num{color:var(--brass)}}
+.box{border-left:4px solid var(--rule);background:var(--panel);padding:14px 18px 6px;margin:18px 0 20px;border-radius:0 4px 4px 0;max-width:76ch;min-width:0}
+.box > .lbl{font-family:var(--cond);font-weight:700;font-size:19px;margin:0 0 6px;display:block}
+.box.def{border-color:var(--def)} .box.def > .lbl{color:var(--def)}
+.box.warn{border-color:var(--warn)} .box.warn > .lbl{color:var(--warn)}
+.box.ex{border-color:var(--ex)} .box.ex > .lbl{color:var(--ex)}
+.box.exam{border-color:var(--exam)} .box.exam > .lbl{color:var(--exam)}
+.box.proc{border-color:var(--brass)} .box.proc > .lbl{color:var(--brass)}
+.box.bg{border-color:var(--muted)} .box.bg > .lbl{color:var(--muted)}
+.def dl{margin:0 0 8px;display:grid;grid-template-columns:118px 1fr;gap:4px 14px}
+.def dt{font-family:var(--cond);font-weight:600;color:var(--muted);font-size:17px;padding-top:3px}
+.def dd{margin:0;min-width:0}
+@media (max-width:560px){.def dl{grid-template-columns:1fr}.def dt{padding-top:6px}}
+.lvl{font-family:var(--cond);font-weight:600;font-size:15px;color:var(--muted);margin-left:6px}
+details{margin:6px 0 10px}
+summary{cursor:pointer;font-weight:600}
+details > div{padding:8px 0 4px 18px;border-left:2px solid var(--rule);margin-top:6px}
+.formula{background:var(--panel);border:1px solid var(--rule);padding:16px 20px 8px;margin:18px 0 22px;border-radius:4px;max-width:76ch}
+.formula .eq{font-family:var(--mono);font-size:20px;text-align:center;padding:10px;margin:0 0 12px;background:var(--code-bg);border-radius:3px;overflow-x:auto}
+.tw{overflow-x:auto;margin:14px 0 22px}
+table{border-collapse:collapse;width:100%;font-size:16px;line-height:1.5}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--rule)}
+th{font-family:var(--cond);font-size:17px;font-weight:600;color:var(--brass);border-bottom:2px solid var(--brass)}
+table.gloss td:first-child{font-weight:600;white-space:nowrap}
+table.gloss{min-width:880px}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+figure.fig{margin:20px 0 24px;background:var(--plate);color:#1B2430;border-radius:4px;padding:18px;overflow-x:auto}
+figure.fig figcaption{font-family:var(--cond);font-size:17px;color:#56606B;margin-top:10px}
+figure.fig pre.mermaid{margin:0;background:transparent;text-align:center}
+.quad{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;font-family:var(--cond);font-size:17px;max-width:520px}
+.quad div{padding:14px 10px;text-align:center}
+.quad .ax{background:none;color:#56606B;display:flex;align-items:center;justify-content:center}
+.q-lo{background:#CFE3D6}.q-md{background:#F1E6C8}.q-hi{background:#EFCACA}
+.tool{border:1px solid var(--brass);border-radius:4px;padding:16px 18px;margin:20px 0 26px;max-width:76ch}
+.tool .lbl{font-family:var(--cond);font-weight:700;font-size:20px;color:var(--brass);display:block;margin-bottom:8px}
+.tool label{font-family:var(--cond);font-size:17px;display:inline-block;margin:4px 12px 4px 0}
+.tool input,.tool select{font-family:var(--mono);font-size:15px;background:var(--bg);color:var(--text);border:1px solid var(--rule);padding:5px 8px;border-radius:3px;max-width:100%}
+.tool button{font-family:var(--cond);font-size:17px;font-weight:600;background:var(--brass);color:var(--on-brass);border:0;padding:6px 14px;border-radius:3px;cursor:pointer;margin:6px 6px 6px 0}
+.tool output,.tool .out{display:block;font-family:var(--mono);font-size:14.5px;background:var(--code-bg);padding:10px 12px;margin-top:10px;white-space:pre-wrap;overflow-x:auto;border-radius:3px}
+.checklist li{list-style:none;position:relative}
+.checklist li::before{content:"☐";position:absolute;left:-1.3em;color:var(--brass)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;max-width:76ch;margin:18px 0}
+.legend .box{margin:0}
+.gantt{display:flex;max-width:76ch;margin:14px 0 18px;border:1px solid var(--brass);border-radius:3px;overflow-x:auto;font-family:var(--cond);font-size:17px}
+.gantt span{flex:1 0 auto;padding:8px 12px;border-right:1px solid var(--brass);white-space:nowrap;text-align:center}
+.gantt span:last-child{border-right:0}
+.mobile-toc{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav.toc{display:none}
+  .mobile-toc{display:block;background:var(--panel);padding:10px 16px;border-bottom:1px solid var(--rule);font-family:var(--cond);font-size:18px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:5}
+  .mobile-toc ol{list-style:none;padding-left:0;max-height:60vh;overflow-y:auto}
+  .mobile-toc ol ol{padding-left:14px}
+  .mobile-toc a{color:var(--text);text-decoration:none}
+  .mobile-toc .actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  main{padding-top:24px}
+  [id]{scroll-margin-top:110px}
+  body{font-size:17px}
+}
+[id]{scroll-margin-top:70px}
+
+/* ---------- home ---------- */
+.home-wrap{max-width:1040px;margin:0 auto;padding-block:48px 120px;padding-inline:clamp(16px,4vw,40px)}
+.home-head{display:grid;gap:10px;margin-bottom:34px}
+.home-head .kicker{font-family:var(--cond);font-size:18px;font-weight:600;color:var(--brass);letter-spacing:.08em;text-transform:uppercase;margin:0}
+.home-head h1{margin:0}
+.home-head .lead{margin:0}
+.search{position:relative;max-width:620px;margin:6px 0 0}
+.search input{width:100%;font-family:var(--serif);font-size:18px;padding:12px 14px;border:1px solid var(--rule);border-radius:4px;background:var(--plate);color:#1B2430}
+.results{list-style:none;margin:10px 0 0;padding:0;max-width:620px;display:grid;gap:2px}
+.results a{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;padding:8px 10px;border-radius:3px;text-decoration:none;color:var(--text)}
+.results a:hover,.results a:focus-visible{background:var(--panel)}
+.results .rc{font-family:var(--cond);font-weight:600;color:var(--brass);white-space:nowrap}
+.results .rt{min-width:0}
+.results .rs{grid-column:2;font-family:var(--cond);color:var(--muted);font-size:15px}
+.results .none{color:var(--muted);padding:8px 10px}
+.term{margin-top:44px}
+.term h2{font-family:var(--cond);font-size:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.course{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:4px 30px;align-items:center;padding:22px 0 26px;border-bottom:1px solid var(--rule)}
+.course .cnum{font-family:var(--cond);font-weight:700;font-size:clamp(72px,11vw,120px);line-height:.85;color:transparent;-webkit-text-stroke:2px var(--brass);grid-row:span 3}
+@supports not (-webkit-text-stroke:2px black){.course .cnum{color:var(--brass)}}
+.course .ctitle{font-family:var(--cond);font-weight:700;font-size:clamp(30px,4vw,40px);line-height:1.05;margin:0}
+.course .cmeta{display:flex;flex-wrap:wrap;gap:4px 16px;font-family:var(--cond);font-size:17px;color:var(--muted);margin:0}
+.pill{display:inline-block;font-family:var(--cond);font-weight:600;font-size:15px;letter-spacing:.04em;padding:1px 9px;border-radius:999px;border:1px solid currentColor}
+.pill.live{color:var(--def)}
+.pill.done{color:var(--muted)}
+.course .cactions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+@media (max-width:640px){.course{grid-template-columns:minmax(0,1fr)}.course .cnum{grid-row:auto;font-size:72px}}
+.howto{margin-top:56px;max-width:72ch;color:var(--muted);font-size:16px}
+.howto h2{font-family:var(--cond);font-size:20px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+
+/* ---------- exam ---------- */
+.exam-wrap{max-width:860px;margin:0 auto;padding-block:40px 120px;padding-inline:clamp(16px,4vw,40px)}
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:4px;padding:18px 20px;margin:0 0 20px}
+.panel h3{margin:0 0 10px;padding:0;border:0;font-size:24px}
+.fieldrow{display:flex;flex-wrap:wrap;gap:8px 10px;margin:4px 0 12px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-family:var(--cond);font-size:17px;padding:5px 12px 5px 9px;border:1px solid var(--rule);border-radius:999px;background:var(--bg);cursor:pointer;user-select:none}
+.chip input{margin:0;accent-color:var(--brass)}
+.chip:has(input:checked){border-color:var(--brass)}
+.chip .cc{color:var(--brass);font-weight:600}
+.chip .cn{color:var(--muted);font-size:14px}
+.linkbtn{background:none;border:0;color:var(--brass);cursor:pointer;font-family:var(--cond);font-size:16px;padding:2px 4px;text-decoration:underline;text-underline-offset:3px}
+.hint{font-family:var(--cond);font-size:16px;color:var(--muted);margin:4px 0 0}
+.status{font-family:var(--cond);font-size:18px;margin:12px 0 0}
+.status.err{color:var(--bad)}
+.scorebar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 52px);z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;background:var(--bg);border-bottom:1px solid var(--rule);padding:10px 0;margin:0 0 18px;font-family:var(--cond);font-size:19px}
+.scorebar .big{font-weight:700;font-size:26px;color:var(--brass);font-variant-numeric:tabular-nums}
+.qlist{list-style:none;margin:0;padding:0;display:grid;gap:16px;counter-reset:q}
+.q{border:1px solid var(--rule);border-left:4px solid var(--rule);border-radius:0 4px 4px 0;padding:14px 18px 12px;background:var(--bg);counter-increment:q}
+.q.right{border-left-color:var(--good)}
+.q.wrong{border-left-color:var(--bad)}
+.q .qhead{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-family:var(--cond);font-size:16px;color:var(--muted);margin:0 0 4px}
+.q .qhead::before{content:"Q" counter(q);font-weight:700;color:var(--brass);font-size:18px}
+.q .qtext{margin:0 0 10px;white-space:pre-wrap}
+.opts{display:grid;gap:6px;margin:0 0 6px;padding:0;list-style:none}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border:1px solid var(--rule);border-radius:3px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:.35em;accent-color:var(--brass)}
+.opt.correct{border-color:var(--good);box-shadow:inset 3px 0 0 var(--good)}
+.opt.chosen-wrong{border-color:var(--bad);box-shadow:inset 3px 0 0 var(--bad)}
+.q textarea{width:100%;min-height:90px;font-family:var(--serif);font-size:17px;padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--plate);color:#1B2430;resize:vertical}
+.verdict{font-family:var(--cond);font-weight:700;font-size:17px;margin:8px 0 4px}
+.verdict.right{color:var(--good)} .verdict.wrong{color:var(--bad)}
+.explain{background:var(--panel);border-radius:3px;padding:10px 14px;margin:6px 0 2px;font-size:16px}
+.explain .k{font-family:var(--cond);font-weight:700;color:var(--muted);display:block;font-size:15px;letter-spacing:.04em;text-transform:uppercase}
+.selfmark{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 2px}
+.selfmark .btn[aria-pressed="true"]{background:var(--brass);color:var(--on-brass)}
+.stream{font-family:var(--mono);font-size:13px;color:var(--muted);max-height:120px;overflow:hidden;white-space:pre-wrap;margin-top:10px}
+.foot{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+</style>
+
+<header class="bar">
+  <a class="home" href="#/">Course <span>Notes</span></a>
+  <span class="crumb" id="crumb"></span>
+  <span class="spacer"></span>
+  <button class="btn quiet" type="button" id="themeBtn">Light / dark</button>
+</header>
+<div id="app"></div>
+
+<script id="courses-data" type="application/json">{{COURSES_JSON}}</script>
+<script id="questions-data" type="application/json">{{QUESTIONS_JSON}}</script>
+{{COURSE_TEMPLATES}}
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script>
+var COURSE_TOOLS = {};
+{{COURSE_TOOLS}}
+</script>
+<script>
+(function(){
+  var COURSES = JSON.parse(document.getElementById('courses-data').textContent);
+  var QUESTIONS = JSON.parse(document.getElementById('questions-data').textContent);
+  var app = document.getElementById('app');
+  var crumb = document.getElementById('crumb');
+  var root = document.documentElement;
+  var rendered = null;          // which course's notes are in the DOM
+  var sampleFn = null;          // Claude sampling, when this page runs as an Artifact
+  var samplePromise = (window.claude && typeof window.claude.use === 'function')
+    ? window.claude.use('sample').then(function(s){ sampleFn = s; return s; }, function(){ return null; })
+    : Promise.resolve(null);
+
+  /* ---------- theme ---------- */
+  try { var saved = localStorage.getItem('course-notes-theme'); if (saved) root.setAttribute('data-theme', saved); } catch (e) {}
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if (!cur) cur = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('course-notes-theme', next); } catch (e) {}
+  });
+
+  /* ---------- helpers ---------- */
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function course(id){ for (var i = 0; i < COURSES.length; i++) if (COURSES[i].id === id) return COURSES[i]; return null; }
+  function tpl(id, part){ var t = document.getElementById('course-' + id + '-' + part); return t ? t.innerHTML : ''; }
+  function shuffle(a){ for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function termOrder(t){ var m = /(Spring|Summer|Fall)\s+(\d{4})/.exec(t || ''); if (!m) return 0; return +m[2] * 10 + {Spring:1, Summer:2, Fall:3}[m[1]]; }
+
+  // Units (chapters / lectures) come straight from the notes' <section class="lecture"> plates.
+  function unitsOf(c){
+    var box = document.createElement('div'); box.innerHTML = tpl(c.id, 'main');
+    var out = [];
+    box.querySelectorAll('section[id]').forEach(function(sec){
+      if ((c.examExclude || []).indexOf(sec.id) >= 0) return;
+      var num = sec.querySelector('.plate .num'), ttl = sec.querySelector('.plate .ttl');
+      if (!ttl) return;
+      out.push({ id: sec.id, code: num ? num.textContent.trim() : sec.id, title: ttl.textContent.trim(), el: sec });
+    });
+    return out;
+  }
+  var unitCache = {};
+  function units(c){ return unitCache[c.id] || (unitCache[c.id] = unitsOf(c)); }
+
+  /* ---------- router ---------- */
+  function parse(){
+    var h = location.hash.replace(/^#\/?/, '');
+    var p = h.split('/').filter(Boolean);
+    if (p[0] === 'c' && p[1] && course(p[1])) {
+      if (p[2] === 'exam') return { view: 'exam', id: p[1] };
+      return { view: 'notes', id: p[1], anchor: p[2] === 's' ? decodeURIComponent(p.slice(3).join('/')) : null };
+    }
+    return { view: 'home' };
+  }
+  function route(){
+    var r = parse();
+    if (r.view === 'notes') return showNotes(r.id, r.anchor);
+    rendered = null;
+    if (r.view === 'exam') return showExam(r.id);
+    showHome();
+  }
+  window.addEventListener('hashchange', route);
+
+  // Links inside the notes use plain #anchors; keep them working inside the hash router.
+  app.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var href = a.getAttribute('href');
+    if (href.charAt(1) === '/' || href === '#') return;
+    var id = href.slice(1), el = document.getElementById(id);
+    if (!el || !rendered) return;
+    e.preventDefault();
+    history.replaceState(null, '', '#/c/' + rendered + '/s/' + encodeURIComponent(id));
+    el.scrollIntoView();
+    var mt = a.closest('details.mobile-toc'); if (mt) mt.open = false;
+  });
+
+  /* ---------- home ---------- */
+  function showHome(){
+    document.title = "Caden's Course Notes";
+    crumb.textContent = '';
+    var terms = {};
+    COURSES.forEach(function(c){ (terms[c.term] = terms[c.term] || []).push(c); });
+    var termNames = Object.keys(terms).sort(function(a, b){ return termOrder(b) - termOrder(a); });
+    var total = COURSES.length, qs = QUESTIONS.length;
+    var html = '<div class="home-wrap">' +
+      '<div class="home-head"><p class="kicker">Georgia State University</p>' +
+      '<h1>Caden\'s Course Notes</h1>' +
+      '<p class="lead">Every class, rewritten as study notes you can read anywhere, with practice exams built from the same material. ' + total + ' course' + (total === 1 ? '' : 's') + ', ' + qs + ' practice questions.</p>' +
+      '<div class="search"><label for="q" class="hint">Find a topic across all courses</label><input id="q" type="search" placeholder="e.g. semaphores, RSA, page table" autocomplete="off"></div>' +
+      '<ul class="results" id="results" aria-live="polite"></ul></div>';
+    termNames.forEach(function(t){
+      html += '<section class="term"><h2>' + esc(t) + '</h2>';
+      terms[t].forEach(function(c){
+        var n = units(c).length, qn = QUESTIONS.filter(function(q){ return q.course === c.id; }).length;
+        var num = (c.code.match(/\d+/) || [c.code])[0];
+        html += '<article class="course"><span class="cnum" aria-hidden="true">' + esc(num) + '</span>' +
+          '<p class="ctitle">' + esc(c.title) + '</p>' +
+          '<p class="cmeta"><span>' + esc(c.code) + '</span>' + (c.instructor ? '<span>' + esc(c.instructor) + '</span>' : '') +
+          '<span>' + n + ' ' + esc(c.unitWord.toLowerCase()) + (n === 1 ? '' : 's') + '</span><span>' + qn + ' questions</span>' +
+          '<span class="pill ' + (c.status === 'Completed' ? 'done' : 'live') + '">' + esc(c.status) + '</span></p>' +
+          '<div class="cactions"><a class="btn solid" href="#/c/' + c.id + '">Study notes</a><a class="btn" href="#/c/' + c.id + '/exam">Practice exam</a></div></article>';
+      });
+      html += '</section>';
+    });
+    html += '<section class="howto"><h2>Adding a class</h2><p>Bring the new class\'s slides or notes to Claude and ask it to add them to the course-notes site. Each class lives in its own folder with a notes file and a question bank; the site rebuilds and publishes to GitHub Pages and this page.</p></section></div>';
+    app.innerHTML = html;
+    window.scrollTo(0, 0);
+
+    var index = [];
+    COURSES.forEach(function(c){
+      var box = document.createElement('div'); box.innerHTML = tpl(c.id, 'toc');
+      box.querySelectorAll('li').forEach(function(li){
+        var a = li.querySelector(':scope > a'); if (!a) return;
+        var parentLi = li.parentElement.closest('li');
+        var parentA = parentLi ? parentLi.querySelector(':scope > a') : null;
+        index.push({ c: c, id: a.getAttribute('href').slice(1), text: a.textContent.replace(/\s+/g, ' ').trim(),
+          parent: parentA ? parentA.textContent.replace(/\s+/g, ' ').trim() : '' });
+      });
+    });
+    var input = document.getElementById('q'), results = document.getElementById('results');
+    input.addEventListener('input', function(){
+      var term = input.value.trim().toLowerCase();
+      if (term.length < 2) { results.innerHTML = ''; return; }
+      var hits = index.filter(function(x){ return x.text.toLowerCase().indexOf(term) >= 0; }).slice(0, 12);
+      results.innerHTML = hits.length ? hits.map(function(x){
+        return '<li><a href="#/c/' + x.c.id + '/s/' + encodeURIComponent(x.id) + '"><span class="rc">' + esc(x.c.code) + '</span><span class="rt">' + esc(x.text) + '</span>' +
+          (x.parent ? '<span class="rs">' + esc(x.parent) + '</span>' : '') + '</a></li>';
+      }).join('') : '<li class="none">No section titles match. Try a shorter word.</li>';
+    });
+  }
+
+  /* ---------- notes ---------- */
+  function showNotes(id, anchor){
+    var c = course(id);
+    if (rendered !== id) {
+      document.title = c.code + ' ' + c.title;
+      crumb.textContent = c.code + ' · ' + c.title;
+      var toc = tpl(id, 'toc');
+      var actions = '<div class="actions"><a class="btn solid" href="#/c/' + id + '/exam">Practice exam</a><a class="btn quiet" href="#/">All courses</a></div>';
+      app.innerHTML =
+        '<details class="mobile-toc"><summary>Contents</summary>' + actions + toc + '</details>' +
+        '<div class="shell"><nav class="toc" aria-label="Contents"><p class="brand">' + esc(c.code) + '<br>' + esc(c.title) + '</p>' +
+        '<p class="sub">' + esc(c.term) + (c.instructor ? ' · ' + esc(c.instructor) : '') + '</p>' + actions + toc + '</nav>' +
+        '<main><header class="prose"><p class="meta-row"><span>' + esc(c.code) + '</span><span>' + esc(c.term) + '</span><span class="pill ' + (c.status === 'Completed' ? 'done' : 'live') + '">' + esc(c.status) + '</span></p>' +
+        '<h1>' + esc(c.headline || c.title) + '</h1><p class="lead">' + esc(c.lead || '') + '</p></header>' +
+        tpl(id, 'main') + '</main></div>';
+      rendered = id;
+      if (COURSE_TOOLS[id]) { try { COURSE_TOOLS[id](); } catch (e) { console.error(e); } }
+      renderMermaid();
+    }
+    var el = anchor && document.getElementById(anchor);
+    if (el) {
+      // Jump without smooth scrolling, and again once web fonts settle the layout.
+      var jump = function(){ el.scrollIntoView({ block: 'start', behavior: 'instant' }); };
+      requestAnimationFrame(jump);
+      if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(jump);
+    }
+    else if (!anchor) window.scrollTo(0, 0);
+  }
+  function renderMermaid(){
+    var nodes = app.querySelectorAll('pre.mermaid:not([data-processed])');
+    if (!nodes.length || !window.mermaid) return;
+    try {
+      window.mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
+      window.mermaid.run({ nodes: nodes });
+    } catch (e) { console.error(e); }
+  }
+
+  /* ---------- practice exam ---------- */
+  var TYPE_NAMES = { mc: 'Multiple choice', tf: 'True / false', short: 'Short answer' };
+  function showExam(id){
+    var c = course(id);
+    document.title = c.code + ' practice exam';
+    crumb.textContent = c.code + ' · Practice exam';
+    var us = units(c);
+    var bank = QUESTIONS.filter(function(q){ return q.course === id; });
+    var counts = {}; bank.forEach(function(q){ counts[q.unit] = (counts[q.unit] || 0) + 1; });
+
+    app.innerHTML = '<div class="exam-wrap">' +
+      '<p class="meta-row"><a href="#/c/' + id + '">← ' + esc(c.code) + ' notes</a></p>' +
+      '<h1>Practice exam</h1><p class="lead">Pick what to cover, then answer everything and grade it at the end, like a real paper exam.</p>' +
+      '<form id="setup" class="panel">' +
+        '<h3>What to cover</h3><div class="fieldrow" id="unitChips">' +
+        us.map(function(u){
+          return '<label class="chip"><input type="checkbox" name="unit" value="' + esc(u.id) + '" checked><span class="cc">' + esc(u.code) + '</span> ' + esc(u.title) + ' <span class="cn">' + (counts[u.id] || 0) + '</span></label>';
+        }).join('') + '</div>' +
+        '<p class="hint"><button type="button" class="linkbtn" data-all="1">Select all</button> · <button type="button" class="linkbtn" data-all="0">Clear</button> · Numbers are questions in the saved bank.</p>' +
+        '<h3 style="margin-top:18px">Question types</h3><div class="fieldrow">' +
+        ['mc', 'tf', 'short'].map(function(t){ return '<label class="chip"><input type="checkbox" name="type" value="' + t + '" checked>' + TYPE_NAMES[t] + '</label>'; }).join('') + '</div>' +
+        '<h3 style="margin-top:18px">Length</h3><div class="fieldrow">' +
+        [10, 20, 30].map(function(n, i){ return '<label class="chip"><input type="radio" name="count" value="' + n + '"' + (i === 0 ? ' checked' : '') + '>' + n + ' questions</label>'; }).join('') +
+        '<label class="chip"><input type="radio" name="count" value="all">Everything that matches</label></div>' +
+        '<h3 style="margin-top:18px">Questions from</h3><div class="fieldrow">' +
+        '<label class="chip"><input type="radio" name="source" value="bank" checked>Saved question bank</label>' +
+        '<label class="chip" id="claudeChip" hidden><input type="radio" name="source" value="claude">New questions written by Claude</label></div>' +
+        '<p class="hint" id="sourceHint">Checking whether Claude is available here…</p>' +
+        '<div class="foot"><button class="btn solid" type="submit" id="startBtn">Start exam</button></div>' +
+        '<p class="status" id="setupStatus" role="status"></p><div class="stream" id="stream" hidden></div>' +
+      '</form><div id="examArea"></div></div>';
+    window.scrollTo(0, 0);
+
+    var form = document.getElementById('setup');
+    form.addEventListener('click', function(e){
+      var b = e.target.closest('[data-all]'); if (!b) return;
+      form.querySelectorAll('input[name=unit]').forEach(function(x){ x.checked = b.getAttribute('data-all') === '1'; });
+    });
+    samplePromise.then(function(s){
+      var hint = document.getElementById('sourceHint'); if (!hint) return;
+      if (s) { document.getElementById('claudeChip').hidden = false; hint.textContent = 'Claude writes a fresh exam from the notes for the chapters you picked. It uses your Claude account and takes about a minute.'; }
+      else hint.textContent = 'Fresh AI-written exams are available when you open this site as a Claude artifact. The saved bank works everywhere.';
+    });
+
+    var controller = null;
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      var status = document.getElementById('setupStatus'); status.className = 'status'; status.textContent = '';
+      if (controller) { controller.abort(); return; }
+      var picked = Array.prototype.map.call(form.querySelectorAll('input[name=unit]:checked'), function(x){ return x.value; });
+      var types = Array.prototype.map.call(form.querySelectorAll('input[name=type]:checked'), function(x){ return x.value; });
+      var countVal = form.querySelector('input[name=count]:checked').value;
+      var source = form.querySelector('input[name=source]:checked').value;
+      if (!picked.length) { status.className = 'status err'; status.textContent = 'Pick at least one ' + c.unitWord.toLowerCase() + '.'; return; }
+      if (!types.length) { status.className = 'status err'; status.textContent = 'Pick at least one question type.'; return; }
+
+      if (source === 'bank') {
+        var pool = shuffle(bank.filter(function(q){ return picked.indexOf(q.unit) >= 0 && types.indexOf(q.type) >= 0; }));
+        if (!pool.length) { status.className = 'status err'; status.textContent = 'The saved bank has no questions for that mix. Add more ' + c.unitWord.toLowerCase() + 's or question types.'; return; }
+        var n = countVal === 'all' ? pool.length : Math.min(+countVal, pool.length);
+        if (countVal !== 'all' && pool.length < +countVal) status.textContent = 'Only ' + pool.length + ' saved questions match, so the exam has ' + pool.length + '.';
+        return runExam(c, pool.slice(0, n), 'Saved bank');
+      }
+      generate(c, us.filter(function(u){ return picked.indexOf(u.id) >= 0; }), types, countVal === 'all' ? 30 : +countVal);
+    });
+
+    function generate(c, chosen, types, n){
+      var status = document.getElementById('setupStatus'), stream = document.getElementById('stream'), btn = document.getElementById('startBtn');
+      if (!sampleFn) { status.className = 'status err'; status.textContent = 'Claude is not available on this copy of the site. Use the saved bank.'; return; }
+      var budget = 42000, per = Math.floor(budget / chosen.length);
+      var material = chosen.map(function(u){
+        var text = u.el.innerText || u.el.textContent;
+        text = text.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n').trim();
+        return '### ' + u.id + ' — ' + u.code + ' ' + u.title + '\n' + text.slice(0, per);
+      }).join('\n\n');
+      var typeRules = { mc: '"mc": 4 choices, "answer" is the 0-based index of the correct choice', tf: '"tf": no choices, "answer" is true or false', short: '"short": no choices, "answer" is a model answer of 1-4 sentences' };
+      var prompt = 'You are writing a practice exam for the university course ' + c.code + ' ' + c.title + '.\n' +
+        'Write exactly ' + n + ' exam questions based ONLY on the course notes below. Spread them across the sections, favor concepts the notes flag as exam material, include calculation questions where the notes have formulas, and do not repeat the notes\' own practice questions word for word.\n' +
+        'Allowed question types: ' + types.map(function(t){ return typeRules[t]; }).join('; ') + '.\n' +
+        'Reply with ONLY a JSON array. Each item: {"unit": the section id shown after ### (e.g. "' + chosen[0].id + '"), "type": "mc"|"tf"|"short", "q": question text, "choices": [..] (mc only), "answer": see type rules, "explain": 1-2 sentences explaining the correct answer}.\n\n' +
+        'COURSE NOTES:\n' + material;
+      controller = new AbortController();
+      btn.textContent = 'Stop writing';
+      status.textContent = 'Claude is reading the notes and writing your exam. This usually takes under a minute.';
+      stream.hidden = false; stream.textContent = '';
+      sampleFn.json(prompt, {
+        signal: controller.signal, cache: false,
+        onText: function(u){ var k = (u.text.match(/"type"\s*:/g) || []).length; status.textContent = 'Writing… ' + k + ' of ' + n + ' questions so far.'; stream.textContent = u.text.slice(-400); }
+      }).then(function(data){
+        var qs = (Array.isArray(data) ? data : []).map(function(q){ q.course = c.id; return q; }).filter(valid);
+        if (!qs.length) throw { code: 'invalid_json' };
+        status.textContent = qs.length < n ? 'Claude wrote ' + qs.length + ' usable questions.' : '';
+        runExam(c, qs, 'Written by Claude');
+      }).catch(function(err){
+        var code = err && err.code;
+        status.className = code === 'cancelled' ? 'status' : 'status err';
+        status.textContent = {
+          cancelled: 'Stopped. Nothing was saved.',
+          not_granted: 'Claude access was declined for this page. The saved bank still works.',
+          sampling_disabled: 'Claude is not available for this account. The saved bank still works.',
+          rate_limited: 'Too many requests right now. Wait a minute, then try again.',
+          invalid_json: 'Claude\'s reply could not be turned into questions. Try again, or ask for fewer questions.',
+          prompt_too_large: 'Too much material at once. Pick fewer ' + c.unitWord.toLowerCase() + 's.',
+          session_expired: 'Your Claude session expired. Sign in again, then retry.'
+        }[code] || 'Something went wrong while writing the exam. Try again in a moment.';
+      }).then(function(){ controller = null; btn.textContent = 'Start exam'; stream.hidden = true; });
+    }
+  }
+  function valid(q){
+    if (!q || typeof q.q !== 'string' || !q.q.trim()) return false;
+    if (q.type === 'mc') return Array.isArray(q.choices) && q.choices.length >= 2 && Number.isInteger(q.answer) && q.answer >= 0 && q.answer < q.choices.length;
+    if (q.type === 'tf') { if (typeof q.answer === 'string') q.answer = /^t/i.test(q.answer); return typeof q.answer === 'boolean'; }
+    if (q.type === 'short') return typeof q.answer === 'string' && q.answer.trim().length > 0;
+    return false;
+  }
+
+  function runExam(c, qs, sourceLabel){
+    var area = document.getElementById('examArea');
+    var unitNames = {}; units(c).forEach(function(u){ unitNames[u.id] = u.code + ' ' + u.title; });
+    var graded = false, marks = {};
+    area.innerHTML = '<div class="scorebar" id="scorebar"><span>' + qs.length + ' questions · ' + esc(sourceLabel) + '</span><span class="spacer" style="flex:1"></span><button class="btn solid" type="button" id="gradeBtn">Grade exam</button></div>' +
+      '<ol class="qlist">' + qs.map(function(q, i){
+        var body = '';
+        if (q.type === 'mc') body = '<div class="opts" role="radiogroup">' + q.choices.map(function(ch, j){
+          return '<label class="opt" data-j="' + j + '"><input type="radio" name="q' + i + '" id="q' + i + '_' + j + '" value="' + j + '"><span>' + esc(ch) + '</span></label>';
+        }).join('') + '</div>';
+        else if (q.type === 'tf') body = '<div class="opts" role="radiogroup">' + ['True', 'False'].map(function(ch, j){
+          return '<label class="opt" data-j="' + j + '"><input type="radio" name="q' + i + '" id="q' + i + '_' + j + '" value="' + (j === 0) + '"><span>' + ch + '</span></label>';
+        }).join('') + '</div>';
+        else body = '<textarea id="q' + i + '_text" aria-label="Your answer" placeholder="Write your answer, then grade the exam to compare with a model answer."></textarea>';
+        return '<li class="q" id="q' + i + '"><p class="qhead"><span>' + esc(unitNames[q.unit] || q.unit || '') + '</span><span>' + TYPE_NAMES[q.type] + '</span></p>' +
+          '<p class="qtext">' + esc(q.q) + '</p>' + body + '<div class="result"></div></li>';
+      }).join('') + '</ol>' +
+      '<div class="foot" id="examFoot" hidden><button class="btn solid" type="button" id="retryBtn">Retake the ones I missed</button><button class="btn" type="button" id="againBtn">New exam</button><a class="btn quiet" href="#/c/' + c.id + '">Back to notes</a></div>';
+    area.scrollIntoView();
+
+    document.getElementById('gradeBtn').addEventListener('click', function(){ if (!graded) grade(); });
+    function grade(){
+      var unanswered = 0;
+      qs.forEach(function(q, i){
+        if (q.type === 'short') { if (!document.getElementById('q' + i + '_text').value.trim()) unanswered++; }
+        else if (!area.querySelector('input[name=q' + i + ']:checked')) unanswered++;
+      });
+      if (unanswered && !confirm(unanswered + ' question' + (unanswered === 1 ? ' is' : 's are') + ' unanswered. Grade anyway?')) return;
+      graded = true;
+      qs.forEach(function(q, i){
+        var li = document.getElementById('q' + i), res = li.querySelector('.result');
+        li.querySelectorAll('input,textarea').forEach(function(x){ x.disabled = true; });
+        if (q.type === 'short') {
+          res.innerHTML = '<div class="explain"><span class="k">Model answer</span>' + esc(q.answer) + '</div>' +
+            (q.explain ? '<div class="explain"><span class="k">Why</span>' + esc(q.explain) + '</div>' : '') +
+            '<div class="selfmark"><span class="hint">Mark yourself:</span><button type="button" class="btn quiet" data-mark="1" aria-pressed="false">I got it</button><button type="button" class="btn quiet" data-mark="0" aria-pressed="false">I missed it</button></div>';
+          return;
+        }
+        var chosen = li.querySelector('input:checked');
+        var correctIdx = q.type === 'mc' ? q.answer : (q.answer ? 0 : 1);
+        var chosenIdx = chosen ? +chosen.parentElement.getAttribute('data-j') : -1;
+        var ok = chosenIdx === correctIdx;
+        marks[i] = ok;
+        li.classList.add(ok ? 'right' : 'wrong');
+        li.querySelectorAll('.opt').forEach(function(o){
+          var j = +o.getAttribute('data-j');
+          if (j === correctIdx) o.classList.add('correct');
+          else if (j === chosenIdx) o.classList.add('chosen-wrong');
+        });
+        res.innerHTML = '<p class="verdict ' + (ok ? 'right">Correct' : 'wrong">' + (chosen ? 'Incorrect' : 'Not answered')) + '</p>' +
+          (q.explain ? '<div class="explain"><span class="k">Why</span>' + esc(q.explain) + '</div>' : '');
+      });
+      area.querySelector('.qlist').addEventListener('click', function(e){
+        var b = e.target.closest('[data-mark]'); if (!b) return;
+        var li = b.closest('.q'), i = +li.id.slice(1), ok = b.getAttribute('data-mark') === '1';
+        marks[i] = ok;
+        li.classList.remove('right', 'wrong'); li.classList.add(ok ? 'right' : 'wrong');
+        li.querySelectorAll('[data-mark]').forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+        updateScore();
+      });
+      document.getElementById('examFoot').hidden = false;
+      updateScore();
+      document.getElementById('scorebar').scrollIntoView();
+    }
+    function updateScore(){
+      var right = 0, marked = 0;
+      qs.forEach(function(q, i){ if (i in marks) { marked++; if (marks[i]) right++; } });
+      var pending = qs.length - marked;
+      var pct = marked ? Math.round(100 * right / marked) : 0;
+      var bar = document.getElementById('scorebar');
+      bar.innerHTML = '<span class="big">' + right + ' / ' + marked + '</span><span>' + pct + '% correct</span>' +
+        (pending ? '<span class="hint">' + pending + ' short answer' + (pending === 1 ? '' : 's') + ' left to self-mark</span>' : '') +
+        '<span style="flex:1"></span><button class="btn" type="button" id="topRetry">Retake missed</button>';
+      document.getElementById('topRetry').addEventListener('click', retry);
+      document.getElementById('retryBtn').disabled = !qs.some(function(q, i){ return marks[i] === false; });
+      document.getElementById('topRetry').disabled = document.getElementById('retryBtn').disabled;
+    }
+    function retry(){
+      var missed = qs.filter(function(q, i){ return marks[i] === false; });
+      if (missed.length) runExam(c, shuffle(missed.slice()), 'Retake of missed questions');
+    }
+    document.getElementById('retryBtn').addEventListener('click', retry);
+    document.getElementById('againBtn').addEventListener('click', function(){ area.innerHTML = ''; document.getElementById('setup').scrollIntoView(); });
+  }
+
+  route();
+})();
+</script>

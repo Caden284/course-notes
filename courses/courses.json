@@ -1,0 +1,26 @@
+[
+  {
+    "id": "itec4235",
+    "code": "ITEC 4235",
+    "title": "Computer Security",
+    "term": "Fall 2026",
+    "status": "In progress",
+    "instructor": "Dr. Peng Wang",
+    "headline": "Computer Security, taught from the slides up",
+    "lead": "Each lecture deck is rewritten as a textbook chapter: every bullet expanded, every diagram described, every formula worked through. New lectures get added as the semester moves.",
+    "unitWord": "Lecture",
+    "examExclude": ["how", "formulas"]
+  },
+  {
+    "id": "csc4320",
+    "code": "CSC 4320",
+    "title": "Operating Systems",
+    "term": "Summer 2026",
+    "status": "Completed",
+    "instructor": "",
+    "headline": "Operating Systems, lectures 1 through 11",
+    "lead": "Complete exam study notes: every slide expanded into full explanation, with definitions, worked examples, misconceptions, and exam traps marked throughout. Chapters 4–7 carried the midterm; chapters 10–11 were the focus of the cumulative final.",
+    "unitWord": "Chapter",
+    "examExclude": ["how"]
+  }
+]
