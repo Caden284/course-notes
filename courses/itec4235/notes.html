@@ -10,6 +10,8 @@
       <ol><li><a href="#l03a-sym">Symmetric encryption and attacks</a></li><li><a href="#l03a-entropy">Redundancy and unicity distance</a></li><li><a href="#l03a-block">Block ciphers: DES, 3DES, AES</a></li><li><a href="#l03a-modes">Modes: ECB and CBC</a></li><li><a href="#l03a-stream">Stream ciphers</a></li><li><a href="#l03a-math">Number theory for RSA</a></li><li><a href="#l03a-rsa">RSA</a></li><li><a href="#l03a-hash">Cryptographic hash functions</a></li><li><a href="#l03a-mac">MACs, HMAC, secure channels</a></li><li><a href="#l03a-chains">Hash chains and Merkle trees</a></li><li><a href="#l03a-appendix">Appendix algorithms</a></li><li><a href="#l03a-gloss">Glossary</a></li></ol></li>
     <li><a href="#l04a"><span class="code">L04a</span>Operating system security</a>
       <ol><li><a href="#l04a-principles">Design principles</a></li><li><a href="#l04a-unix">UNIX security model</a></li><li><a href="#l04a-perms">File permissions</a></li><li><a href="#l04a-proc">Processes and user IDs</a></li><li><a href="#l04a-setuid">setuid, sudo, capabilities</a></li><li><a href="#l04a-win">Windows security model</a></li><li><a href="#l04a-sandbox">Sandboxing and Chrome</a></li><li><a href="#l04a-gloss">Glossary</a></li></ol></li>
+    <li><a href="#l04b"><span class="code">L04b</span>OS security 2: Windows</a>
+      <ol><li><a href="#l04b-warmup">Warm-up: setuid review</a></li><li><a href="#l04b-recap">Carried over from L04a</a></li><li><a href="#l04b-arch">Windows architecture</a></li><li><a href="#l04b-models">DAC, MAC, and RBAC</a></li><li><a href="#l04b-sids">SIDs and the access token</a></li><li><a href="#l04b-ad">Active Directory and Kerberos</a></li><li><a href="#l04b-lp">Least privilege, groups, UAC</a></li><li><a href="#l04b-perms">Permissions and access decisions</a></li><li><a href="#l04b-audit">Auditing, tools, AGULP</a></li><li><a href="#l04b-chrome">Chrome sandbox revisited</a></li><li><a href="#l04b-gloss">Glossary</a></li></ol></li>
     <li><a href="#formulas">Formula sheet</a></li>
   </ol></template>
 <template data-part="main">
@@ -2547,6 +2549,562 @@ setuid(0);           # allowed: 0 equals RUID/SUID → back to root</code></pre>
       <li>Contrast capabilities (tickets) with ACLs.</li>
       <li>Describe the macOS and Android sandboxes.</li>
       <li>Describe Chrome's process model, site isolation, broker, and the four Windows sandbox layers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== L04b ===================== -->
+<section class="lecture prose" id="l04b">
+  <div class="plate"><span class="num" aria-hidden="true">L04b</span><p class="ttl">Operating system security, part 2: Windows</p><p class="src">Source: L04b-os_sec2.pdf (Windows figures and tables from Jones &amp; Bartlett Learning, 2025)</p></div>
+
+  <p>L04a built the general toolkit (least privilege, UNIX permissions, setuid) and sketched Windows in one section. This deck goes all the way into Windows: how the OS is layered, the three classic access control models, how a logon turns into a security access token, how Active Directory shares identities across machines, how Windows decides allow or deny on an object, and how you audit it all. It closes by revisiting Chrome's sandbox, which is built from exactly these Windows pieces.</p>
+
+  <h3 id="l04b-warmup">Warm-up: setuid review</h3>
+  <h4>Big picture</h4>
+  <p>The deck opens with two review questions on L04a's setuid material. Expect this style on quizzes: one command-recognition MCQ and one "explain with a scenario" short answer.</p>
+  <div class="box exam"><span class="lbl">Exam practice from the opening slide</span>
+    <details><summary>Which command correctly sets the setuid bit on a binary named admin_tool? A) chmod 755 admin_tool B) chmod u+s admin_tool C) chown root:root admin_tool D) setuid admin_tool 4755</summary><div>
+      <p><strong>B) <code>chmod u+s admin_tool</code>.</strong> <code>u+s</code> adds the "s" (set user ID) bit to the owner's execute position.</p>
+      <p>Why the others are wrong: A sets ordinary rwxr-xr-x bits with no special bit. C changes the owner and group but no mode bits. D is not a real command; <code>setuid</code> is a system call, not a shell utility. The octal version would be <code>chmod 4755 admin_tool</code> (the leading 4 is setuid, from L04a's octal notation), so D mixes up the command name and argument order.</p>
+    </div></details>
+    <details><summary>What is the purpose of the setuid() system call in a program? Give an example scenario.</summary><div>
+      <p>A running process calls <code>setuid(uid)</code> to change its user IDs. As root it sets EUID, RUID, and SUID all at once, so it is the standard way to <strong>permanently drop privilege</strong> after finishing the one task that needed root.</p>
+      <p>Scenario: Apache must start as root to bind port 80 (ports below 1024 are privileged). Right after opening the socket, the worker calls <code>setuid(getuid("www-data"))</code>. From then on a bug in the web server only gives an attacker www-data's rights, not root's. See <a href="#l04a-proc">L04a: UNIX processes and user IDs</a>. Don't confuse it with the setuid <em>bit</em>, which <em>raises</em> privilege.</p>
+    </div></details>
+  </div>
+
+  <h3 id="l04b-recap">Carried over from L04a: inevitable bugs and defense in depth</h3>
+  <p>Slides 3–5 repeat L04a's opening: any single buffer overflow, use-after-free, or null pointer dereference can let an attacker run code; we are getting better at finding bugs, but there will <em>always</em> be bugs (the slide underlines "always"). The example is again the sudo heap overflow CVE-2021-3156, found by Qualys in January 2021, present since 2011, affecting Linux, macOS, and BSD. The takeaway slide: systems <strong>must</strong> be designed to be resilient against both software vulnerabilities and malicious users, which means defense in depth (Chrome, then the OS, then hardware, then the network each stopping a JavaScript-engine exploit at its layer).</p>
+  <p>The full treatment, including the second CVE and the layer diagram, is in <a href="#l04a-principles">L04a: design principles</a>. Everything below is how Windows implements those principles.</p>
+
+  <h3 id="l04b-arch">Windows architecture and run modes</h3>
+  <h4>Big picture</h4>
+  <p>Before you can reason about Windows security you need a map of what runs where. The key split is the same one from CSC 4320's dual-mode operation: code in kernel mode can touch everything, code in user mode has to ask.</p>
+
+  <h4>Explanation</h4>
+  <p>According to the slides, current versions of Windows:</p>
+  <ul>
+    <li>Address a wide range of needs, from portable devices and workstations to enterprise-class, high-performance platforms.</li>
+    <li>Are based on the legacy <strong>Windows NT</strong> code base.</li>
+    <li>Are <strong>modular</strong>, to provide the widest variety of services for most platform requirements.</li>
+    <li>Use <strong>modified microkernel architectures</strong>.</li>
+    <li>Allow many system functions to be implemented as external programs that run in kernel mode.</li>
+  </ul>
+  <div class="box bg"><span class="lbl">Background: why "modified" microkernel</span>
+    <p>A pure microkernel (like Mach, from CSC 4320 Chapter 2) pushes almost everything into user space and talks by message passing. Windows keeps a small microkernel core but runs the executive, drivers, and the HAL in kernel mode too, for speed. That is why it is often called a <em>hybrid</em> kernel. The security consequence: more code runs with full privilege, so a buggy kernel-mode driver can compromise the whole machine.</p>
+  </div>
+
+  <h4>Diagram explained: basic architecture of a Windows operating system</h4>
+  <figure class="fig">
+<pre class="mermaid">
+flowchart TD
+  subgraph UM [User mode]
+    IS[Integral subsystem]
+    ES[Environment subsystem]
+  end
+  subgraph KM [Kernel mode]
+    EX[Executive]
+    KD[Kernel mode drivers]
+    MK[Microkernel]
+    HAL["Hardware abstraction layer (HAL)"]
+  end
+  HW[Hardware]
+  IS <--> EX
+  ES <--> EX
+  EX <--> KD
+  EX <--> MK
+  KD <--> HAL
+  MK <--> HAL
+  HAL <--> HW
+</pre>
+    <figcaption>Redrawn from the slide: user-mode subsystems talk only to the executive; everything reaches hardware through the HAL.</figcaption>
+  </figure>
+  <p>Read it top to bottom. A box labeled <strong>User mode</strong> holds the <strong>integral subsystem</strong> and the <strong>environment subsystem</strong>. Double arrows cross the user/kernel boundary into the <strong>Executive</strong>, the only kernel component user mode talks to. Below the executive sit <strong>kernel mode drivers</strong> and the <strong>microkernel</strong>, and both connect down to the <strong>hardware abstraction layer (HAL)</strong>, which is the only thing that touches the <strong>Hardware</strong> box outside the diagram. What to notice: there is exactly one door from user mode (the executive) and exactly one door to hardware (the HAL).</p>
+
+  <h4>Kernel mode components</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Component</th><th>What it does</th><th>Why it exists</th></tr></thead>
+    <tbody>
+      <tr><td>Hardware Abstraction Layer (HAL)</td><td>Provides the actual access to physical hardware. All other kernel-mode programs reach hardware through it.</td><td>Microsoft supports a new hardware platform by writing a new HAL module instead of rewriting the whole OS.</td></tr>
+      <tr><td>Kernel mode drivers</td><td>Give user programs and other kernel programs access to individual devices, through the HAL, and translate devices into <em>file objects</em>.</td><td>Programs can treat a device like a file (the abstraction idea from CSC 4320).</td></tr>
+      <tr><td>Microkernel</td><td>The memory-resident core: CPU synchronization, process/thread and interrupt scheduling, and exception handling.</td><td>The minimum that must always be in memory and always privileged.</td></tr>
+      <tr><td>Executive</td><td>The "highest level" of kernel-mode programs: manages objects, I/O, security, and processes.</td><td>User-mode programs interact with the OS <em>only</em> through the executive.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Run modes</h4>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Kernel (supervisor) mode</th><th>User mode</th></tr></thead>
+    <tbody>
+      <tr><td>Runs</td><td>HAL, drivers, microkernel, executive</td><td>Application programs and the Windows user-mode layer</td></tr>
+      <tr><td>Access</td><td>Complete access to hardware and system services</td><td>Must request services through the executive</td></tr>
+      <tr><td>Security meaning</td><td>An attractive target: compromising it means owning the machine</td><td>A compromise is contained to what that user's token allows</td></tr>
+    </tbody>
+  </table></div>
+  <p>The Windows <strong>user-mode layer</strong> handles user interaction and processing requests and passes I/O requests to the right kernel-mode drivers via the executive. It has two components:</p>
+  <ul>
+    <li><strong>Environment subsystem:</strong> lets Windows run programs written for other operating systems, including earlier Windows versions and Linux (today's Windows Subsystem for Linux is the modern descendant).</li>
+    <li><strong>Integral subsystem:</strong> handles user-mode functions on behalf of the environment subsystem, including <strong>logon and access control</strong>, network access, and network services. This is where the security work in the rest of the lecture starts.</li>
+  </ul>
+  <p><strong>Screenshots explained.</strong> Two slides titled "Windows operating system components" show familiar tools rather than new concepts. <em>Task Manager</em> lists one app (Task Manager itself) and 22 background processes (AggregatorHost, COM Surrogate, Runtime Broker, Search, Spooler SubSystem App, OneDrive, and others) with CPU, memory, disk, and network columns: these are user-mode processes. <em>Computer Management</em> is open to <em>System Tools → Local Users and Groups → Groups</em>, listing built-in groups such as Access Control Assistance Operators, Administrators, Backup Operators, Cryptographic Operators, Event Log Readers, Guests, Hyper-V Administrators, IIS_IUSRS, Remote Desktop Users, and Users. That second screen is where local accounts and groups are managed (see below).</p>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Which component would Microsoft rewrite to port Windows to a new hardware platform, and why not the rest?</summary><div><p>The HAL. Every other kernel-mode program reaches hardware only through the HAL, so a new HAL module hides the hardware differences from everything above it.</p></div></details>
+    <details><summary>A user-mode program wants to read a file. Which kernel component does it talk to?</summary><div><p>The executive. User mode never calls drivers, the microkernel, or the HAL directly; the executive passes the I/O request to the correct kernel-mode driver.</p></div></details>
+  </div>
+
+  <h3 id="l04b-models">Access control models: DAC, MAC, and RBAC</h3>
+  <h4>Big picture</h4>
+  <p>Every OS has to answer "who decides who gets access?" There are three classic answers: the owner decides (DAC), a central policy of labels decides (MAC), or your job role decides (RBAC).</p>
+  <h4>Definitions</h4>
+  <div class="box def"><span class="lbl">Definition: discretionary access control (DAC)</span>
+    <dl>
+      <dt>Plain English</dt><dd>Whoever owns a file decides who else can use it.</dd>
+      <dt>Technical</dt><dd>Access control defined primarily at the user (subject) level. Each object has a defined owner, and the owner has complete control over which users can access it; access is granted based on the user's settings.</dd>
+      <dt>Why it matters</dt><dd>It is how UNIX permissions and Windows DACLs work. It is flexible, but one careless owner can expose data.</dd>
+    </dl>
+  </div>
+  <div class="box def"><span class="lbl">Definition: mandatory access control (MAC)</span>
+    <dl>
+      <dt>Plain English</dt><dd>The system, not the owner, decides, by comparing your clearance to the data's classification label.</dd>
+      <dt>Technical</dt><dd>Data objects are labeled with a classification (e.g., Unclassified, Restricted, Confidential, Secret, Top Secret) and subjects are granted a clearance. A subject must hold a clearance at or above the object's classification, and in most environments must also show a specific need to know.</dd>
+      <dt>Why it matters</dt><dd>Used in military and government settings where owners must not be able to share data at will.</dd>
+    </dl>
+  </div>
+  <div class="box def"><span class="lbl">Definition: role-based access control (RBAC)</span>
+    <dl>
+      <dt>Plain English</dt><dd>Permissions belong to jobs; people get permissions by being given jobs.</dd>
+      <dt>Technical</dt><dd>Extends (generalizes) DAC. Object access is defined by role rather than by individual user; each user is assigned one or more roles, and those roles define which objects the user can access.</dd>
+      <dt>Why it matters</dt><dd>Most operating systems, Windows included, combine DAC and RBAC, implemented with user-based and group-based permissions.</dd>
+    </dl>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>DAC</th><th>MAC</th><th>RBAC</th></tr></thead>
+    <tbody>
+      <tr><td>Who decides</td><td>The object's owner</td><td>Central policy (labels and clearances)</td><td>Administrators, by defining roles</td></tr>
+      <tr><td>Decision based on</td><td>User identity and owner's settings</td><td>Clearance ≥ classification, plus need to know</td><td>Roles assigned to the user</td></tr>
+      <tr><td>Typical setting</td><td>General-purpose OSes</td><td>Military, government</td><td>Organizations; combined with DAC in Windows</td></tr>
+      <tr><td>Example</td><td>You share a document with a classmate</td><td>A Secret-cleared analyst cannot open a Top Secret file</td><td>Everyone in "TAs" can edit the gradebook</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked examples: which model? <span class="lvl">easy → medium</span></span>
+    <p><strong>1.</strong> A Google Drive owner clicks Share and adds a friend. <strong>DAC</strong>: the owner's discretion.</p>
+    <p><strong>2.</strong> An officer with Secret clearance and a need to know opens a Confidential report. <strong>MAC</strong>, allowed because Secret ≥ Confidential.</p>
+    <p><strong>3.</strong> The same officer tries to open a Top Secret report about their own project. <strong>MAC, denied</strong>: need to know is not enough if clearance is below the classification.</p>
+    <p><strong>4.</strong> A new hire is added to the "Payroll" group and can suddenly open payroll files. <strong>RBAC</strong>, implemented with a group.</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception: two different "DACs"</span>
+    <p>This deck uses the acronym DAC for two unrelated things: <strong>Discretionary</strong> Access Control (the model above) and Windows Server's <strong>Dynamic</strong> Access Control (a feature set covered below). Read the full name in a question before answering.</p>
+  </div>
+
+  <h3 id="l04b-sids">Identity: SIDs and the security access token</h3>
+  <h4>Big picture</h4>
+  <p>Windows never makes access decisions based on your username. It uses numbers (SIDs), bundled into a token that rides along with every process you start.</p>
+  <p>Each local system defines local users and groups during installation, and you can add more with <strong>Computer Management → Local Users and Groups</strong>.</p>
+  <div class="box def"><span class="lbl">Definition: security identifier (SID)</span>
+    <dl>
+      <dt>Plain English</dt><dd>A permanent ID number for a user or group.</dd>
+      <dt>Technical</dt><dd>A unique value identifying a security subject or group of subjects. The SID stays the same even if the user or group is renamed.</dd>
+      <dt>Why it matters</dt><dd>Because ACLs store SIDs, renaming "jsmith" to "jsmith2" keeps every permission intact, while deleting and recreating an account with the same name creates a new SID and loses them all. It is the Windows equivalent of the UNIX UID.</dd>
+    </dl>
+  </div>
+  <h4>Well-known SIDs</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Well-known SID</th><th>String value</th><th>Identifies</th></tr></thead>
+    <tbody>
+      <tr><td>Null SID</td><td><code>S-1-0-0</code></td><td>A group with no members, often used when a SID is not known</td></tr>
+      <tr><td>World</td><td><code>S-1-1-0</code></td><td>A group that includes all users ("Everyone")</td></tr>
+      <tr><td>Local</td><td><code>S-1-2-0</code></td><td>Users who log on at local terminals</td></tr>
+      <tr><td>Creator Owner ID</td><td><code>S-1-3-0</code></td><td>Placeholder replaced by the SID of the user who creates a new object</td></tr>
+      <tr><td>Creator Group ID</td><td><code>S-1-3-1</code></td><td>Placeholder replaced by the primary group SID of the user who creates a new object</td></tr>
+    </tbody>
+  </table></div>
+  <p>Memory hook: the second number counts up, 0 = nobody, 1 = world, 2 = local, 3 = creator (owner is .0, group is .1). The null SID <code>S-1-0-0</code> returns at the end of the lecture: it is the identity Chrome gives its sandboxed renderer.</p>
+
+  <div class="box def"><span class="lbl">Definition: security access token (SAT)</span>
+    <dl>
+      <dt>Plain English</dt><dd>Your ID badge, printed at logon and clipped to every program you run.</dd>
+      <dt>Technical</dt><dd>An object holding the user's SID, the SIDs of every group the user belongs to, the user's list of privileges (local rights), and other access information. A session's SAT is attached to all of that user's processes.</dd>
+      <dt>Why it matters</dt><dd>When a process touches an object, Windows compares the SIDs in the process's SAT with the object's DACL. L04a called this the <a href="#l04a-win">access token</a>.</dd>
+    </dl>
+  </div>
+  <p><strong>Diagram explained: Windows SAT.</strong> A tall box labeled "User's security access token (SAT)" contains four stacked gray blocks, top to bottom: <em>User SID</em>, <em>Group SIDs</em>, <em>List of privileges</em>, and <em>Other access information</em>. What to notice: identity (the SIDs) and rights (the privileges) travel together in one object.</p>
+
+  <div class="box proc"><span class="lbl">Process: how Windows validates a user and builds the SAT</span>
+    <ol>
+      <li><strong>Identify and authenticate.</strong> Windows prompts for identification and authentication credentials (username and password, PIN, and so on).</li>
+      <li><strong>Check.</strong> Windows looks up the defined user and its stored authentication information. If what was supplied matches, the user is authenticated.</li>
+      <li><strong>Build the token.</strong> The OS records the user's SID, the SID of each group the user is in, and the user's privileges (it also looks up local rights for this computer) in a token.</li>
+      <li><strong>Attach.</strong> The SAT, with all the user and group SIDs, is attached to each process the user runs.</li>
+    </ol>
+    <p><strong>Why it exists:</strong> access checks later are fast, because everything needed is already in the token; Windows doesn't re-query the account database on every file open.</p>
+    <p><strong>Common exam question:</strong> put the steps in order, or map them to identification → authentication → authorization (authorization happens later, when the token is compared against an object's DACL).</p>
+    <p><strong>Common misconception:</strong> that adding a user to a group takes effect immediately in running programs. The group list was copied into the token at logon, so the user usually has to log off and on again.</p>
+  </div>
+
+  <h3 id="l04b-ad">Workgroups, Active Directory, and Kerberos</h3>
+  <h4>Big picture</h4>
+  <p>Computing is spread across many machines that still need to share users and resources. Windows offers two ways to organize that: peer-to-peer workgroups, or a central directory.</p>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Workgroup</th><th>Active Directory (domain)</th></tr></thead>
+    <tbody>
+      <tr><td>Structure</td><td>Peer-to-peer network of Windows computers sharing resources; decentralized</td><td>True hierarchical directory (tree model) using LDAP and the X.500 structure</td></tr>
+      <tr><td>Where users and groups live</td><td>Defined separately on <em>each</em> computer</td><td>Defined once at a central location and shared among computers</td></tr>
+      <tr><td>Changing a permission</td><td>Must be applied to every computer</td><td>Done centrally; shared within one or more domains</td></tr>
+      <tr><td>Cost</td><td>Easy and cheap to set up</td><td>Needs more administration time and resources up front</td></tr>
+      <tr><td>Scale</td><td>Unmanageable past about half a dozen computers; highly discouraged</td><td>Reduces redundant administrative effort at any size</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box def"><span class="lbl">Definition: domain</span>
+    <dl>
+      <dt>Plain English</dt><dd>A named set of computers that share one user database.</dd>
+      <dt>Technical</dt><dd>A group of computers grouped together for some purpose; Active Directory uses domains to limit how many computers share a given set of users and groups, and defines identity and authorization permissions that can be shared within one or more domains.</dd>
+      <dt>Why it matters</dt><dd>A domain controller becomes the trusted authority for logons, which is why it is a top target for attackers.</dd>
+    </dl>
+  </div>
+  <div class="box bg"><span class="lbl">Background: LDAP and X.500</span>
+    <p><strong>X.500</strong> is an ITU directory standard that names entries in a tree (country → organization → unit → person). <strong>LDAP</strong> (Lightweight Directory Access Protocol) is the simpler protocol for querying and updating such a tree over TCP/IP. Active Directory names look like <code>CN=Alice,OU=CS,DC=gsu,DC=edu</code>, which is X.500-style naming accessed over LDAP. ITU also defined X.509 certificates, from L01a's standards table.</p>
+  </div>
+
+  <h4>Sharing SIDs and SATs across the network</h4>
+  <ul>
+    <li>The SAT for each process is built from the user's SID and group SIDs; Active Directory stores the shared information needed to construct it.</li>
+    <li>When a user logs on, the domain controller sends security information to the computer where the user logs on. Windows extends authentication to the <em>computer</em> level when constructing SATs.</li>
+    <li><strong>Complete SATs are never shared across a network</strong>, only the parts needed to construct one.</li>
+  </ul>
+  <p><strong>Diagram explained: distributed SAT.</strong> Three boxes form an equation. The first, <em>Domain controller</em>, contains <em>Domain user SID</em> and <em>Domain group SIDs</em>. A plus sign leads to <em>Computer where resource resides</em>, containing <em>Local group SIDs</em>. An equals sign leads to <em>Complete SAT</em>, containing all three: domain user SID, domain group SIDs, local group SIDs. What to notice: the domain contributes who you are everywhere; the local machine adds groups that only mean something on that machine; the full token is assembled at the destination rather than sent whole.</p>
+
+  <h4>Managed service accounts</h4>
+  <p>Services (databases, web servers) need accounts too, and their passwords traditionally never got changed. <strong>Managed service accounts</strong> (Windows Server 2012 and newer) are managed domain accounts that can be shared across systems; domain controllers change their passwords automatically at the domain level. That removes a classic weakness: stale, shared, never-rotated service passwords.</p>
+
+  <h4>Kerberos</h4>
+  <div class="box def"><span class="lbl">Definition: Kerberos</span>
+    <dl>
+      <dt>Plain English</dt><dd>A ticket system: prove who you are once to a trusted office, then show tickets to each service instead of your password.</dd>
+      <dt>Technical</dt><dd>The default authentication protocol in Windows domains. Each domain controller acts as a Kerberos <strong>key distribution center (KDC)</strong>, which functions first as an <strong>authentication service (AS)</strong> and then as a <strong>ticket-granting service (TGS)</strong>.</dd>
+      <dt>Why it matters</dt><dd>Your password is never sent to every server you use, and servers trust tickets issued by the KDC instead of keeping their own password lists.</dd>
+    </dl>
+  </div>
+  <figure class="fig">
+<pre class="mermaid">
+sequenceDiagram
+  participant C as Client
+  participant K as KDC (domain controller)
+  participant S as Server with object
+  C->>K: Request
+  K-->>C: Access ticket
+  C->>S: Access ticket
+</pre>
+    <figcaption>Redrawn from the slide: the client gets a ticket from the KDC and presents it to the server that holds the object.</figcaption>
+  </figure>
+  <div class="box bg"><span class="lbl">Background: the two steps inside "Request"</span>
+    <p>The slide compresses Kerberos to one request and one ticket. Underneath, the <strong>AS</strong> step happens once at logon: the client proves its identity and receives a <strong>ticket-granting ticket (TGT)</strong>. Then, for each service, the client shows the TGT to the <strong>TGS</strong> and receives a <strong>service ticket</strong> for that server. Tickets are encrypted with keys the KDC shares with each party and expire after a few hours, which limits replay. That is the "first AS, then TGS" order on the slide.</p>
+  </div>
+
+  <h3 id="l04b-lp">Least privilege, groups, rights, and UAC</h3>
+  <h4>Big picture</h4>
+  <p>Windows applies L04a's least-privilege principle at the <em>account</em> level, and uses groups (roles) to hand out exactly the access each job needs.</p>
+  <ul>
+    <li>Microsoft calls accounts built on this principle <strong>least privilege user accounts (LUAs)</strong>.</li>
+    <li>The recommended way to implement it: create user groups that represent roles in the organization (RBAC via groups).</li>
+  </ul>
+  <h4>Sample default Active Directory security groups</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Group</th><th>Description</th><th>Least-privilege note</th></tr></thead>
+    <tbody>
+      <tr><td>Account operators</td><td>Create and modify most types of accounts; can log in locally to domain controllers</td><td>Powerful; keep membership small</td></tr>
+      <tr><td>Administrators</td><td>Unrestricted access to the computer, or to the entire domain if the computer is a domain controller</td><td>The opposite of least privilege; use only for admin tasks</td></tr>
+      <tr><td>IIS_IUSRS</td><td>Built-in group used by Internet Information Services since version 7.0; the IUSR account belongs to it and provides consistency for web users</td><td>A service identity, like UNIX's www-data</td></tr>
+      <tr><td>Users</td><td>Run applications, access local resources, shut down or lock the computer, install per-user applications</td><td>The default for normal work</td></tr>
+      <tr><td>Guests</td><td>One-time users with the basic privileges of a regular user; the entire profile is deleted at logout</td><td>Nothing persists</td></tr>
+      <tr><td>Backup operators</td><td>Back up and restore all files on a computer, regardless of the files' permissions</td><td>Bypasses DACLs by design, so a stolen account reads everything</td></tr>
+      <tr><td>Remote desktop users</td><td>Establish remote connections to a Remote Desktop Session Host server</td><td>Grants remote login, a big attack surface</td></tr>
+    </tbody>
+  </table></div>
+  <p>(Groups as listed for Windows Server 2016, 2019, and 2022.)</p>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>"Backup operators just copy files, so it's a low-risk group." Its whole purpose is to read and restore every file regardless of permissions. Anyone in it can read payroll, password databases, and private mail. Treat it almost like Administrators.</p>
+  </div>
+
+  <h4>Rights vs. permissions, ACLs, ACEs, and DACLs</h4>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>User rights</th><th>Permissions</th></tr></thead>
+    <tbody>
+      <tr><td>Apply to</td><td>What a user can do on the <em>system</em> (log on locally, shut down, back up files)</td><td>A <em>specific object</em> (this file, that printer)</td></tr>
+      <tr><td>Maintained through</td><td>Group security policy objects</td><td>Each object's own security settings</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>Each group can apply rights and permissions to a set of users at once.</li>
+    <li>The list of access permissions on an object is its <strong>access control list (ACL)</strong>.</li>
+    <li>ACLs in Active Directory are lists of <strong>access control entries (ACEs)</strong>.</li>
+    <li>Windows ACLs implement discretionary access control, so the list is a <strong>discretionary access control list (DACL)</strong>, and each entry in it is an ACE.</li>
+  </ul>
+  <p>Hierarchy to memorize: <strong>object → security descriptor → DACL → ACEs</strong>, where each ACE says allow or deny a permission to one SID. (L04a adds the other half of the descriptor: the SACL for auditing.)</p>
+
+  <h4>User Account Control (UAC)</h4>
+  <div class="box def"><span class="lbl">Definition: User Account Control (UAC)</span>
+    <dl>
+      <dt>Plain English</dt><dd>Even admins run as normal users until they click "Yes" to do something powerful.</dd>
+      <dt>Technical</dt><dd>Members of the Administrators group get a <strong>split SAT</strong>: one part with full privileges and one limited like a normal user's. Processes start with the limited SAT. If a process needs a privilege allowed for administrators and the process also holds an administrator SAT, Windows prompts the user for escalation confirmation.</dd>
+      <dt>Why it matters</dt><dd>Malware launched by an admin (a malicious email attachment, say) starts with only the limited token, and a visible prompt is needed before it gets full rights. It is least privilege for administrators.</dd>
+    </dl>
+  </div>
+  <p><strong>Screenshots explained.</strong> The <em>privilege escalation request</em> dialog asks "Do you want to allow this app to make changes to your device?" for <em>UserAccountControlSettings</em>, showing <em>Verified publisher: Microsoft Windows</em> and the program location <code>C:\Windows\system32\UserAccountControlSettings.exe</code>, with Yes and No buttons. Check the publisher line: an unknown publisher on a prompt you didn't expect is a red flag. The <em>UAC settings</em> window has a four-position slider from <em>Always notify</em> (top) to <em>Never notify</em> (bottom). At the top, you are notified when apps try to install software or change the computer <em>and</em> when you change Windows settings yourself, which the dialog recommends if you routinely install new software and visit unfamiliar websites. Sliding to Never notify turns off the safety prompt entirely.</p>
+  <div class="box ex"><span class="lbl">Worked example: UAC and sudo <span class="lvl">medium</span></span>
+    <p>Compare to L04a's <code>sudo</code>. On Linux an admin account runs normally unprivileged and types <code>sudo</code> (plus a password) to run one command as root. On Windows an administrator's processes run with the limited half of the split SAT and a UAC prompt switches to the full half for that one program. Same idea: <strong>privilege on request, not by default</strong>. Difference: UAC for an admin is usually just a Yes click (a consent prompt), while a standard user gets a credential prompt asking for an admin's password.</p>
+  </div>
+
+  <h4>Dynamic Access Control (Windows Server 2016, 2019, 2022)</h4>
+  <p><strong>Dynamic Access Control</strong> is a collection of features that describe user and data <em>attributes</em>, which Windows uses in policies for finer control over who can access data. Its four features:</p>
+  <ul>
+    <li><strong>Identify and classify data:</strong> tag data manually or automatically to tell Windows how to secure it. Automatic tagging can look for special data such as Social Security numbers.</li>
+    <li><strong>Control file access:</strong> central access policies set global, organization-wide rules on who can access each type of data.</li>
+    <li><strong>Audit file access:</strong> central audit policies let auditors and forensic investigators find out who accessed sensitive information.</li>
+    <li><strong>Apply encryption to sensitive documents:</strong> Automatic Rights Management Services (RMS) encrypts files containing tagged sensitive data with no user interaction.</li>
+  </ul>
+  <p>Memory hook: <strong>Classify, Control, Audit, Encrypt</strong>. It moves Windows from "who is on this file's list" toward "what kind of data is this and what attributes does the user have," which looks more like MAC's labels.</p>
+
+  <h3 id="l04b-perms">Securable objects, permissions, and the access decision</h3>
+  <h4>Big picture</h4>
+  <p>Anything Windows can protect has a DACL. This section covers what the permissions are, how to see them, and the exact rule Windows uses to turn several ACEs into one allow-or-deny answer.</p>
+  <p>Every resource whose access can be controlled is a <strong>securable object</strong>. Common ones: NTFS files and folders; named and unnamed pipes; processes and threads; registry keys; Windows services; local and remote printers; network shares; and job objects (the same job objects Chrome uses to fence in renderers). A securable object needs a DACL for Windows to control access, and the DACL (a collection of ACEs) can be edited in the object's <em>Properties → Security</em> page.</p>
+
+  <p><strong>Screenshot explained: Windows object DACL.</strong> The <em>test Properties</em> dialog, Security tab, for <code>C:\Users\rshimonski\Desktop\Bookwork\test.txt</code>. The <em>Group or user names</em> list shows SYSTEM, rshimonski, and Administrators. With SYSTEM selected, the <em>Permissions for SYSTEM</em> grid has Allow checks for Full control, Modify, Read &amp; execute, Read, and Write, and nothing under Deny. Each row of names plus its Allow/Deny column is an ACE. The <em>Advanced</em> button opens the special permissions.</p>
+
+  <h4>Basic permissions</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Permission</th><th>Description (from the slide)</th></tr></thead>
+    <tbody>
+      <tr><td>Full Control</td><td>No restrictions on access to the object</td></tr>
+      <tr><td>Modify</td><td>All modifications to files and folders; cannot delete files or folders, change permissions, or take ownership</td></tr>
+      <tr><td>Read and Execute</td><td>Traverse folders; execute files; list folders; read data, basic and extended attributes, and permissions</td></tr>
+      <tr><td>Read</td><td>List folders; read data, basic and extended attributes, and permissions</td></tr>
+      <tr><td>Write</td><td>Create files and folders; write data and basic and extended attributes; read permissions</td></tr>
+      <tr><td>Special Permissions</td><td>The ACE for this user or group is defined on the Advanced page</td></tr>
+    </tbody>
+  </table></div>
+  <p>The difference between Read and Read and Execute is exactly traverse/execute. The difference between Modify and Full Control is permission changes and ownership. On the slide, Modify also excludes deletion; see the note below.</p>
+
+  <h4>Special (advanced) permissions</h4>
+  <p>Each basic permission is really a bundle of these finer ones. Several have two names because the same bit means one thing on a folder and another on a file.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Special permission</th><th>On a folder</th><th>On a file (nonfolder)</th></tr></thead>
+    <tbody>
+      <tr><td>Traverse Folder / Execute File</td><td>Navigate through the folder</td><td>Run the file</td></tr>
+      <tr><td>List Folder / Read Data</td><td>List contents</td><td>Read data</td></tr>
+      <tr><td>Create Files / Write Data</td><td>Create files in it</td><td>Write data</td></tr>
+      <tr><td>Create Folders / Append Data</td><td>Create subfolders</td><td>Append to existing data</td></tr>
+      <tr><td>Read Attributes / Read Extended Attributes</td><td colspan="2">Read basic / extended object attributes</td></tr>
+      <tr><td>Write Attributes / Write Extended Attributes</td><td colspan="2">Write basic / extended object attributes</td></tr>
+      <tr><td>Delete</td><td colspan="2">Delete nonfolder objects</td></tr>
+      <tr><td>Read Permissions</td><td colspan="2">Read the object's permissions</td></tr>
+      <tr><td>Change Permissions</td><td colspan="2">Change the object's permissions</td></tr>
+      <tr><td>Take Ownership</td><td colspan="2">Become the new owner of the object</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box bg"><span class="lbl">Background: mapping to UNIX</span>
+    <p>UNIX's <code>r</code> on a directory is List Folder, <code>x</code> is Traverse Folder, and <code>w</code> is roughly Create Files + Delete. Windows splits these further and adds Change Permissions and Take Ownership as separately grantable rights; in UNIX only the owner (or root) can chmod, and only root can chown.</p>
+  </div>
+  <p><strong>Screenshots explained.</strong> <em>DACL Advanced Security Settings</em> for <code>HelloWorld.txt</code> shows the owner (rshimonski, with a Change link) and three tabs: Permissions, Auditing, Effective Access. The Permissions tab lists entries with columns Type, Principal, Access, and Inherited from: Allow SYSTEM Full control, Allow Administrators Full control, Allow rshimonski Full control, each inherited from <code>C:\Users\rshimonski\</code>. "Inherited from" means the ACE was copied down from the parent folder; the <em>Disable inheritance</em> button stops that. The <em>Effective Access</em> tab lets you pick a user (rshimonski) and click <em>View effective access</em> to see the final computed result for each special permission (Full control, Traverse folder / execute file, List folder / read data, and so on) along with an "Access limited by" column. Use it to check the algorithm below on a real file.</p>
+
+  <h4>Identifiers: SID, GUID, CLSID</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Identifier</th><th>Identifies</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>SID (security identifier)</td><td>A security subject or group of subjects</td><td>Used in tokens and ACEs</td></tr>
+      <tr><td>GUID (globally unique identifier), also called UUID</td><td>Objects that may originate from different computers: computers, web browsers, database records, files, application components</td><td>128-bit value, unique without a central registry</td></tr>
+      <tr><td>CLSID (class identifier)</td><td>Objects in the Windows Registry</td><td>The Registry uses GUIDs to identify objects and record attributes; those GUIDs are stored as CLSIDs</td></tr>
+    </tbody>
+  </table></div>
+  <p>Common CLSIDs from the slide (type <code>shell:::{…}</code> into Run or Explorer to open them):</p>
+  <div class="tw"><table>
+    <thead><tr><th>CLSID</th><th>Opens</th></tr></thead>
+    <tbody>
+      <tr><td><code>::{20d04fe0-3aea-1069-a2d8-08002b30309d}</code></td><td>My Computer</td></tr>
+      <tr><td><code>::{450d8fba-ad25-11d0-98a8-0800361b1103}</code></td><td>My Documents</td></tr>
+      <tr><td><code>::{208d2c60-3aea-1069-a2d7-08002b30309d}</code></td><td>My Network Places</td></tr>
+      <tr><td><code>::{1f4de370-d627-11d1-ba4f-00a0c91eedba}</code></td><td>Network Computers</td></tr>
+      <tr><td><code>::{7007acc7-3202-11d1-aad2-00805fc1270e}</code></td><td>Network Connections</td></tr>
+      <tr><td><code>::{2227a280-3aea-1069-a2de-08002b30309d}</code></td><td>Printers and Faxes</td></tr>
+      <tr><td><code>::{645ff040-5081-101b-9f08-00aa002f954e}</code></td><td>Recycle Bin</td></tr>
+      <tr><td><code>::{d6277990-4c6a-11cf-8d87-00aa0060f5bf}</code></td><td>Scheduled Tasks</td></tr>
+      <tr><td><code>::{450d8fba-ad25-11d0-98a8-0800361b1103}\My Folder</code></td><td>"My Folder" under Documents (assumes it exists)</td></tr>
+    </tbody>
+  </table></div>
+  <p>You don't need to memorize the hex. Know that the format is <code>8-4-4-4-12</code> hex digits (32 hex digits = 128 bits, from the number-systems refresher) and that the Recycle Bin is the slide's featured example.</p>
+
+  <h4>Calculating Windows access permissions</h4>
+  <div class="box proc"><span class="lbl">Process: resolving an object access request (the slide's algorithm)</span>
+    <ol>
+      <li><strong>Collect identities.</strong> Retrieve the user and group SIDs from the requesting process's SAT.</li>
+      <li><strong>Examine the DACL.</strong> Look at every ACE in the object's DACL that matches one of those SIDs for the requested permission.
+        <ol type="a">
+          <li>If no DACL or ACE is defined for the requested access, Windows <strong>allows</strong> it.</li>
+          <li>If exactly one ACE applies, the answer is whatever it says: allow or deny.</li>
+          <li>If multiple ACEs apply, <strong>all</strong> must be allow for access to be allowed. <strong>Any deny wins.</strong></li>
+        </ol>
+      </li>
+      <li><strong>Return</strong> approval or denial.</li>
+    </ol>
+    <p><strong>Common exam question:</strong> given a DACL and a user's group memberships, decide allow or deny.</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked examples: allow or deny? <span class="lvl">easy → hard</span></span>
+    <p>File <code>budget.xlsx</code> has this DACL: <em>Allow Staff: Read</em>; <em>Allow Finance: Read, Write</em>; <em>Deny Interns: Write</em>.</p>
+    <p><strong>1. Dana (Staff) wants to Read.</strong> One matching ACE (Allow Staff Read). <strong>Allowed.</strong></p>
+    <p><strong>2. Dana (Staff) wants to Write.</strong> Staff has no Write ACE. Under the slide's rule 2a (no ACE for the requested access) it is <strong>allowed</strong>. In real Windows it is <strong>denied</strong>: see the note below. Answer the way the question frames it, and if a short answer allows it, mention both.</p>
+    <p><strong>3. Farid (Finance) wants to Write.</strong> One matching ACE (Allow Finance Write). <strong>Allowed.</strong></p>
+    <p><strong>4. Ivy is in Finance and Interns and wants to Write.</strong> Two matching ACEs: Allow (Finance) and Deny (Interns). Any deny wins, so <strong>denied</strong>, even though she is in Finance.</p>
+    <p><strong>5. Ivy wants to Read.</strong> Only Allow Finance Read matches; the Interns ACE is about Write, not Read. <strong>Allowed.</strong> Deny only affects the permission it names.</p>
+    <p><strong>Lesson:</strong> use a Deny ACE to carve an exception out of a broad allow ("all of Finance except interns can edit").</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception: the slide's simplifications vs. real Windows</span>
+    <p><strong>Missing ACEs.</strong> Real Windows distinguishes a <em>null DACL</em> (no DACL at all), which grants everyone full access, from a DACL that simply has <em>no ACE</em> matching you, which denies access implicitly. The slide's rule 2a lumps both into "allow." That is dangerous if applied to a real system, but use the slide's rule on the course exam unless the question says otherwise.</p>
+    <p><strong>Deny ordering.</strong> Real Windows checks explicit deny ACEs before allow ACEs, which is why "any deny wins" works in practice (L04a mentioned this). An inherited deny, however, can be overridden by an explicit allow on the object itself.</p>
+    <p><strong>Modify and Delete.</strong> The slide says Modify cannot delete. In current Windows the Modify permission does include Delete; what it lacks is Change Permissions and Take Ownership. Know the slide's wording for the exam and the real behavior for the lab.</p>
+  </div>
+
+  <h3 id="l04b-audit">Auditing, access tools, and AGULP</h3>
+  <h4>Big picture</h4>
+  <p>Access control decides; auditing remembers. Without logs you can't tell who read the salary spreadsheet or whether someone is guessing passwords.</p>
+  <div class="box def"><span class="lbl">Definition: auditing</span>
+    <dl>
+      <dt>Plain English</dt><dd>Keeping a record of who tried to do what, and whether it worked.</dd>
+      <dt>Technical</dt><dd>Collecting information on which actions were taken and storing it for later analysis. For access control, it records desired, allowed, and denied access requests.</dd>
+      <dt>Why it matters</dt><dd>It serves the Detect and Respond parts of L01a's PDRR strategy, and it is what forensic investigators rely on after an incident.</dd>
+    </dl>
+  </div>
+  <div class="box proc"><span class="lbl">Process: auditing object access in Windows</span>
+    <ol>
+      <li><strong>Enable auditing</strong> in the audit policy. This tells Windows to record the events you define.</li>
+      <li>On the object, add auditing entries (Advanced Security Settings → Auditing tab). These are the SACL entries from L04a.</li>
+      <li>Windows writes audit events to the <strong>event logs</strong> (the Security log in Event Viewer).</li>
+      <li>Review and analyze the logs.</li>
+    </ol>
+  </div>
+  <p><strong>Screenshot explained: Local Audit Policy.</strong> The <em>Local Security Policy</em> console is open to <em>Security Settings → Local Policies → Audit Policy</em>. The nine policies and their settings are: Audit account logon events (No auditing), Audit account management (No auditing), Audit directory service access (No auditing), <strong>Audit logon events (Failure)</strong>, <strong>Audit object access (Success, Failure)</strong>, Audit policy change (No auditing), Audit privilege use (No auditing), Audit process tracking (No auditing), Audit system events (No auditing). Recording logon <em>failures</em> catches password guessing; recording object access <em>success and failure</em> shows both who got in and who was blocked.</p>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>You suspect someone is brute-forcing passwords on a workstation. Which audit policy should you enable, and for success or failure?</summary><div><p>Audit logon events, Failure. Each wrong password produces a failed-logon record, and a burst of them is the brute-force signature (L01a's password-cracking math is what the attacker is running).</p></div></details>
+    <details><summary>Why log object access successes as well as failures?</summary><div><p>Failures show attempts that access control blocked. Successes show who actually read or changed sensitive data, which is what matters after an insider abuses legitimate access or a stolen account is used.</p></div></details>
+  </div>
+  <p><strong>Expression-based security audit policy</strong> (Windows Server 2012 and newer): Dynamic Access Control lets administrators write targeted audit policies as expressions over user, computer, and resource claims (attributes). Slide example: <em>audit everyone without a high security clearance who attempts to access highly sensitive documents</em>. That records exactly the risky events instead of flooding the log with every access.</p>
+
+  <h4>Windows access management tools</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Tool</th><th>Stands for</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>cacls.exe</code></td><td>Control Access Control List</td><td>Legacy command-line tool to display or modify DACLs on files and folders. Still shipped for people used to it and for old batch files.</td></tr>
+      <tr><td><code>icacls.exe</code></td><td>Integrity Control Access Control List</td><td>Replaces and extends cacls (and the older xcacls). Lists, updates, and backs up ACLs; finds files owned by a user; changes ownership; replaces one user's permissions with another's.</td></tr>
+      <tr><td><code>robocopy.exe</code></td><td>Robust File Copy</td><td>Copies files and folders with or without their ACLs.</td></tr>
+    </tbody>
+  </table></div>
+<pre class="code"><code>:: list the DACL of a folder
+icacls C:\Reports
+:: give group Finance Modify, inherited by files (OI) and subfolders (CI)
+icacls C:\Reports /grant Finance:(OI)(CI)M
+:: explicit deny Write for Interns
+icacls C:\Reports /deny Interns:W
+:: back up the ACLs of the whole tree to a file
+icacls C:\Reports /save acl.txt /T
+:: copy everything including security (the S in DATS)
+robocopy C:\Reports D:\Backup /E /COPY:DATS</code></pre>
+  <p>(Command examples are standard usage for illustration, not from the slides.) Exam point: plain copying to a new location usually makes files inherit the destination folder's permissions; robocopy with <code>/COPY:…S</code> or <code>/SEC</code> preserves the original ACLs.</p>
+
+  <h4>Best practice: AGULP</h4>
+  <div class="box def"><span class="lbl">Definition: AGULP</span>
+    <dl>
+      <dt>Plain English</dt><dd>Never give permissions straight to people. Put people in groups, nest groups, and give permissions only to the innermost local group.</dd>
+      <dt>Technical</dt><dd><strong>A</strong>ccounts go into <strong>G</strong>lobal groups, global groups into <strong>U</strong>niversal groups, universal groups into <strong>L</strong>ocal groups, and <strong>P</strong>ermissions are assigned to the local groups. It systematically nests user accounts in groups to make securing objects more general.</dd>
+      <dt>Why it matters</dt><dd>It manages any number of users predictably. It may look overly complex for a small office, but it shines on a network with many users.</dd>
+    </dl>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: AGULP for a shared reports folder <span class="lvl">medium</span></span>
+    <p><strong>A:</strong> accounts alice and bob (Atlanta accountants), carol (Savannah accountant).</p>
+    <p><strong>G:</strong> alice and bob go in global group <code>ATL-Accountants</code>; carol goes in <code>SAV-Accountants</code>. Global groups gather users from one domain.</p>
+    <p><strong>U:</strong> both global groups go in universal group <code>All-Accountants</code>, which can span domains.</p>
+    <p><strong>L:</strong> <code>All-Accountants</code> goes in local group <code>Reports-Modify</code> on the file server.</p>
+    <p><strong>P:</strong> the <code>C:\Reports</code> DACL gets one ACE: <em>Allow Reports-Modify: Modify</em>.</p>
+    <p>When a new accountant joins in Savannah, you add one account to <code>SAV-Accountants</code> and touch no ACLs. When the Reports folder moves to a new server, you recreate one local group and one ACE. Microsoft documentation often writes this as AGDLP or AGUDLP ("DL" = domain local); it's the same idea.</p>
+  </div>
+
+  <h3 id="l04b-chrome">Chrome's sandbox, revisited through Windows</h3>
+  <p>The deck ends with the same Chrome slides as L04a: the pre-2006 single browser process vs. the modern multi-process design, the browser/renderer/plugin/GPU process roles, process-based site isolation, the broker, and the restricted token. The full notes are in <a href="#l04a-sandbox">L04a: sandboxing</a>. What is new here is that you now know the Windows parts Chrome is built from:</p>
+  <ul>
+    <li><strong>Restricted token</strong> = a SAT (this lecture) with most privileges stripped, created with <code>CreateRestrictedToken</code>.</li>
+    <li>Its user and group are the <strong>null SID <code>S-1-0-0</code></strong> ("Nobody") from the well-known SIDs table, so no DACL grants it anything. As long as disk root directories have non-null security, no files can be opened (even ones with null ACLs), and there's no network access on Vista and later.</li>
+    <li>That last caveat is the null-DACL rule from the misconception box above in action: a null DACL would let anyone in, so the roots must have real DACLs.</li>
+    <li>The <strong>job object</strong> that confines the renderer is one of the securable objects listed above.</li>
+  </ul>
+  <p><strong>Diagram explained: Chrome broker architecture.</strong> A <em>Broker</em> box (the main browser process) contains an <em>Interception Manager</em>, an <em>IPC Service</em>, a <em>Policy Engine</em>, and a <em>Policy</em> block. A dotted IPC line runs down to two <em>Target</em> boxes, each inside a dotted <em>Sandbox</em> border. Each target contains an <em>IPC Client</em>, a <em>Policy Engine Client</em>, and <em>Interceptions</em>. How it works: when sandboxed code calls a Windows API it isn't allowed to use (say, opening a file), the interception catches the call and sends it over IPC to the broker; the broker's policy engine checks it against the policy and, if allowed, performs the action with the broker's own privileges and returns the result. The renderer never holds the power itself. This is privilege separation plus a reference monitor.</p>
+
+  <h3 id="l04b-gloss">L04b glossary</h3>
+  <div class="tw"><table class="gloss">
+    <thead><tr><th>Term</th><th>Definition</th><th>Example</th><th>Memory trick</th><th>Similar</th><th>Opposite</th></tr></thead>
+    <tbody>
+      <tr><td>Windows NT</td><td>Code base all current Windows versions build on</td><td>Windows 11, Server 2022</td><td>New Technology</td><td>—</td><td>Windows 9x line</td></tr>
+      <tr><td>Kernel (supervisor) mode</td><td>Privileged mode with full hardware access</td><td>Drivers, HAL</td><td>The supervisor sees all</td><td>Ring 0</td><td>User mode</td></tr>
+      <tr><td>HAL</td><td>Only layer that touches physical hardware</td><td>Porting Windows to ARM</td><td>Hides hardware</td><td>Device abstraction</td><td>—</td></tr>
+      <tr><td>Executive</td><td>Top kernel layer; user mode's only door into the kernel</td><td>Object and security manager</td><td>The executive takes the meetings</td><td>System call layer</td><td>—</td></tr>
+      <tr><td>Microkernel (Windows)</td><td>Memory-resident core: sync, scheduling, exceptions</td><td>Thread scheduling</td><td>Micro = the core</td><td>Kernel core</td><td>Executive</td></tr>
+      <tr><td>Environment subsystem</td><td>Runs programs written for other OSes</td><td>WSL, old Windows apps</td><td>Other environments</td><td>Compatibility layer</td><td>—</td></tr>
+      <tr><td>Integral subsystem</td><td>User-mode logon, access control, networking</td><td>Logon screen</td><td>Integral to security</td><td>—</td><td>—</td></tr>
+      <tr><td>DAC (discretionary)</td><td>Owner decides who gets access</td><td>Sharing a file</td><td>At the owner's discretion</td><td>ACLs</td><td>MAC</td></tr>
+      <tr><td>MAC</td><td>Labels and clearances decide access</td><td>Secret vs Top Secret</td><td>Mandatory = no choice</td><td>Multilevel security</td><td>DAC</td></tr>
+      <tr><td>RBAC</td><td>Access by role; users assigned roles</td><td>Payroll group</td><td>Role → rights</td><td>Groups</td><td>Per-user ACEs</td></tr>
+      <tr><td>SID</td><td>Permanent ID for a user or group</td><td><code>S-1-1-0</code> World</td><td>Security ID</td><td>UID</td><td>Username (changeable)</td></tr>
+      <tr><td>Null SID</td><td><code>S-1-0-0</code>, group with no members</td><td>Chrome renderer token</td><td>0 = nobody</td><td>nobody user</td><td>World SID</td></tr>
+      <tr><td>SAT</td><td>User SID, group SIDs, privileges attached to each process</td><td>Token built at logon</td><td>Badge on every process</td><td>Access token</td><td>—</td></tr>
+      <tr><td>Workgroup</td><td>Peer-to-peer; accounts on each PC</td><td>Home network</td><td>Work in a small group</td><td>P2P</td><td>Domain</td></tr>
+      <tr><td>Active Directory</td><td>Central hierarchical directory (LDAP, X.500)</td><td>University domain</td><td>The directory of everyone</td><td>LDAP directory</td><td>Workgroup</td></tr>
+      <tr><td>Domain</td><td>Computers sharing one user database</td><td>gsu.edu</td><td>One domain, one rulebook</td><td>Realm</td><td>Workgroup</td></tr>
+      <tr><td>Distributed SAT</td><td>Domain SIDs + local group SIDs assembled at the resource</td><td>File server logon</td><td>Parts, not the whole</td><td>—</td><td>Shipping full tokens</td></tr>
+      <tr><td>Managed service account</td><td>Domain service account with automatic password changes</td><td>SQL Server service</td><td>Managed = auto passwords</td><td>gMSA</td><td>Static service password</td></tr>
+      <tr><td>Kerberos</td><td>Ticket-based default Windows authentication</td><td>Domain logon</td><td>Three-headed dog: client, KDC, server</td><td>SSO</td><td>Password per server</td></tr>
+      <tr><td>KDC / AS / TGS</td><td>Domain controller role; authenticates, then grants tickets</td><td>TGT then service ticket</td><td>AS first, TGS second</td><td>Trusted third party</td><td>—</td></tr>
+      <tr><td>LUA</td><td>Least privilege user account</td><td>Standard user for daily work</td><td>Least User Access</td><td>Least privilege</td><td>Daily admin account</td></tr>
+      <tr><td>User right</td><td>System-wide ability, set by group policy</td><td>Log on locally</td><td>Rights = system</td><td>Privilege</td><td>Permission</td></tr>
+      <tr><td>Permission</td><td>Access to a specific object</td><td>Read on report.docx</td><td>Permission = object</td><td>ACE</td><td>User right</td></tr>
+      <tr><td>ACE</td><td>One allow/deny entry for a SID</td><td>Deny Interns Write</td><td>Entry</td><td>ACL row</td><td>—</td></tr>
+      <tr><td>DACL</td><td>Discretionary list of ACEs on an object</td><td>Security tab</td><td>DACL Decides</td><td>ACL</td><td>SACL</td></tr>
+      <tr><td>UAC</td><td>Split admin token with escalation prompt</td><td>"Allow this app to make changes?"</td><td>Admins ask permission too</td><td>sudo</td><td>Always-admin</td></tr>
+      <tr><td>Dynamic Access Control</td><td>Attribute-based classify, control, audit, encrypt</td><td>Auto-tag SSNs</td><td>Dynamic, not discretionary</td><td>ABAC</td><td>Static ACLs</td></tr>
+      <tr><td>RMS</td><td>Rights Management Services; auto-encrypts tagged files</td><td>Encrypted HR docs</td><td>Rights managed</td><td>IRM</td><td>—</td></tr>
+      <tr><td>Securable object</td><td>Any resource with a DACL</td><td>Registry key, printer</td><td>Can be secured</td><td>Object</td><td>—</td></tr>
+      <tr><td>Special permissions</td><td>Fine-grained rights inside basic ones</td><td>Take Ownership</td><td>The fine print</td><td>Advanced permissions</td><td>Basic permissions</td></tr>
+      <tr><td>Effective access</td><td>Final computed rights for a user</td><td>Effective Access tab</td><td>What actually takes effect</td><td>Effective permissions</td><td>—</td></tr>
+      <tr><td>GUID / UUID</td><td>128-bit globally unique object ID</td><td>Database record key</td><td>Globally unique</td><td>UUID</td><td>—</td></tr>
+      <tr><td>CLSID</td><td>GUID identifying a Registry class/object</td><td>Recycle Bin <code>645ff040…</code></td><td>Class ID</td><td>ProgID</td><td>—</td></tr>
+      <tr><td>Auditing</td><td>Recording access attempts for later analysis</td><td>Failed logon events</td><td>The audit trail</td><td>Logging</td><td>—</td></tr>
+      <tr><td>Expression-based audit</td><td>Audit rules over user/resource claims</td><td>Low-clearance users on sensitive docs</td><td>Audit by expression</td><td>Targeted auditing</td><td>Audit everything</td></tr>
+      <tr><td>cacls / icacls</td><td>Command-line ACL viewers/editors (legacy / current)</td><td><code>icacls C:\Reports</code></td><td>i = integrity, improved</td><td>chmod, setfacl</td><td>—</td></tr>
+      <tr><td>robocopy</td><td>Robust copy, optionally with ACLs</td><td><code>/COPY:DATS</code></td><td>Robust copy</td><td>rsync</td><td>Plain copy</td></tr>
+      <tr><td>AGULP</td><td>Accounts → Global → Universal → Local → Permissions</td><td>Reports-Modify group</td><td>"A Good User Loves Permissions"</td><td>AGDLP</td><td>Per-user ACEs</td></tr>
+      <tr><td>Broker</td><td>Privileged process acting for sandboxed targets</td><td>Chrome browser process</td><td>Middleman with the keys</td><td>Reference monitor</td><td>—</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box exam"><span class="lbl">L04b exam checklist</span>
+    <ul class="checklist">
+      <li>Answer the setuid warm-ups: <code>chmod u+s</code> and what the setuid() call is for, with the Apache scenario.</li>
+      <li>Describe Windows' NT base and modified microkernel design; name the user- and kernel-mode components and draw the layer diagram.</li>
+      <li>State what the HAL, drivers, microkernel, and executive each do; explain why the HAL aids portability.</li>
+      <li>Distinguish the environment and integral subsystems.</li>
+      <li>Define and contrast DAC, MAC, and RBAC; classify a scenario; know Windows combines DAC and RBAC.</li>
+      <li>Explain SIDs (unchanged by rename) and recognize the well-known SIDs, especially <code>S-1-0-0</code> and <code>S-1-1-0</code>.</li>
+      <li>List what a SAT contains and the four logon steps that build it.</li>
+      <li>Compare workgroups and Active Directory; define a domain; mention LDAP/X.500.</li>
+      <li>Explain the distributed SAT and why full SATs never cross the network.</li>
+      <li>Describe managed service accounts and Kerberos (KDC as AS then TGS).</li>
+      <li>Explain LUAs and the default AD groups; say why Backup Operators is sensitive.</li>
+      <li>Distinguish rights from permissions; define ACL, ACE, DACL.</li>
+      <li>Explain UAC's split token and prompts; compare to sudo.</li>
+      <li>List Dynamic Access Control's four features (classify, control, audit, encrypt) and don't confuse it with discretionary access control.</li>
+      <li>Name common securable objects; describe basic and special permissions.</li>
+      <li>Apply the access-calculation algorithm, including "any deny wins"; know the slide rule vs. real Windows.</li>
+      <li>Distinguish SID, GUID, and CLSID.</li>
+      <li>Explain auditing, the local audit policy settings, and expression-based audit policies.</li>
+      <li>Know what cacls, icacls, and robocopy do.</li>
+      <li>Expand AGULP and apply it to a scenario.</li>
+      <li>Connect Chrome's restricted token, null SID, and job object to the Windows model; explain the broker diagram.</li>
     </ul>
   </div>
 </section>

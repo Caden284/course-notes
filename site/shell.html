@@ -382,24 +382,25 @@ var COURSE_TOOLS = {};
         tpl(id, 'main') + '</main></div>';
       rendered = id;
       if (COURSE_TOOLS[id]) { try { COURSE_TOOLS[id](); } catch (e) { console.error(e); } }
-      renderMermaid();
+      var drawn = renderMermaid();
     }
     var el = anchor && document.getElementById(anchor);
     if (el) {
-      // Jump without smooth scrolling, and again once web fonts settle the layout.
-      var jump = function(){ el.scrollIntoView({ block: 'start', behavior: 'instant' }); };
+      // Jump without smooth scrolling, then again once web fonts and diagrams have changed the layout.
+      var jump = function(){ if (location.hash.indexOf(encodeURIComponent(anchor)) >= 0) el.scrollIntoView({ block: 'start', behavior: 'instant' }); };
       requestAnimationFrame(jump);
       if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(jump);
+      if (drawn) drawn.then(jump, jump);
     }
     else if (!anchor) window.scrollTo(0, 0);
   }
   function renderMermaid(){
     var nodes = app.querySelectorAll('pre.mermaid:not([data-processed])');
-    if (!nodes.length || !window.mermaid) return;
+    if (!nodes.length || !window.mermaid) return null;
     try {
       window.mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
-      window.mermaid.run({ nodes: nodes });
-    } catch (e) { console.error(e); }
+      return window.mermaid.run({ nodes: nodes });
+    } catch (e) { console.error(e); return null; }
   }
 
   /* ---------- practice exam ---------- */
