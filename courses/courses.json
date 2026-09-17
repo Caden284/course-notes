@@ -9,7 +9,10 @@
     "headline": "Computer Security, taught from the slides up",
     "lead": "Each lecture deck is rewritten as a textbook chapter: every bullet expanded, every diagram described, every formula worked through. New lectures get added as the semester moves.",
     "unitWord": "Lecture",
-    "examExclude": ["how", "formulas"]
+    "examExclude": [
+      "how",
+      "formulas"
+    ]
   },
   {
     "id": "csc4320",
@@ -21,6 +24,36 @@
     "headline": "Operating Systems, lectures 1 through 11",
     "lead": "Complete exam study notes: every slide expanded into full explanation, with definitions, worked examples, misconceptions, and exam traps marked throughout. Chapters 4–7 carried the midterm; chapters 10–11 were the focus of the cumulative final.",
     "unitWord": "Chapter",
-    "examExclude": ["how"]
+    "examExclude": [
+      "how"
+    ]
+  },
+  {
+    "id": "csc3210",
+    "code": "CSC 3210",
+    "title": "Computer Organization & Programming",
+    "term": "Earlier coursework",
+    "status": "Completed",
+    "instructor": "",
+    "headline": "Computer organization, from the transistor count up",
+    "lead": "Performance math, number systems, and RISC-V assembly: instruction formats and encoding, bitwise masking, the stack and calling convention, branches and constants, with the exam toolkit at the end.",
+    "unitWord": "Unit",
+    "examExclude": [
+      "how"
+    ]
+  },
+  {
+    "id": "csc3320",
+    "code": "CSC 3320",
+    "title": "System-Level Programming",
+    "term": "Earlier coursework",
+    "status": "Completed",
+    "instructor": "",
+    "headline": "System-level programming: UNIX and C",
+    "lead": "The command line and Snowball, then C from the ground up: the compilation pipeline, types, I/O and strings, flow control and scope, and arrays, functions, and pointers, with every pitfall the guide flags.",
+    "unitWord": "Unit",
+    "examExclude": [
+      "how"
+    ]
   }
 ]

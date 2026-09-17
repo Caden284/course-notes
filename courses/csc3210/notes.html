@@ -1,0 +1,787 @@
+<template data-part="toc"><ol>
+<li><a href="#how">How to use these notes</a></li>
+<li><a href="#u1"><span class="code">U1</span>Architecture &amp; performance</a>
+  <ol><li><a href="#u1-computer">What a computer is</a></li><li><a href="#u1-ideas">Seven great ideas</a></li><li><a href="#u1-perf">Performance metrics</a></li><li><a href="#u1-cputime">The CPU time formula</a></li><li><a href="#u1-amdahl">Amdahl's law</a></li><li><a href="#u1-trends">Moore's law and trends</a></li><li><a href="#u1-hierarchy">Memory hierarchy</a></li><li><a href="#u1-mips">Why MIPS misleads</a></li></ol></li>
+<li><a href="#u2"><span class="code">U2</span>Number systems &amp; arithmetic</a>
+  <ol><li><a href="#u2-systems">The four number systems</a></li><li><a href="#u2-convert">Conversion methods</a></li><li><a href="#u2-signed">Signed vs. unsigned</a></li><li><a href="#u2-arith">Binary and hex arithmetic</a></li></ol></li>
+<li><a href="#u3"><span class="code">U3</span>RISC-V ISA &amp; instruction formats</a>
+  <ol><li><a href="#u3-overview">RISC-V overview</a></li><li><a href="#u3-registers">The register file</a></li><li><a href="#u3-formats">Instruction formats</a></li><li><a href="#u3-encode">Encoding and decoding</a></li><li><a href="#u3-instructions">Common instructions</a></li></ol></li>
+<li><a href="#u4"><span class="code">U4</span>Bitwise operations &amp; masking</a>
+  <ol><li><a href="#u4-truth">Truth tables</a></li><li><a href="#u4-masks">Masking techniques</a></li><li><a href="#u4-shifts">Shift operations</a></li><li><a href="#u4-xor">XOR swap</a></li></ol></li>
+<li><a href="#u5"><span class="code">U5</span>Procedures, stack &amp; memory</a>
+  <ol><li><a href="#u5-convention">Call convention</a></li><li><a href="#u5-leaf">Leaf vs. non-leaf</a></li><li><a href="#u5-stack">Why the stack exists</a></li><li><a href="#u5-layout">Memory layout</a></li><li><a href="#u5-endian">Addressing and endianness</a></li></ol></li>
+<li><a href="#u6"><span class="code">U6</span>Branches, jumps &amp; constants</a>
+  <ol><li><a href="#u6-branch">PC-relative branches</a></li><li><a href="#u6-patterns">Loop and if-else patterns</a></li><li><a href="#u6-constants">Loading 32-bit constants</a></li><li><a href="#u6-jumps">jal and jalr</a></li><li><a href="#u6-blocks">Basic blocks</a></li></ol></li>
+<li><a href="#u7"><span class="code">U7</span>Exam toolkit</a>
+  <ol><li><a href="#u7-formulas">Formula sheet</a></li><li><a href="#u7-powers">Powers of two</a></li><li><a href="#u7-must">Must-know facts</a></li><li><a href="#u7-mistakes">Common mistakes</a></li><li><a href="#u7-encoding">Character encoding</a></li><li><a href="#u7-riscv-x86">RISC-V vs. x86</a></li></ol></li>
+</ol></template>
+<template data-part="main">
+<section id="how" class="prose">
+  <h3>How to use these notes</h3>
+  <p>This is the comprehensive study guide rebuilt as readable notes. Everything from the guide is here, with the reasoning filled in: why each formula works, what each instruction field means, and where the traps are. The colored boxes are your review layer.</p>
+  <div class="legend">
+    <div class="box def"><span class="lbl">Definition</span><p>Plain English, the exam wording, and why it matters.</p></div>
+    <div class="box ex"><span class="lbl">Worked example</span><p>Numbers carried all the way through.</p></div>
+    <div class="box warn"><span class="lbl">Misconception</span><p>The mistake the guide flags, corrected.</p></div>
+    <div class="box exam"><span class="lbl">Exam practice</span><p>Questions with the answer hidden until you open it.</p></div>
+    <div class="box proc"><span class="lbl">Process</span><p>A procedure you may need to reproduce.</p></div>
+  </div>
+  <p>The guide's own advice: review Units 3–6 most heavily. Unit 7 is the cram sheet.</p>
+</section>
+
+<section class="lecture prose" id="u1">
+  <div class="plate"><span class="num" aria-hidden="true">U1</span><p class="ttl">Computer architecture &amp; performance</p><p class="src">Unit 1 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u1-computer">What a computer is</h3>
+  <p>A computer is any mechanism designed to process data through arithmetic or logical operations, covering input, processing, and output. In the Von Neumann model the core components are the <strong>processor (CPU)</strong>, <strong>memory</strong>, and <strong>I/O</strong>, all connected by the system bus.</p>
+  <div class="box def"><span class="lbl">Definition: Von Neumann architecture</span>
+    <dl>
+      <dt>Plain English</dt><dd>One memory holds both the program and the data it works on.</dd>
+      <dt>Technical</dt><dd>A stored-program computer in which a single shared memory holds instructions and data on the same bus. The CPU contains the control unit (CU), the arithmetic logic unit (ALU), and registers; the system bus carries address, data, and control signals.</dd>
+      <dt>Why it matters</dt><dd>Every machine you meet in this course, from desktops and servers to phones and embedded IoT and automotive systems, is an implementation of it.</dd>
+    </dl>
+  </div>
+  <div class="box bg"><span class="lbl">Background: the bus bottleneck</span>
+    <p>Because instructions and data share one path to memory, the CPU cannot fetch an instruction and its operand at the same instant. That limit is nicknamed the <em>Von Neumann bottleneck</em>, and it is a big reason caches and pipelining (great ideas 4 and 6) exist.</p>
+  </div>
+
+  <h3 id="u1-ideas">The seven great ideas in computer architecture</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Great idea</th><th>What it means / example</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Abstraction</td><td>Hide lower-level complexity behind clean interfaces. The OS hides hardware from apps; a high-level language hides the ISA.</td></tr>
+      <tr><td>2</td><td>Make the common case fast</td><td>Optimize frequent operations even at some cost to rare ones. 12-bit immediate operands are fast because small constants are common.</td></tr>
+      <tr><td>3</td><td>Parallelism</td><td>Execute multiple operations simultaneously: multi-core CPUs, GPU SIMD, pipelined execution.</td></tr>
+      <tr><td>4</td><td>Pipelining</td><td>Overlap instruction stages (fetch, decode, execute, writeback) like an assembly line.</td></tr>
+      <tr><td>5</td><td>Prediction</td><td>Branch prediction pre-fetches the likely next instruction to avoid pipeline stalls.</td></tr>
+      <tr><td>6</td><td>Memory hierarchy</td><td>Layer storage (registers → cache → RAM → disk) to balance speed and cost.</td></tr>
+      <tr><td>7</td><td>Redundancy</td><td>Duplicate components to detect and correct errors and improve dependability, as in RAID.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Memory hook: <strong>A</strong>bstraction, <strong>C</strong>ommon case, <strong>P</strong>arallelism, <strong>P</strong>ipelining, <strong>P</strong>rediction, <strong>H</strong>ierarchy, <strong>R</strong>edundancy. Ideas 3, 4, and 5 all buy speed; 6 and 7 trade extra hardware for speed and safety.</p>
+
+  <h3 id="u1-perf">Performance metrics</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Term</th><th>Definition</th><th>Better when</th></tr></thead>
+    <tbody>
+      <tr><td>Response time (latency)</td><td>Time to complete one task from start to finish</td><td>Lower</td></tr>
+      <tr><td>Throughput</td><td>Number of tasks completed per unit time</td><td>Higher</td></tr>
+      <tr><td>Performance</td><td>Formally 1 / execution time</td><td>Higher</td></tr>
+      <tr><td>Elapsed time</td><td>Wall-clock time including CPU, I/O, OS overhead, and idle time</td><td>Lower</td></tr>
+      <tr><td>CPU time</td><td>Only the time the CPU spends on your program (user CPU time + system CPU time)</td><td>Lower</td></tr>
+      <tr><td>Clock period</td><td>Duration of one clock cycle, e.g. 250 ps = 0.25 ns</td><td>Lower</td></tr>
+      <tr><td>Clock frequency</td><td>Cycles per second, e.g. 4.0 GHz = 4×10⁹ cycles/s; frequency = 1 / period</td><td>Higher</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Treating CPU time and elapsed time as the same thing. Elapsed time includes waiting on disk, the network, and other programs; CPU time excludes all of that. A program can have tiny CPU time and terrible elapsed time.</p>
+  </div>
+
+  <h3 id="u1-cputime">The CPU time formula</h3>
+  <div class="formula"><span class="lbl" style="font-family:var(--cond);font-weight:700;color:var(--brass)">Formula: CPU time</span>
+    <div class="eq">CPU Time = IC × CPI × Cycle Time = (IC × CPI) / Clock Rate</div>
+    <p><strong>Variables.</strong> <code>IC</code> = instruction count, the number of instructions actually executed. <code>CPI</code> = average cycles per instruction. <code>Cycle Time</code> = 1 / clock rate.</p>
+    <p><strong>Why it works.</strong> Multiply how many instructions you run by how many cycles each takes to get total cycles (<code>CPU Cycles = IC × CPI</code>), then multiply by how long a cycle lasts. Three independent knobs, one product.</p>
+    <p><strong>Weighted CPI</strong> = Σ (CPIᵢ × fractionᵢ) across instruction types, when different instruction classes take different numbers of cycles.</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked examples: CPU time <span class="lvl">easy → hard</span></span>
+    <p><strong>1.</strong> IC = 2×10⁹, CPI = 1.5, clock = 3 GHz. CPU time = (2×10⁹ × 1.5) / 3×10⁹ = 1.0 s.</p>
+    <p><strong>2. Solve for CPI.</strong> A program runs in 2 s at 4 GHz with IC = 4×10⁹. Cycles = 2 × 4×10⁹ = 8×10⁹, so CPI = 8×10⁹ / 4×10⁹ = 2.0.</p>
+    <p><strong>3. Weighted CPI.</strong> 50% ALU at CPI 1, 30% loads at CPI 5, 20% branches at CPI 2: CPI = 0.5(1) + 0.3(5) + 0.2(2) = 0.5 + 1.5 + 0.4 = 2.4.</p>
+    <p><strong>4. Trade-off.</strong> A compiler change cuts IC by 20% but raises CPI from 2.0 to 2.4. New CPU time ∝ 0.8 × 2.4 = 1.92 vs. old 1 × 2.0 = 2.0, so it is about 4% faster. Always multiply all three factors before declaring a win.</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>If this is high</th><th>Root cause</th><th>Fix</th></tr></thead>
+    <tbody>
+      <tr><td>Instruction count</td><td>Inefficient algorithm; poor compiler</td><td>Improve the algorithm; enable compiler optimization</td></tr>
+      <tr><td>CPI</td><td>Many slow instructions (memory loads, branches)</td><td>Add cache; restructure code; reduce branch mispredictions</td></tr>
+      <tr><td>Cycle time</td><td>Low clock rate (hardware limit)</td><td>Faster technology or a different processor</td></tr>
+    </tbody>
+  </table></div>
+  <div class="formula"><span class="lbl" style="font-family:var(--cond);font-weight:700;color:var(--brass)">Formula: "X is n times faster than Y"</span>
+    <div class="eq">Perf_X / Perf_Y = Time_Y / Time_X = n</div>
+    <p><strong>Worked example.</strong> Computer A runs a program in 20 s, computer B in 40 s. Speedup = 40/20 = 2.0, so A is 2 times faster than B. Note the times flip when you move from performance to time.</p>
+  </div>
+
+  <h3 id="u1-amdahl">Amdahl's law</h3>
+  <div class="formula"><span class="lbl" style="font-family:var(--cond);font-weight:700;color:var(--brass)">Formula: Amdahl's law</span>
+    <div class="eq">Speedup = 1 / [ (1 − P) + P/N ]</div>
+    <p><strong>Variables.</strong> <code>P</code> = the fraction of the program that can be parallelized (or improved); <code>N</code> = the number of processors.</p>
+    <p><strong>Why it works.</strong> Total work takes time 1. The serial share (1 − P) is untouched; the parallel share P is divided across N. Add the two pieces to get the new time, then invert.</p>
+    <p><strong>Ceiling.</strong> As N → ∞ the term P/N → 0, so Speedup → 1 / (1 − P).</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked examples: Amdahl <span class="lvl">easy → hard</span></span>
+    <p><strong>1. The guide's example.</strong> P = 0.80, N = 4: 1 / [0.20 + 0.80/4] = 1 / [0.20 + 0.20] = 1 / 0.40 = <strong>2.5×</strong>.</p>
+    <p><strong>2. The ceiling.</strong> Same P = 0.80 with infinite cores: 1 / 0.20 = <strong>5×</strong>, no matter how much hardware you buy.</p>
+    <p><strong>3. Harder.</strong> P = 0.95, N = 8: 1 / [0.05 + 0.11875] = 1 / 0.16875 ≈ <strong>5.93×</strong>; the ceiling is 1/0.05 = 20×.</p>
+    <p><strong>4. Backwards.</strong> You want 4× on 8 cores. Solve 4 = 1/[(1−P) + P/8] → (1−P) + 0.125P = 0.25 → 1 − 0.875P = 0.25 → P ≈ 0.857. You would need almost 86% of the program parallelized.</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Dividing the <em>whole</em> program by N, or plugging in percentages instead of fractions. Only the parallel part is divided by N, and P must be a fraction of 1 (0.80, not 80). Also: N cores never gives N× speedup unless P = 1. <em>(CSC 4320 writes the same law with S for the serial fraction: speedup = 1/(S + (1−S)/N). Here P = 1 − S.)</em></p>
+  </div>
+
+  <h3 id="u1-trends">Moore's law and technology trends</h3>
+  <p><strong>Moore's law:</strong> transistor count doubles roughly every two years with stable cost per transistor.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Year</th><th>Technology</th><th class="num">Performance vs. 1951</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>1951</td><td>Vacuum tubes</td><td class="num">1× (baseline)</td><td>First generation</td></tr>
+      <tr><td>1965</td><td>Transistors</td><td class="num">35×</td><td>Discrete components</td></tr>
+      <tr><td>1975</td><td>Integrated circuits</td><td class="num">900×</td><td>ICs</td></tr>
+      <tr><td>1995</td><td>VLSI</td><td class="num">2.4 million×</td><td>Very large scale integration</td></tr>
+      <tr><td>2013</td><td>Ultra-large ICs</td><td class="num">250 billion×</td><td>Billions of transistors per chip</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u1-hierarchy">Memory hierarchy</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Level</th><th>Size</th><th>Speed</th><th>Volatile?</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>Registers</td><td>32–64 bits each</td><td>Fastest</td><td>Yes</td><td>Immediate CPU operands</td></tr>
+      <tr><td>L1/L2/L3 cache (SRAM)</td><td>KB → MB</td><td>Faster than RAM</td><td>Yes</td><td>Reduce memory latency</td></tr>
+      <tr><td>Main memory (DRAM)</td><td>GB</td><td>~100 ns access</td><td>Yes</td><td>Running programs and data</td></tr>
+      <tr><td>Secondary (SSD/HDD)</td><td>TB+</td><td>Milliseconds</td><td>No</td><td>Long-term storage</td></tr>
+    </tbody>
+  </table></div>
+  <p>The pattern: closer to the CPU means faster, smaller, and more expensive per byte. This is great idea 6, and it is the same hierarchy CSC 4320 covers from the OS side.</p>
+
+  <h3 id="u1-mips">Why MIPS is a misleading metric</h3>
+  <p>MIPS (millions of instructions per second) sounds like a performance number but is unreliable:</p>
+  <ul>
+    <li>Different ISAs have instructions of vastly different complexity; one x86 instruction is not one RISC-V instruction.</li>
+    <li>A program executing more instructions on RISC-V can still finish sooner than fewer CISC instructions.</li>
+    <li>MIPS ignores CPI, so a high MIPS number with high CPI can still mean slow execution.</li>
+  </ul>
+  <p>Use <strong>execution time</strong> instead: it captures IC × CPI × cycle time together.</p>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Machine A: 4 GHz, CPI 2.0. Machine B: 3 GHz, CPI 1.2. Same instruction count. Which is faster and by how much?</summary><div><p>Time ∝ CPI / clock rate. A: 2.0/4 = 0.5 ns per instruction. B: 1.2/3 = 0.4 ns. B is faster by 0.5/0.4 = 1.25×, even though A has the higher clock rate.</p></div></details>
+    <details><summary>Why can a machine with higher MIPS lose to one with lower MIPS?</summary><div><p>Because MIPS counts instructions, not work. A RISC machine may need more, simpler instructions to do the same job, and MIPS ignores CPI differences entirely. Compare execution time.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u2">
+  <div class="plate"><span class="num" aria-hidden="true">U2</span><p class="ttl">Number systems &amp; arithmetic</p><p class="src">Unit 2 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u2-systems">The four number systems</h3>
+  <div class="tw"><table>
+    <thead><tr><th>System</th><th class="num">Base</th><th>Digits</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Decimal</td><td class="num">10</td><td>0–9</td><td>2345₁₀ = 2×10³ + 3×10² + 4×10¹ + 5×10⁰</td></tr>
+      <tr><td>Binary</td><td class="num">2</td><td>0, 1</td><td>1011₂ = 8 + 0 + 2 + 1 = 11₁₀</td></tr>
+      <tr><td>Octal</td><td class="num">8</td><td>0–7</td><td>1271₈ = 512 + 128 + 56 + 1 = 697₁₀</td></tr>
+      <tr><td>Hexadecimal</td><td class="num">16</td><td>0–9, A–F</td><td>A110₁₆ = 10×4096 + 256 + 16 + 0 = 41,232₁₀</td></tr>
+    </tbody>
+  </table></div>
+  <p>Hex digits: 0–9 as usual, then A = 10, B = 11, C = 12, D = 13, E = 14, F = 15.</p>
+
+  <h3 id="u2-convert">Conversion methods</h3>
+  <div class="box proc"><span class="lbl">Process: the four conversions you need cold</span>
+    <ol>
+      <li><strong>Binary → decimal.</strong> Multiply each bit by its place value and sum. <code>101011₂</code> = 32 + 8 + 2 + 1 = 43₁₀.</li>
+      <li><strong>Decimal → binary.</strong> Divide by 2 repeatedly, record remainders, read them upward. 38₁₀: 38→19 r0, 19→9 r1, 9→4 r1, 4→2 r0, 2→1 r0, 1→0 r1, so <code>100110₂</code>.</li>
+      <li><strong>Binary ↔ hex.</strong> Group bits in fours from the right; each group is one hex digit. Hex → binary expands each digit to exactly 4 bits: <code>ABCF₁₆</code> = 1010 1011 1100 1111₂.</li>
+      <li><strong>Decimal → hex.</strong> Divide by 16 repeatedly, converting remainders ≥ 10 to A–F, read upward. 1234₁₀: 1234→77 r2, 77→4 r13 (D), 4→0 r4, so <code>4D2₁₆</code>. Check: 4×256 + 13×16 + 2 = 1234.</li>
+    </ol>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: binary → hex, grouping from the right</span>
+    <p>Convert <code>1011011101₂</code>. Pad on the <em>left</em> to a multiple of four: <code>0010 1101 1101</code>. Each group: 0010 = 2, 1101 = D, 1101 = D. Answer: <code>2DD₁₆</code>. Check: 2×256 + 13×16 + 13 = 512 + 208 + 13 = 733, and the binary is 512+128+64+16+8+4+1 = 733. ✓</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Grouping bits from the left. Always group from the right and pad the left with zeros; 4 binary digits = 1 hex digit only when the groups line up with the low end of the number.</p>
+  </div>
+
+  <h3 id="u2-signed">Signed vs. unsigned binary</h3>
+  <div class="box def"><span class="lbl">Definition: two's complement</span>
+    <dl>
+      <dt>Plain English</dt><dd>The standard way to write negative numbers in binary: flip every bit, then add one.</dd>
+      <dt>Technical</dt><dd>To negate an n-bit value, take the one's complement (invert all bits) and add 1. The MSB acts as a sign bit; the representable range is −2^(n−1) to 2^(n−1) − 1.</dd>
+      <dt>Why it matters</dt><dd>Addition and subtraction use the same hardware for signed and unsigned values, and there is exactly one representation of zero.</dd>
+    </dl>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: negate 01001010₂</span>
+    <p>One's complement: <code>10110101</code>. Add 1: <code>10110110</code>. The original is 74, so this is −74.</p>
+    <p>Verify by adding them: 01001010 + 10110110 = 1 00000000; the low 8 bits are zero, which is exactly what x + (−x) should give. ✓</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th class="num">Bits</th><th>Unsigned range</th><th>Signed range</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="num">4</td><td>0 to 15</td><td>−8 to +7</td><td>MSB is the sign bit</td></tr>
+      <tr><td class="num">5</td><td>0 to 31</td><td>−16 to +15</td><td></td></tr>
+      <tr><td class="num">8</td><td>0 to 255</td><td>−128 to +127</td><td>ASCII fits in unsigned 8-bit</td></tr>
+      <tr><td class="num">16</td><td>0 to 65,535</td><td>−32,768 to +32,767</td><td></td></tr>
+      <tr><td class="num">32</td><td>0 to 4,294,967,295</td><td>−2,147,483,648 to +2,147,483,647</td><td>RISC-V word size</td></tr>
+    </tbody>
+  </table></div>
+  <p>Notice the asymmetry: the signed range has one more negative value than positive, because zero uses a slot on the positive side.</p>
+
+  <h3 id="u2-arith">Binary and hex arithmetic</h3>
+  <p>Binary addition rules: 0+0 = 0, 0+1 = 1, 1+0 = 1, and 1+1 = 10₂ (write 0, carry 1). Add column by column from the LSB, propagating carries.</p>
+  <div class="box ex"><span class="lbl">Worked example: 8-bit overflow</span>
+    <p><code>10110111₂</code> (183) + <code>01101110₂</code> (110) = 293, which needs 9 bits. In 8 bits you keep <code>00100101₂</code> (37) and a carry-out of 1: 293 − 256 = 37. That carry-out is <strong>unsigned overflow</strong>.</p>
+  </div>
+  <div class="box def"><span class="lbl">Definition: overflow, two kinds</span>
+    <dl>
+      <dt>Unsigned overflow</dt><dd>A carry out of the MSB; the result wraps around and is wrong.</dd>
+      <dt>Signed overflow</dt><dd>The sign changes unexpectedly: adding two positives gives a negative, or two negatives give a positive.</dd>
+      <dt>Why it matters</dt><dd>The same bits can be fine as unsigned and broken as signed, or the reverse, so you must know which interpretation the program intends.</dd>
+    </dl>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: hexadecimal addition</span>
+    <p><code>6A2₁₆ + 49A₁₆</code>, working right to left, carrying when a column reaches 16:</p>
+    <p>Units: 2 + A(10) = 12 → <code>C</code>, no carry. Sixteens: A(10) + 9 = 19 → 19 − 16 = 3, carry 1. 256s: 1 + 6 + 4 = 11 → <code>B</code>. Result: <strong><code>B3C₁₆</code></strong>. Check in decimal: 1698 + 1178 = 2876 = 11×256 + 3×16 + 12. ✓</p>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>What is the 8-bit two's complement representation of −100?</summary><div><p>100 = <code>01100100</code>. Invert: <code>10011011</code>. Add 1: <code>10011100</code>. Check: 128+16+8+4 = 156, and 156 − 256 = −100. ✓</p></div></details>
+    <details><summary>Adding 8-bit 01111111 + 00000001 gives 10000000. Is this overflow?</summary><div><p>As unsigned, no: 127 + 1 = 128 fits in 0–255. As signed, yes: two positives produced a negative (127 + 1 gave −128). Whether it is overflow depends on the interpretation.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u3">
+  <div class="plate"><span class="num" aria-hidden="true">U3</span><p class="ttl">RISC-V ISA &amp; instruction formats</p><p class="src">Unit 3 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u3-overview">RISC-V overview</h3>
+  <ul>
+    <li>Open-source RISC instruction set developed at UC Berkeley, managed by RISC-V International (200+ member companies).</li>
+    <li><strong>Fixed 32-bit instruction length</strong>, which makes decode logic simple and uniform and pipelining efficient.</li>
+    <li><strong>32 general-purpose registers</strong>, x0–x31, each 32 bits wide in the base ISA.</li>
+    <li><strong>Load/store architecture:</strong> arithmetic operates only on registers; memory is reached only through loads and stores (<code>lw</code>, <code>sw</code>).</li>
+    <li><strong>Little endian</strong> byte ordering.</li>
+  </ul>
+  <div class="box def"><span class="lbl">Definition: RISC vs. CISC</span>
+    <dl>
+      <dt>Plain English</dt><dd>RISC uses many simple instructions; CISC uses fewer, more complicated ones.</dd>
+      <dt>Technical</dt><dd>RISC (RISC-V, ARM, MIPS) uses simple fixed-length instructions with register operands. CISC (x86, x86-64) uses complex variable-length instructions that can operate directly on memory.</dd>
+      <dt>Why it matters</dt><dd>Fixed length plus load/store is what makes a clean five-stage pipeline possible, which is the whole performance argument for RISC.</dd>
+    </dl>
+  </div>
+
+  <h3 id="u3-registers">The register file</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Register</th><th>ABI name</th><th>Saver</th><th>Purpose</th></tr></thead>
+    <tbody>
+      <tr><td>x0</td><td>zero</td><td>—</td><td>Hardwired zero: reads return 0, writes are discarded</td></tr>
+      <tr><td>x1</td><td>ra</td><td>Caller</td><td>Return address: holds PC+4 after <code>jal</code></td></tr>
+      <tr><td>x2</td><td>sp</td><td>Callee</td><td>Stack pointer: top of the stack</td></tr>
+      <tr><td>x3</td><td>gp</td><td>—</td><td>Global pointer: references the static data segment</td></tr>
+      <tr><td>x4</td><td>tp</td><td>—</td><td>Thread pointer</td></tr>
+      <tr><td>x5–x7</td><td>t0–t2</td><td>Caller</td><td>Temporaries; a callee may overwrite them</td></tr>
+      <tr><td>x8</td><td>s0/fp</td><td>Callee</td><td>Saved register / frame pointer</td></tr>
+      <tr><td>x9</td><td>s1</td><td>Callee</td><td>Saved register</td></tr>
+      <tr><td>x10–x11</td><td>a0–a1</td><td>Caller</td><td>Function arguments <em>and</em> return values</td></tr>
+      <tr><td>x12–x17</td><td>a2–a7</td><td>Caller</td><td>Additional arguments (8 total in registers)</td></tr>
+      <tr><td>x18–x27</td><td>s2–s11</td><td>Callee</td><td>Saved registers; callee must save and restore</td></tr>
+      <tr><td>x28–x31</td><td>t3–t6</td><td>Caller</td><td>More temporaries</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box def"><span class="lbl">Definition: caller-saved vs. callee-saved</span>
+    <dl>
+      <dt>Plain English</dt><dd>Who is responsible for preserving a register across a function call.</dd>
+      <dt>Technical</dt><dd><strong>Caller-saved</strong> (a0–a7, t0–t6, ra): if the caller still needs the value after the call, the caller must save it first. <strong>Callee-saved</strong> (s0–s11, sp): if the called function modifies these, it must save them on the stack and restore them before returning.</dd>
+      <dt>Why it matters</dt><dd>It is a contract. Break it and a function quietly corrupts its caller's variables, which is one of the hardest assembly bugs to find.</dd>
+    </dl>
+  </div>
+  <p>Mnemonic: <strong>t</strong> = temporary = trashable by the callee; <strong>s</strong> = saved = safe across calls.</p>
+
+  <h3 id="u3-formats">Instruction formats</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Format</th><th>Primary use</th><th>Immediate</th><th>Field layout</th></tr></thead>
+    <tbody>
+      <tr><td><strong>R</strong></td><td>Register-register ALU (add, sub, and, or, xor, sll)</td><td>None</td><td>funct7 | rs2 | rs1 | funct3 | rd | opcode</td></tr>
+      <tr><td><strong>I</strong></td><td>Immediate arithmetic and loads (addi, lw, lb, jalr)</td><td>12-bit signed</td><td>imm[11:0] | rs1 | funct3 | rd | opcode</td></tr>
+      <tr><td><strong>S</strong></td><td>Stores (sw, sb, sh)</td><td>12-bit, split</td><td>imm[11:5] | rs2 | rs1 | funct3 | imm[4:0] | opcode</td></tr>
+      <tr><td><strong>B</strong></td><td>Conditional branches (beq, bne, blt, bge)</td><td>13-bit, PC-relative</td><td>imm[12|10:5] | rs2 | rs1 | funct3 | imm[4:1|11] | opcode</td></tr>
+      <tr><td><strong>U</strong></td><td>Upper immediate (lui, auipc)</td><td>20-bit upper</td><td>imm[31:12] | rd | opcode</td></tr>
+      <tr><td><strong>J</strong></td><td>Jumps (jal)</td><td>21-bit, PC-relative</td><td>imm[20|10:1|11|19:12] | rd | opcode</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tw"><table>
+    <thead><tr><th>Field</th><th class="num">Bits</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>opcode</td><td class="num">7</td><td>Identifies the instruction type (0110011 = R-type ALU, 0010011 = I-type ALU)</td></tr>
+      <tr><td>rd</td><td class="num">5</td><td>Destination register number (0–31)</td></tr>
+      <tr><td>rs1</td><td class="num">5</td><td>First source register</td></tr>
+      <tr><td>rs2</td><td class="num">5</td><td>Second source register</td></tr>
+      <tr><td>funct3</td><td class="num">3</td><td>Distinguishes variants within a format (add vs. xor)</td></tr>
+      <tr><td>funct7</td><td class="num">7</td><td>Further distinguishes: add = 0000000, sub = 0100000</td></tr>
+      <tr><td>immediate</td><td class="num">12</td><td>Sign-extended constant in I and S formats; split across fields in S</td></tr>
+    </tbody>
+  </table></div>
+  <p>Sanity check: 7 + 5 + 3 + 5 + 5 + 7 = 32 bits for R-type, and 12 + 5 + 3 + 5 + 7 = 32 for I-type. Every format fills exactly one 32-bit word.</p>
+  <div class="box bg"><span class="lbl">Background: why S and B split their immediates</span>
+    <p>It looks arbitrary, but the split keeps <code>rs1</code>, <code>rs2</code>, and <code>funct3</code> in the same bit positions in every format. The decoder can read the register numbers before it even knows the instruction type, which saves hardware. The B-type's low bit is dropped (offsets are always even), which buys one extra bit of range.</p>
+  </div>
+
+  <h3 id="u3-encode">Encoding and decoding</h3>
+  <div class="box ex"><span class="lbl">Worked example: encode addi x5, x0, 10</span>
+    <p>It adds an immediate, so it is <strong>I-type</strong>, opcode <code>0010011</code>, funct3 <code>000</code>.</p>
+<pre class="code"><code>imm[11:0]      rs1    funct3  rd     opcode
+000000001010   00000  000     00101  0010011
+     10         x0     addi    x5     I-ALU
+
+Regroup into bytes: 0000 0000 1010 0000 0000 0010 1001 0011
+Hex: 0x00A00293</code></pre>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: decode 0x002082B3</span>
+<pre class="code"><code>0x002082B3 = 0000000 00010 00001 000 00101 0110011
+             funct7  rs2   rs1   f3  rd    opcode
+
+opcode 0110011 → R-format (register-register ALU)
+funct3 000 + funct7 0000000 → ADD (funct7 0100000 would be SUB)
+rd  00101 → x5      rs1 00001 → x1      rs2 00010 → x2</code></pre>
+    <p>Assembly: <code>add x5, x1, x2</code>.</p>
+  </div>
+  <div class="box proc"><span class="lbl">Process: decoding any instruction on an exam</span>
+    <ol>
+      <li>Write the 32 bits out, grouped as 7 | 5 | 5 | 3 | 5 | 7 from the left.</li>
+      <li>Read the <strong>last 7 bits</strong> (opcode) first; that tells you the format.</li>
+      <li>Pull the register numbers from their fixed positions and convert to decimal.</li>
+      <li>Use funct3 (and funct7 for R-type) to pick the exact operation.</li>
+      <li>For I/S/B, reassemble and sign-extend the immediate.</li>
+    </ol>
+  </div>
+
+  <h3 id="u3-instructions">Common RISC-V instructions</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Instruction</th><th>Format</th><th>Operation / notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>add rd, rs1, rs2</code></td><td>R</td><td>rd = rs1 + rs2</td></tr>
+      <tr><td><code>sub rd, rs1, rs2</code></td><td>R</td><td>rd = rs1 − rs2 (funct7 = 0100000)</td></tr>
+      <tr><td><code>and/or/xor rd, rs1, rs2</code></td><td>R</td><td>Bitwise AND / OR / XOR</td></tr>
+      <tr><td><code>sll/srl rd, rs1, rs2</code></td><td>R</td><td>Shift left/right logical by the amount in rs2</td></tr>
+      <tr><td><code>addi rd, rs1, imm</code></td><td>I</td><td>rd = rs1 + sign_extend(imm), a 12-bit constant</td></tr>
+      <tr><td><code>lw rd, imm(rs1)</code></td><td>I</td><td>rd = Memory[rs1 + sign_extend(imm)], 32-bit word</td></tr>
+      <tr><td><code>lb / lbu rd, imm(rs1)</code></td><td>I</td><td>Load byte: <code>lb</code> sign-extends, <code>lbu</code> zero-extends</td></tr>
+      <tr><td><code>sw rs2, imm(rs1)</code></td><td>S</td><td>Memory[rs1 + sign_extend(imm)] = rs2</td></tr>
+      <tr><td><code>beq / bne rs1, rs2, L</code></td><td>B</td><td>Branch if equal / not equal (PC-relative)</td></tr>
+      <tr><td><code>blt / bge rs1, rs2, L</code></td><td>B</td><td>Branch if less / greater-or-equal, <strong>signed</strong></td></tr>
+      <tr><td><code>bltu / bgeu rs1, rs2, L</code></td><td>B</td><td>Unsigned variants</td></tr>
+      <tr><td><code>jal rd, label</code></td><td>J</td><td>rd = PC+4, then jump (PC-relative, ±1 MB)</td></tr>
+      <tr><td><code>jalr rd, imm(rs1)</code></td><td>I</td><td>rd = PC+4, then jump to rs1 + imm (returns, computed jumps)</td></tr>
+      <tr><td><code>lui rd, imm</code></td><td>U</td><td>rd = imm &lt;&lt; 12 (load upper 20 bits)</td></tr>
+      <tr><td><code>slli rd, rs1, shamt</code></td><td>I</td><td>rd = rs1 &lt;&lt; shamt (multiply by 2^shamt)</td></tr>
+      <tr><td><code>srli rd, rs1, shamt</code></td><td>I</td><td>rd = rs1 &gt;&gt; shamt (logical, zero-fills)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Which format is sw, and why can't it be I-type?</summary><div><p>S-type. A store has two source registers (address base and data) and no destination, so the 5 bits that I-type uses for <code>rd</code> are needed for the low half of the immediate. That is why the S immediate is split.</p></div></details>
+    <details><summary>Encode add x10, x11, x12 in hex.</summary><div><p>R-type: funct7 0000000, rs2 = x12 = 01100, rs1 = x11 = 01011, funct3 000, rd = x10 = 01010, opcode 0110011. Bits: 0000000 01100 01011 000 01010 0110011 = 0000 0000 1100 0101 1000 0101 0011 0011 = <code>0x00C58533</code>.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u4">
+  <div class="plate"><span class="num" aria-hidden="true">U4</span><p class="ttl">Bitwise operations &amp; masking</p><p class="src">Unit 4 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u4-truth">Truth tables</h3>
+  <div class="tw"><table>
+    <thead><tr><th>A</th><th>B</th><th>A AND B</th><th>A OR B</th><th>A XOR B</th><th>NOT A</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+      <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+      <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+      <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table></div>
+  <p>Read them as rules, not rows: AND is 1 only when both are 1, OR is 1 unless both are 0, XOR is 1 when the inputs <em>differ</em>.</p>
+
+  <h3 id="u4-masks">Masking techniques</h3>
+  <div class="box def"><span class="lbl">Definition: mask</span>
+    <dl>
+      <dt>Plain English</dt><dd>A pattern of bits you combine with your data to pick out, set, or flip just the bits you care about.</dd>
+      <dt>Technical</dt><dd>A bit pattern used with AND, OR, or XOR to selectively clear, set, or toggle bits of a value.</dd>
+      <dt>Why it matters</dt><dd>Hardware registers, flags, and packed data all live inside single words; masking is how you read and write one field without disturbing its neighbors.</dd>
+    </dl>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Operation</th><th>Effect</th><th>Typical mask</th><th>Use case</th></tr></thead>
+    <tbody>
+      <tr><td>AND</td><td>Keeps bits where the mask is 1, clears where it is 0</td><td><code>0x000000FF</code></td><td>Extract or isolate specific bits</td></tr>
+      <tr><td>OR</td><td>Sets bits where the mask is 1, leaves others unchanged</td><td><code>0x00000001</code></td><td>Force specific bits to 1</td></tr>
+      <tr><td>XOR</td><td>Toggles bits where the mask is 1, leaves others unchanged</td><td>Any pattern</td><td>Flip bits; simple encryption</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tw"><table>
+    <thead><tr><th>Mask</th><th>Effect on a 32-bit register</th></tr></thead>
+    <tbody>
+      <tr><td><code>0x000000FF</code></td><td>Keeps the lowest 8 bits (byte 0)</td></tr>
+      <tr><td><code>0x0000FF00</code></td><td>Keeps the second byte (bits 15:8)</td></tr>
+      <tr><td><code>0x0000FFFF</code></td><td>Keeps the lowest 16 bits</td></tr>
+      <tr><td><code>0xFFFFFF00</code></td><td>Clears the lowest 8 bits</td></tr>
+      <tr><td><code>0xFFFF0000</code></td><td>Keeps the upper 16 bits</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Building masks with only addi (no li or lui)</h4>
+  <p>A favorite exam constraint: build constants using nothing but <code>addi</code> and shifts. The trick is that <code>addi x, x0, -1</code> gives all ones, and shifting walks the boundary to where you need it.</p>
+<pre class="code"><code>addi x10, x0, 0xFF      # 255 fits in a 12-bit signed immediate → 0x000000FF
+
+addi x11, x0, -1        # x11 = 0xFFFFFFFF (all ones)
+slli x11, x11, 8        # shift left 8  → 0xFFFFFF00
+
+addi x12, x0, -1        # x12 = 0xFFFFFFFF
+srli x12, x12, 16       # shift right 16 → 0x0000FFFF</code></pre>
+  <div class="box ex"><span class="lbl">Worked example: three tasks on x5 = 0x12345678</span>
+    <p><strong>Task 1 — extract the lowest byte into x6:</strong></p>
+<pre class="code"><code>addi x10, x0, 0xFF
+and  x6, x5, x10        # x6 = 0x00000078</code></pre>
+    <p><strong>Task 2 — clear the lowest byte into x7:</strong></p>
+<pre class="code"><code>addi x11, x0, -1
+slli x11, x11, 8        # mask = 0xFFFFFF00
+and  x7, x5, x11        # x7 = 0x12345600</code></pre>
+    <p><strong>Task 3 — extract the second byte (bits 15:8) into x8:</strong></p>
+<pre class="code"><code>addi x10, x0, 0xFF
+srli x8, x5, 8          # x8 = 0x00123456  (shift the field down first)
+and  x8, x8, x10        # x8 = 0x00000056</code></pre>
+    <p>The general recipe for extracting a field: <strong>shift it down to bit 0, then AND with a mask of that many ones.</strong></p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Using OR to clear bits or AND to set bits. <strong>AND clears</strong> (where the mask is 0), <strong>OR sets</strong> (where the mask is 1), <strong>XOR toggles</strong>. To clear with AND you need a mask with zeros in the target positions, which is why <code>0xFFFFFF00</code> clears the low byte.</p>
+  </div>
+
+  <h3 id="u4-shifts">Shift operations</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Instruction</th><th>Direction</th><th>Fills with</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>slli rd, rs1, n</code></td><td>Left</td><td>0s on the right</td><td>Multiply by 2ⁿ</td></tr>
+      <tr><td><code>srli rd, rs1, n</code></td><td>Right</td><td>0s on the left</td><td>Divide by 2ⁿ (unsigned)</td></tr>
+      <tr><td><code>srai rd, rs1, n</code></td><td>Right</td><td>Copies of the sign bit</td><td>Divide by 2ⁿ (signed, arithmetic)</td></tr>
+      <tr><td><code>sll / srl / sra rd, rs1, rs2</code></td><td>Either</td><td>As above</td><td>Shift amount comes from a register</td></tr>
+    </tbody>
+  </table></div>
+  <p>Why <code>srai</code> exists: shifting −8 (<code>0xFFFFFFF8</code>) right by 1 with <code>srli</code> gives a huge positive number, while <code>srai</code> keeps the sign and gives −4.</p>
+
+  <h3 id="u4-xor">XOR swap with no temporary register</h3>
+  <p>XOR's three properties: A ⊕ A = 0, A ⊕ 0 = A, and it is commutative and associative. Together they let you swap two registers without a third.</p>
+<pre class="code"><code>xor x5, x5, x6    # x5 = A⊕B
+xor x6, x5, x6    # x6 = (A⊕B)⊕B = A   (original x5)
+xor x5, x5, x6    # x5 = (A⊕B)⊕A = B   (original x6)</code></pre>
+  <p>The same self-inverse property is the basis of XOR encryption: Cipher = Plaintext ⊕ Key, so Plaintext = Cipher ⊕ Key. (Your security course uses this for stream ciphers.)</p>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Write instructions that set bit 3 of x5 without touching any other bit.</summary><div><p>Bit 3 is the value 8: <code>addi x10, x0, 8</code> then <code>or x5, x5, x10</code>. OR sets, and every other mask bit is 0, so nothing else changes.</p></div></details>
+    <details><summary>x5 = 0x000000F0. What is x6 after srli x6, x5, 4 followed by and x6, x6, 0x0F?</summary><div><p>Shifting right 4 gives 0x0000000F; ANDing with 0x0F leaves 0x0000000F, so x6 = 15. You extracted the high nibble of the low byte.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u5">
+  <div class="plate"><span class="num" aria-hidden="true">U5</span><p class="ttl">Procedures, stack &amp; memory layout</p><p class="src">Unit 5 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u5-convention">The procedure call convention</h3>
+  <div class="box proc"><span class="lbl">Process: the six steps of a call</span>
+    <ol>
+      <li>Place arguments in <code>x10–x17</code> (a0–a7). Extra arguments go on the stack.</li>
+      <li>Transfer control: <code>jal x1, ProcedureLabel</code>, which saves the return address PC+4 in x1 (ra).</li>
+      <li>The callee allocates stack space: <code>addi sp, sp, -N</code> where N is the bytes needed.</li>
+      <li>Execute the procedure's work.</li>
+      <li>Place the return value in <code>x10</code> (a0); a second return value goes in <code>x11</code> (a1).</li>
+      <li>Return: <code>jalr x0, 0(x1)</code>, jumping to the address in ra and discarding the new return address into x0.</li>
+    </ol>
+  </div>
+
+  <h3 id="u5-leaf">Leaf vs. non-leaf procedures</h3>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Leaf procedure</th><th>Non-leaf procedure</th></tr></thead>
+    <tbody>
+      <tr><td>Calls others?</td><td>No</td><td>Yes, at least one other function</td></tr>
+      <tr><td>Save x1 (ra)?</td><td>No: x1 is never overwritten</td><td><strong>Yes</strong>: a nested <code>jal</code> overwrites ra</td></tr>
+      <tr><td>Stack needed for</td><td>Callee-saved registers it modifies</td><td>ra + callee-saved registers + extra args + locals</td></tr>
+      <tr><td>Complexity</td><td>Simple, few stack operations</td><td>More stack management</td></tr>
+      <tr><td>Example</td><td>A simple math helper</td><td>Recursive factorial, or anything that calls another function</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: complete leaf procedure</span>
+    <p>C source: <code>int leaf_example(int g, int h, int i, int j) { int f = (g + h) - (i + j); return f; }</code></p>
+<pre class="code"><code>leaf_example:              # g=x10, h=x11, i=x12, j=x13
+    addi sp, sp, -8        # allocate 8 bytes of stack frame
+    sw   x5, 4(sp)         # save temp x5 (this code chooses to preserve it)
+    sw   x6, 0(sp)         # save temp x6
+    add  x5, x10, x11      # x5 = g + h
+    add  x6, x12, x13      # x6 = i + j
+    sub  x10, x5, x6       # return value in a0 = (g+h) - (i+j)
+    lw   x6, 0(sp)         # restore x6
+    lw   x5, 4(sp)         # restore x5
+    addi sp, sp, 8         # free the frame
+    jalr x0, 0(x1)         # return</code></pre>
+    <p>Note the symmetry: allocate then save at the top, restore then deallocate at the bottom, in reverse order.</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: what a non-leaf adds</span>
+    <p>Before any <code>jal</code>, save what the call would destroy; after it returns, restore:</p>
+<pre class="code"><code>    sw   x1,  N(sp)        # save return address before the nested call
+    sw   x10, M(sp)        # save an argument you still need afterward
+    jal  x1, other_function
+    lw   x1,  N(sp)        # restore return address
+    lw   x10, M(sp)        # restore the argument</code></pre>
+    <p>In recursion every call gets its own frame, which is exactly what keeps each invocation's state independent.</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Forgetting to save <code>ra</code> in a non-leaf procedure. The nested <code>jal</code> overwrites x1 with <em>its</em> return address, so when you finally execute <code>jalr x0, 0(x1)</code> you jump back into the middle of your own function instead of to your caller. Infinite loops and wild crashes come from this one line.</p>
+  </div>
+
+  <h3 id="u5-stack">Five reasons the stack exists</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Reason</th><th>Explanation</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Return address preservation</td><td>Nested <code>jal</code>s overwrite x1, so ra is saved before each call</td></tr>
+      <tr><td>2</td><td>Callee-saved register preservation</td><td>s0–s11 modified by a callee must be saved and restored so the caller's values survive</td></tr>
+      <tr><td>3</td><td>Extra arguments</td><td>Beyond the 8 in a0–a7, arguments are passed on the stack</td></tr>
+      <tr><td>4</td><td>Local variables</td><td>Arrays, structs, and data too large for registers live on the stack</td></tr>
+      <tr><td>5</td><td>Recursion support</td><td>Each recursive call needs its own independent state, which frames provide</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box proc"><span class="lbl">Diagram: a stack frame</span>
+<pre class="code"><code>Higher addresses
++---------------------------------+  <- caller's sp (before the call)
+| caller's saved data             |
++---------------------------------+
+| return address (ra / x1)        |  <- non-leaf only
++---------------------------------+
+| saved s-registers               |
++---------------------------------+
+| local variables / arrays        |
++---------------------------------+
+| extra arguments (if more than 8)|  <- sp + 0
++---------------------------------+  <- callee's sp after addi sp, sp, -N
+Lower addresses          (the stack grows DOWN)</code></pre>
+  </div>
+
+  <h3 id="u5-layout">RISC-V memory layout</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Segment</th><th>Contains</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Stack</td><td>Local variables, saved registers, return addresses</td><td>Grows <strong>downward</strong> from high addresses; managed by sp (x2)</td></tr>
+      <tr><td>Heap</td><td>Dynamically allocated memory</td><td>Grows <strong>upward</strong>; managed by the programmer (malloc/new)</td></tr>
+      <tr><td>Static data</td><td>Global and static variables, constants, string literals</td><td>Referenced via the global pointer x3</td></tr>
+      <tr><td>Text</td><td>Program machine instructions</td><td>Read-only at run time; loaded by the OS</td></tr>
+      <tr><td>Reserved</td><td>OS and hardware use</td><td>Lowest addresses</td></tr>
+    </tbody>
+  </table></div>
+  <p>Heap and stack grow toward each other through the free space between them, which is the same picture CSC 4320 draws for a process's address space.</p>
+
+  <h3 id="u5-endian">Memory addressing and endianness</h3>
+  <ul>
+    <li><strong>Byte-addressable:</strong> each address points to exactly 8 bits.</li>
+    <li><strong>Little endian:</strong> the least significant byte is stored at the lowest address.</li>
+    <li>The guide notes that RISC-V does not require word alignment (unlike ARM), so <code>lw</code> can target any byte address.</li>
+  </ul>
+  <div class="box ex"><span class="lbl">Worked example: 0x12345678 stored at 0x1000</span>
+    <div class="tw"><table>
+      <thead><tr><th>Address</th><th>Byte</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>0x1000</td><td><code>0x78</code></td><td>Least significant byte, stored first</td></tr>
+        <tr><td>0x1001</td><td><code>0x56</code></td><td></td></tr>
+        <tr><td>0x1002</td><td><code>0x34</code></td><td></td></tr>
+        <tr><td>0x1003</td><td><code>0x12</code></td><td>Most significant byte, stored last</td></tr>
+      </tbody>
+    </table></div>
+    <p>Memory hook: <em>little endian = little end first</em>.</p>
+  </div>
+  <div class="box bg"><span class="lbl">Background: alignment in practice</span>
+    <p>Architecturally RISC-V allows misaligned loads and stores, but real implementations often handle them slowly or trap to a handler that fixes them up. So the guide's claim is right for the exam, while real code still aligns data for speed.</p>
+  </div>
+
+  <h4 id="u5-branches">Conditional branch quick reference</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Instruction</th><th>Branches when</th><th>Comparison</th><th>Complement (exit)</th></tr></thead>
+    <tbody>
+      <tr><td><code>beq rs1, rs2, L</code></td><td>rs1 == rs2</td><td>Either</td><td><code>bne</code></td></tr>
+      <tr><td><code>bne rs1, rs2, L</code></td><td>rs1 != rs2</td><td>Either</td><td><code>beq</code></td></tr>
+      <tr><td><code>blt rs1, rs2, L</code></td><td>rs1 &lt; rs2</td><td>Signed</td><td><code>bge</code></td></tr>
+      <tr><td><code>bge rs1, rs2, L</code></td><td>rs1 &gt;= rs2</td><td>Signed</td><td><code>blt</code></td></tr>
+      <tr><td><code>bltu rs1, rs2, L</code></td><td>rs1 &lt; rs2</td><td>Unsigned</td><td><code>bgeu</code></td></tr>
+      <tr><td><code>bgeu rs1, rs2, L</code></td><td>rs1 &gt;= rs2</td><td>Unsigned</td><td><code>bltu</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="box warn"><span class="lbl">Misconception: the 0xFFFFFFFF trap</span>
+    <p><code>0xFFFFFFFF</code> is −1 read as signed and 4,294,967,295 read as unsigned. So <code>blt</code> says 0xFFFFFFFF &lt; 1 is <strong>true</strong> (−1 &lt; 1), while <code>bltu</code> says it is <strong>false</strong> (a huge number is not less than 1). The bits are identical; only the instruction decides the meaning.</p>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>A function needs 3 saved registers and its return address. How much stack space, and what is the allocation instruction?</summary><div><p>Four 4-byte words = 16 bytes: <code>addi sp, sp, -16</code>, then <code>sw</code> each at offsets 0, 4, 8, 12, and <code>addi sp, sp, 16</code> before returning.</p></div></details>
+    <details><summary>Why is jalr x0, 0(x1) used to return instead of jal?</summary><div><p><code>jal</code> takes a fixed PC-relative label, but a function can be called from anywhere, so the return target is only known at run time, in ra. <code>jalr</code> jumps to a computed address, and writing the new return address to x0 discards it.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u6">
+  <div class="plate"><span class="num" aria-hidden="true">U6</span><p class="ttl">Branches, jumps &amp; loading constants</p><p class="src">Unit 6 of the CSC 3210 study guide</p></div>
+
+  <h3 id="u6-branch">PC-relative branch addressing</h3>
+  <div class="formula"><span class="lbl" style="font-family:var(--cond);font-weight:700;color:var(--brass)">Formula: branch target</span>
+    <div class="eq">Target = PC + Immediate × 2</div>
+    <p>The immediate is a signed 13-bit value stored in the B-type instruction, and it counts <strong>half-words</strong>; multiplying by 2 converts to bytes. Branch not taken: PC = PC + 4. Branch taken: PC = PC + imm × 2.</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: a backward branch</span>
+    <p>A branch sits at PC = <code>0x00000100</code> and its target <code>Loop</code> is <code>0x000000D0</code>.</p>
+    <p>Byte offset = 0xD0 − 0x100 = −0x30 = <strong>−48 bytes</strong>. Stored immediate = −48 / 2 = <strong>−24</strong>, in 13-bit two's complement. Decoding: −24 × 2 = −48, and 0x100 + (−48) = 0xD0. ✓</p>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>Treating the branch immediate as a byte offset. It is a half-word offset: divide the byte distance by 2 when encoding, multiply by 2 when decoding. This works because every instruction is 2- or 4-byte aligned, so the lowest bit is always 0 and storing it would waste range.</p>
+  </div>
+
+  <h3 id="u6-patterns">Loop and if-else patterns</h3>
+  <div class="box proc"><span class="lbl">Process: while loop (memorize the shape)</span>
+    <p>C: <code>while (i &lt; 10) { body; }</code></p>
+<pre class="code"><code>Loop:
+    bge  x11, x12, Exit     # if i >= 10, leave  (INVERT the condition)
+    ...loop body...
+    beq  x0, x0, Loop       # unconditional branch back (x0 == x0 always)
+Exit:</code></pre>
+    <p><strong>Key rule:</strong> the C condition is inverted for the exit branch. "while i &lt; 10" becomes "branch out when i &gt;= 10", so you use <code>bge</code>.</p>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: if-else</span>
+    <p>C: <code>if (i == j) f = g + h; else f = g - h;</code> with i=x22, j=x23, f=x19, g=x20, h=x21.</p>
+<pre class="code"><code>    bne  x22, x23, Else     # if i != j, skip the then-branch
+    add  x19, x20, x21      # f = g + h
+    beq  x0, x0, Exit       # jump over the else
+Else:
+    sub  x19, x20, x21      # f = g - h
+Exit:</code></pre>
+    <p>Same inversion idea: the branch tests the <em>opposite</em> of the C condition, because the branch's job is to skip the code.</p>
+  </div>
+
+  <h3 id="u6-constants">Loading 32-bit constants: lui + addi</h3>
+  <p>I-format immediates are only 12 bits signed (−2048 to +2047), so a full 32-bit constant is split: <code>lui</code> loads the upper 20 bits and <code>addi</code> adds the lower 12.</p>
+  <div class="box ex"><span class="lbl">Worked example: the easy case</span>
+    <p>Load <code>0x12340050</code> into x19:</p>
+<pre class="code"><code>lui  x19, 0x12340       # x19 = 0x12340000
+addi x19, x19, 0x50     # x19 = 0x12340050</code></pre>
+  </div>
+  <div class="box warn"><span class="lbl">Misconception: the sign-extension trap (lower 12 bits ≥ 0x800)</span>
+    <p><code>addi</code> sign-extends its 12-bit immediate. If the lower 12 bits are ≥ 0x800, bit 11 is 1, so the immediate is treated as <em>negative</em> and subtracts from the upper part.</p>
+    <p><strong>Wrong:</strong> to load <code>0x12340800</code>, <code>lui x6, 0x12340</code> then <code>addi x6, x6, 0x800</code> gives 0x12340000 − 0x800 = <code>0x1233F800</code>. ✗</p>
+    <p><strong>Right:</strong> pre-compensate by adding 1 to the upper 20 bits: <code>lui x6, 0x12341</code> then <code>addi x6, x6, 0x800</code> gives 0x12341000 − 0x800 = <code>0x12340800</code>. ✓</p>
+    <p><strong>Rule:</strong> if lower12 ≥ 0x800, add 1 to the value used in <code>lui</code>.</p>
+  </div>
+
+  <h3 id="u6-jumps">Jump instructions: jal and jalr</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Instruction</th><th>Format</th><th>Operation and use</th></tr></thead>
+    <tbody>
+      <tr><td><code>jal rd, label</code></td><td>J</td><td>rd = PC+4; PC = PC + offset (20-bit, ±1 MB). Procedure call or unconditional jump.</td></tr>
+      <tr><td><code>jalr rd, imm(rs1)</code></td><td>I</td><td>rd = PC+4; PC = rs1 + sign_extend(imm). Returns, computed jumps, switch-case.</td></tr>
+      <tr><td><code>jalr x0, 0(x1)</code></td><td>I</td><td>The standard return: jump to ra, discard the new return address.</td></tr>
+      <tr><td><code>lui</code> + <code>jalr</code></td><td>U + I</td><td>Load a full 32-bit target into a temporary, then jump, for unlimited range.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u6-blocks">Basic blocks</h3>
+  <div class="box def"><span class="lbl">Definition: basic block</span>
+    <dl>
+      <dt>Plain English</dt><dd>A straight-line run of instructions with one way in at the top and one way out at the bottom.</dd>
+      <dt>Technical</dt><dd>A maximal sequence of instructions with no branch or jump inside it (except possibly at the very end) and no branch target label inside it (except possibly at the very start).</dd>
+      <dt>Why it matters</dt><dd>Compilers treat basic blocks as atomic units for register allocation and instruction scheduling, and hardware pipelines them efficiently because nothing can jump into the middle.</dd>
+    </dl>
+  </div>
+  <div class="box ex"><span class="lbl">Worked example: finding the blocks</span>
+<pre class="code"><code>    addi x10, x0, 0     -+
+    addi x11, x0, 0      |  Block 1: initialization
+    addi x12, x0, 10    -+
+Loop:                   -+  Block 2: loop header
+    bge  x11, x12, Exit -+   (label at start, branch at end)
+    add  x10, x10, x11  -+
+    addi x11, x11, 1     |  Block 3: loop body
+    beq  x0, x0, Loop   -+
+Exit:                   -+  Block 4: post-loop</code></pre>
+    <p>The boundaries are exactly where labels and branches sit.</p>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>A branch at PC = 0x200 must reach 0x260. What immediate is encoded?</summary><div><p>Byte offset = 0x260 − 0x200 = 0x60 = 96 bytes. Immediate = 96 / 2 = 48.</p></div></details>
+    <details><summary>Load 0xABCDEF00 with lui and addi.</summary><div><p>Split the target at bit 12: upper20 = <code>0xABCDE</code>, lower12 = <code>0xF00</code>. Since 0xF00 ≥ 0x800, add 1 to the upper: use <code>0xABCDF</code>.</p><pre class="code"><code>lui  x5, 0xABCDF        # x5 = 0xABCDF000
+addi x5, x5, 0xF00      # 0xF00 sign-extends to -256
+                        # 0xABCDF000 - 0x100 = 0xABCDEF00</code></pre></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u7">
+  <div class="plate"><span class="num" aria-hidden="true">U7</span><p class="ttl">Exam toolkit</p><p class="src">Unit 7 of the CSC 3210 study guide: formulas, must-know facts, and traps</p></div>
+
+  <h3 id="u7-formulas">Master formula sheet</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Formula</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>CPU Time = IC × CPI × Cycle_Time = (IC × CPI) / Clock_Rate</code></td><td>The core performance equation</td></tr>
+      <tr><td><code>Clock_Rate = 1 / Cycle_Time</code></td><td>250 ps period → 4 GHz</td></tr>
+      <tr><td><code>CPU Cycles = IC × CPI</code></td><td>Total cycles</td></tr>
+      <tr><td><code>Weighted CPI = Σ (CPIᵢ × fractionᵢ)</code></td><td>Mixed instruction types</td></tr>
+      <tr><td><code>Speedup(A over B) = Time_B / Time_A = Perf_A / Perf_B</code></td><td>"n times faster"</td></tr>
+      <tr><td><code>Amdahl = 1 / [(1−P) + P/N]</code></td><td>Partial-improvement speedup</td></tr>
+      <tr><td><code>Max Amdahl = 1 / (1−P)</code></td><td>The ceiling as N → ∞</td></tr>
+      <tr><td><code>Branch target = PC + imm × 2</code></td><td>B-type addressing</td></tr>
+      <tr><td><code>LUI: rd[31:12] = imm, rd[11:0] = 0</code></td><td>Then add the lower 12 with ADDI</td></tr>
+      <tr><td><code>Unsigned range = 0 … 2ⁿ − 1</code></td><td></td></tr>
+      <tr><td><code>Signed range = −2^(n−1) … 2^(n−1) − 1</code></td><td></td></tr>
+      <tr><td><code>Two's complement = invert all bits + 1</code></td><td></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u7-powers">Powers of two</h3>
+  <div class="tw"><table>
+    <thead><tr><th>2ⁿ</th><th class="num">Value</th><th>2ⁿ</th><th class="num">Value</th><th>2ⁿ</th><th class="num">Value</th><th>2ⁿ</th><th class="num">Value</th></tr></thead>
+    <tbody>
+      <tr><td>2⁰</td><td class="num">1</td><td>2⁴</td><td class="num">16</td><td>2⁸</td><td class="num">256</td><td>2¹²</td><td class="num">4,096</td></tr>
+      <tr><td>2¹</td><td class="num">2</td><td>2⁵</td><td class="num">32</td><td>2⁹</td><td class="num">512</td><td>2¹⁶</td><td class="num">65,536</td></tr>
+      <tr><td>2²</td><td class="num">4</td><td>2⁶</td><td class="num">64</td><td>2¹⁰</td><td class="num">1,024</td><td>2²⁰</td><td class="num">~1 M</td></tr>
+      <tr><td>2³</td><td class="num">8</td><td>2⁷</td><td class="num">128</td><td>2¹¹</td><td class="num">2,048</td><td>2³²</td><td class="num">~4 B</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u7-must">High-frequency test topics</h3>
+  <div class="box exam"><span class="lbl">Must-know checklist</span>
+    <ul class="checklist">
+      <li>CPU time formula: IC × CPI × cycle time, solved for any variable.</li>
+      <li>Amdahl's law: plug in P and N, compute speedup, state the 1/(1−P) limit.</li>
+      <li>Two's complement: invert and add 1; ranges for 4, 8, and 32 bits.</li>
+      <li>Convert fluently between hex, binary, and decimal; 4 binary bits = 1 hex digit.</li>
+      <li>Identify R/I/S formats by opcode; know every field name and size.</li>
+      <li>Masking: AND extracts and clears, OR sets, XOR toggles; build masks with addi + shifts.</li>
+      <li>The stack grows downward; allocate with <code>addi sp, sp, -N</code>.</li>
+      <li>Leaf vs. non-leaf: a non-leaf must save ra before any <code>jal</code>.</li>
+      <li>Branch addressing: target = PC + imm × 2 (half-word offsets).</li>
+      <li>LUI + ADDI: add 1 to the upper 20 bits when lower12 ≥ 0x800.</li>
+      <li>Little endian: least significant byte at the lowest address.</li>
+      <li>x0 is hardwired zero: writes are discarded, reads return 0.</li>
+      <li>Signed vs. unsigned branches: use <code>bltu</code>/<code>bgeu</code> for unsigned comparisons.</li>
+      <li>Moore's law progression: 1951 → 2013 is about 250 billion× performance.</li>
+      <li>MIPS is unreliable; use execution time.</li>
+    </ul>
+  </div>
+
+  <h3 id="u7-mistakes">Common mistakes to avoid</h3>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Mistake</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Forgetting to save ra before a <code>jal</code> in a non-leaf procedure</td><td>Returns to the wrong address</td></tr>
+      <tr><td>2</td><td>LUI + ADDI without the +1 correction when lower12 ≥ 0x800</td><td>Constant is 0x1000 too low</td></tr>
+      <tr><td>3</td><td>Confusing signed and unsigned comparisons with 0xFFFFFFFF</td><td>Branch goes the wrong way</td></tr>
+      <tr><td>4</td><td>Treating the branch immediate as a byte offset</td><td>Target is twice as far as intended</td></tr>
+      <tr><td>5</td><td>Using OR to clear bits or AND to set bits</td><td>Mask does the opposite of what you want</td></tr>
+      <tr><td>6</td><td>Forgetting <code>addi sp, sp, +N</code> at the end of a function</td><td>Stack pointer drifts; caller's frame is corrupted</td></tr>
+      <tr><td>7</td><td>Treating CPU time and elapsed time as the same</td><td>Wrong performance conclusions</td></tr>
+      <tr><td>8</td><td>Assuming a higher clock rate always wins</td><td>CPI and IC matter just as much</td></tr>
+      <tr><td>9</td><td>Trying to store a value in x0</td><td>Silently discarded</td></tr>
+      <tr><td>10</td><td>Flipping endianness</td><td>RISC-V is little endian: LSB at the lowest address</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u7-encoding">Character encoding</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Encoding</th><th class="num">Bits</th><th>Range</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>ASCII</td><td class="num">7</td><td>0–127 (128 chars)</td><td>Standard English characters; fits in an unsigned byte</td></tr>
+      <tr><td>Extended ASCII</td><td class="num">8</td><td>0–255</td><td>Extra symbols and Latin characters</td></tr>
+      <tr><td>Latin-1</td><td class="num">8</td><td>0–255</td><td>Western European languages</td></tr>
+      <tr><td>Unicode</td><td class="num">32</td><td>Millions of characters</td><td>Most world languages; handled with <code>lb</code>/<code>lh</code>/<code>lw</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u7-riscv-x86">RISC-V vs. x86 side by side</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Feature</th><th>RISC-V (RISC)</th><th>x86 (CISC)</th></tr></thead>
+    <tbody>
+      <tr><td>Instruction length</td><td>Fixed 32-bit, simple decode</td><td>Variable 1–15 bytes, complex decode</td></tr>
+      <tr><td>Memory operands</td><td>Load/store only</td><td>Arithmetic can address memory directly</td></tr>
+      <tr><td>Register count</td><td>32 general-purpose</td><td>8–16, with more complex conventions</td></tr>
+      <tr><td>Instruction complexity</td><td>Simple, about one cycle each</td><td>Some instructions perform many operations</td></tr>
+      <tr><td>Proprietary?</td><td>No, open source (RISC-V International)</td><td>Yes, Intel/AMD controlled</td></tr>
+      <tr><td>Addressing modes</td><td>Primarily base + offset</td><td>Many: immediate, indirect, scaled, segment</td></tr>
+      <tr><td>ISA examples</td><td>RISC-V, ARM, MIPS</td><td>x86, x86-64</td></tr>
+    </tbody>
+  </table></div>
+</section>
+</template>

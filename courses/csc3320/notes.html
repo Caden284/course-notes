@@ -1,0 +1,804 @@
+<template data-part="toc"><ol>
+<li><a href="#how">How to use these notes</a></li>
+<li><a href="#u1"><span class="code">U1</span>CLI &amp; UNIX fundamentals</a>
+  <ol><li><a href="#u1-systems">Computer systems overview</a></li><li><a href="#u1-shells">Shell environments</a></li><li><a href="#u1-ssh">Remote access: SSH &amp; Snowball</a></li><li><a href="#u1-commands">Essential UNIX commands</a></li><li><a href="#u1-shortcuts">Keyboard shortcuts</a></li><li><a href="#u1-paths">Paths and permissions</a></li><li><a href="#u1-sftp">SFTP reference</a></li></ol></li>
+<li><a href="#u2"><span class="code">U2</span>Introduction to C</a>
+  <ol><li><a href="#u2-history">History and origins</a></li><li><a href="#u2-properties">Properties of C</a></li><li><a href="#u2-compare">C vs. Java vs. Python</a></li><li><a href="#u2-pipeline">The compilation pipeline</a></li><li><a href="#u2-types">Basic data types</a></li><li><a href="#u2-structure">Program structure</a></li></ol></li>
+<li><a href="#u3"><span class="code">U3</span>I/O, strings &amp; preprocessor</a>
+  <ol><li><a href="#u3-pre">Preprocessor directives</a></li><li><a href="#u3-io">printf and scanf</a></li><li><a href="#u3-format">Format specifiers</a></li><li><a href="#u3-escape">Escape sequences</a></li><li><a href="#u3-strings">Strings in C</a></li><li><a href="#u3-strfun">String functions</a></li></ol></li>
+<li><a href="#u4"><span class="code">U4</span>Flow control &amp; scope</a>
+  <ol><li><a href="#u4-scope">Scope and lifetime</a></li><li><a href="#u4-operators">Operators</a></li><li><a href="#u4-selection">if, else, and switch</a></li><li><a href="#u4-loops">Loops</a></li></ol></li>
+<li><a href="#u5"><span class="code">U5</span>Arrays, functions &amp; pointers</a>
+  <ol><li><a href="#u5-arrays">Arrays</a></li><li><a href="#u5-functions">Functions</a></li><li><a href="#u5-byvalue">Pass by value</a></li><li><a href="#u5-arrayparam">Passing arrays</a></li><li><a href="#u5-recursion">Recursion</a></li><li><a href="#u5-pointers">Pointers</a></li></ol></li>
+<li><a href="#u6"><span class="code">U6</span>Exam toolkit</a>
+  <ol><li><a href="#u6-commands">Command cheat sheet</a></li><li><a href="#u6-keywords">C keyword reference</a></li><li><a href="#u6-specifiers">Format specifiers</a></li><li><a href="#u6-pitfalls">Common pitfalls</a></li></ol></li>
+</ol></template>
+<template data-part="main">
+<section id="how" class="prose">
+  <h3>How to use these notes</h3>
+  <p>This is the comprehensive study guide rebuilt as readable notes: the same tables and commands, with the reasoning and the traps spelled out. C here is the same C that CSC 4320 assumes in its Chapter 3 review, so the two courses reinforce each other.</p>
+  <div class="legend">
+    <div class="box def"><span class="lbl">Definition</span><p>Plain English, the exam wording, and why it matters.</p></div>
+    <div class="box ex"><span class="lbl">Worked example</span><p>Code traced to its output.</p></div>
+    <div class="box warn"><span class="lbl">Pitfall</span><p>The traps the guide flags as most-tested.</p></div>
+    <div class="box exam"><span class="lbl">Exam practice</span><p>Questions with the answer hidden until you open it.</p></div>
+    <div class="box proc"><span class="lbl">Process</span><p>A procedure worth reproducing.</p></div>
+  </div>
+</section>
+
+<section class="lecture prose" id="u1">
+  <div class="plate"><span class="num" aria-hidden="true">U1</span><p class="ttl">CLI &amp; UNIX fundamentals</p><p class="src">Unit 1 of the CSC 3320 study guide</p></div>
+
+  <h3 id="u1-systems">Computer systems overview</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Component</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>Hardware</td><td>Physical components: CPU, memory (RAM), storage, peripherals</td></tr>
+      <tr><td>Operating system</td><td>Software managing hardware, memory, files, scheduling, and user interfaces</td></tr>
+      <tr><td>Applications</td><td>Everything else running on top of the OS: games, editors, compilers</td></tr>
+      <tr><td>API</td><td>Application Program Interface: how applications reach OS services</td></tr>
+      <tr><td>UNIX</td><td>Major OS family; the foundation of macOS, Linux, and Android</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u1-shells">Shell environments</h3>
+  <div class="box def"><span class="lbl">Definition: shell</span>
+    <dl>
+      <dt>Plain English</dt><dd>The text program that takes your typed commands and hands them to the OS.</dd>
+      <dt>Technical</dt><dd>A non-graphical interface that accepts user commands and passes them to the operating system.</dd>
+      <dt>Why it matters</dt><dd>It is the entire interface to Snowball, and every command in this unit runs inside one.</dd>
+    </dl>
+  </div>
+  <ul>
+    <li><strong>Bourne shell (sh)</strong> — the original UNIX shell.</li>
+    <li><strong>Korn shell (ksh)</strong> — an extended Bourne shell.</li>
+    <li><strong>C shell (csh)</strong> — C-like scripting syntax.</li>
+    <li><strong>Bash</strong> (Bourne Again Shell) — the most common shell in modern Linux, and the one you use on Snowball.</li>
+  </ul>
+
+  <h3 id="u1-ssh">Remote access: SSH and Snowball</h3>
+  <p>Snowball (<code>snowball.cs.gsu.edu</code>) is GSU's instructional server for C programming and UNIX coursework.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Protocol</th><th>Security</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td>SSH (Secure Shell)</td><td>Encrypted — <strong>secure</strong></td><td>Remote terminal login</td></tr>
+      <tr><td>Telnet</td><td>Plaintext — insecure</td><td>Legacy remote login (avoid)</td></tr>
+      <tr><td>SFTP</td><td>Encrypted, runs over SSH</td><td>Secure file transfer</td></tr>
+      <tr><td>FTP</td><td>Plaintext — insecure</td><td>Legacy file transfer (avoid)</td></tr>
+    </tbody>
+  </table></div>
+<pre class="code"><code>ssh username@snowball.cs.gsu.edu</code></pre>
+  <p>The first connection asks you to accept the server's key fingerprint; authentication uses your GSU single sign-on password.</p>
+  <div class="box bg"><span class="lbl">Background: why the fingerprint prompt exists</span>
+    <p>SSH has no certificate authority by default, so the first time you connect your client shows the server's public key fingerprint and stores it. If it ever changes, SSH warns loudly, because a changed key can mean a man-in-the-middle. (Your security course covers exactly this problem and how certificates solve it.)</p>
+  </div>
+
+  <h3 id="u1-commands">Essential UNIX commands</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Command</th><th>Purpose</th><th>Common flags</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td><code>pwd</code></td><td>Print working directory</td><td>—</td><td><code>pwd</code> → /home/student</td></tr>
+      <tr><td><code>ls</code></td><td>List directory contents</td><td><code>-a -l -F -R -d -s -g</code></td><td><code>ls -la</code></td></tr>
+      <tr><td><code>cd</code></td><td>Change directory</td><td>—</td><td><code>cd /home/student</code></td></tr>
+      <tr><td><code>mkdir</code></td><td>Create directories</td><td>—</td><td><code>mkdir myproject</code></td></tr>
+      <tr><td><code>rm</code></td><td>Remove files</td><td><code>-f -i -r</code></td><td><code>rm -i file.c</code></td></tr>
+      <tr><td><code>rmdir</code></td><td>Remove an empty directory</td><td>—</td><td><code>rmdir emptydir</code></td></tr>
+      <tr><td><code>cp</code></td><td>Copy files and directories</td><td><code>-i -r</code></td><td><code>cp src.c dest.c</code></td></tr>
+      <tr><td><code>mv</code></td><td>Move or rename</td><td><code>-i</code></td><td><code>mv old.c new.c</code></td></tr>
+      <tr><td><code>cat</code></td><td>Display file contents</td><td>—</td><td><code>cat main.c</code></td></tr>
+      <tr><td><code>more</code> / <code>less</code></td><td>Paginate / scroll forward and back</td><td>—</td><td><code>less largefile.c</code></td></tr>
+      <tr><td><code>head</code> / <code>tail</code></td><td>First / last n lines</td><td><code>-n</code></td><td><code>head -5 file.c</code></td></tr>
+      <tr><td><code>man</code></td><td>Manual pages</td><td><code>-s section</code></td><td><code>man ls</code></td></tr>
+      <tr><td><code>clear</code></td><td>Clear the terminal</td><td>—</td><td><code>clear</code></td></tr>
+      <tr><td><code>wc</code></td><td>Word, line, byte count</td><td><code>-l -w -c</code></td><td><code>wc -l file.c</code></td></tr>
+      <tr><td><code>script</code></td><td>Record a terminal session</td><td>—</td><td><code>script session.log</code></td></tr>
+      <tr><td><code>chmod</code></td><td>Change permissions</td><td>—</td><td><code>chmod g+w file.c</code></td></tr>
+      <tr><td><code>chgrp</code></td><td>Change group</td><td><code>-R</code></td><td><code>chgrp team file.c</code></td></tr>
+      <tr><td><code>groups</code></td><td>List a user's groups</td><td>—</td><td><code>groups jsmith</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="box warn"><span class="lbl">Pitfall</span>
+    <p><code>rm</code> is irreversible: there is no recycle bin. <code>rm -rf dir</code> deletes a whole tree without asking. Use <code>-i</code> while learning, and read the path twice before pressing Enter.</p>
+  </div>
+
+  <h3 id="u1-shortcuts">Keyboard shortcuts</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>CTRL-C</kbd></td><td>Interrupt (kill) the running process</td></tr>
+      <tr><td><kbd>CTRL-Z</kbd></td><td>Suspend (pause) the running process</td></tr>
+      <tr><td><kbd>CTRL-D</kbd></td><td>End of file (EOF); also logs out of a shell</td></tr>
+      <tr><td><kbd>CTRL-S</kbd></td><td>Stop/pause terminal output</td></tr>
+    </tbody>
+  </table></div>
+  <p>Exam contrast: CTRL-C <em>kills</em>, CTRL-Z only <em>pauses</em> (the job still exists), and CTRL-D signals end of input rather than killing anything.</p>
+
+  <h3 id="u1-paths">Paths, directories, and permissions</h3>
+  <ul>
+    <li><strong>Absolute path</strong> — starts at the root <code>/</code>: <code>/home/student/csc3320/main.c</code></li>
+    <li><strong>Relative path</strong> — starts at the current directory: <code>csc3320/main.c</code></li>
+  </ul>
+  <div class="tw"><table>
+    <thead><tr><th>Symbol</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>/</code></td><td>Root, the top-level ancestor of all files</td></tr>
+      <tr><td><code>.</code></td><td>Current directory</td></tr>
+      <tr><td><code>..</code></td><td>Parent directory (one level up)</td></tr>
+      <tr><td><code>~</code></td><td>Home directory of the current user</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box proc"><span class="lbl">Process: chmod symbolic syntax</span>
+    <p><code>chmod &lt;who&gt;&lt;+/-&gt;&lt;permission&gt; &lt;file&gt;</code></p>
+    <p><strong>Who:</strong> <code>u</code> user (owner), <code>g</code> group, <code>o</code> others, <code>a</code> all. <strong>Permissions:</strong> <code>r</code> read, <code>w</code> write, <code>x</code> execute. <code>+</code> adds, <code>-</code> removes. Separate multiple changes with commas.</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Command</th><th>Effect</th><th>Before</th><th>After</th></tr></thead>
+    <tbody>
+      <tr><td><code>chmod g+w file</code></td><td>Add write for the group</td><td><code>rw-r--r--</code></td><td><code>rw-rw-r--</code></td></tr>
+      <tr><td><code>chmod u-rw file</code></td><td>Remove owner read and write</td><td><code>rw-r--r--</code></td><td><code>---r--r--</code></td></tr>
+      <tr><td><code>chmod u+x,g-r file</code></td><td>Add execute for owner, remove group read</td><td><code>rw-r--r--</code></td><td><code>rwx---r--</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: symbolic vs. octal</span>
+    <p>The same permissions can be written numerically, with r = 4, w = 2, x = 1 per triplet. <code>rw-r--r--</code> = 6 4 4 = <code>chmod 644 file</code>. <code>rwxr-xr-x</code> = 755. Symbolic mode changes one bit and leaves the rest alone; octal mode sets all nine bits at once.</p>
+  </div>
+
+  <h3 id="u1-sftp">SFTP quick reference</h3>
+  <div class="tw"><table>
+    <thead><tr><th>SFTP command</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><code>sftp username@snowball.cs.gsu.edu</code></td><td>Start an SFTP session</td></tr>
+      <tr><td><code>ls</code> / <code>pwd</code> / <code>cd dirname</code></td><td>List, show, and change the <em>remote</em> directory</td></tr>
+      <tr><td><code>get filename</code></td><td><strong>Download</strong> from remote to local</td></tr>
+      <tr><td><code>get -r dirname</code></td><td>Download a directory recursively</td></tr>
+      <tr><td><code>put filename</code></td><td><strong>Upload</strong> from local to remote</td></tr>
+      <tr><td><code>put -r dirname</code></td><td>Upload a directory recursively</td></tr>
+      <tr><td><code>reget</code> / <code>reput filename</code></td><td>Resume an interrupted download / upload</td></tr>
+      <tr><td><code>exit</code></td><td>Close the session</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box exam"><span class="lbl">Exam watch: SSH vs. SFTP vs. FTP</span>
+    <p>SSH is an encrypted remote <em>terminal</em>. SFTP is encrypted <em>file transfer</em> running over SSH. FTP and Telnet are unencrypted and should never be used on public networks. <code>get</code> (download) and <code>put</code> (upload) are the most tested commands. GUI alternatives: FileZilla (cross-platform) and WinSCP (Windows only).</p>
+    <details><summary>You are on your laptop in an SFTP session and want to copy hw1.c from Snowball to your laptop. Which command?</summary><div><p><code>get hw1.c</code>. Think of the direction from your machine's point of view: get pulls down, put pushes up.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u2">
+  <div class="plate"><span class="num" aria-hidden="true">U2</span><p class="ttl">Introduction to C programming</p><p class="src">Unit 2 of the CSC 3320 study guide</p></div>
+
+  <h3 id="u2-history">History and origins</h3>
+  <p>C's lineage: <strong>BCPL (1967) → B (Ken Thompson) → C (Dennis Ritchie, Bell Labs, 1973)</strong>.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Standard / event</th><th>Key facts</th></tr></thead>
+    <tbody>
+      <tr><td>BCPL (1967)</td><td>Typeless systems language by Martin Richards</td></tr>
+      <tr><td>B</td><td>Created by Ken Thompson at Bell Labs, based on BCPL</td></tr>
+      <tr><td>C (1973)</td><td>Dennis Ritchie extended B into C</td></tr>
+      <tr><td>UNIX in C (1973)</td><td>UNIX was rewritten in C: the portability breakthrough</td></tr>
+      <tr><td>K&amp;R C (1978)</td><td>Kernighan &amp; Ritchie's book became the de facto standard</td></tr>
+      <tr><td>C89 / C90</td><td>First formal ANSI/ISO standard</td></tr>
+      <tr><td>C99 (1999)</td><td>Added <code>//</code> comments, <code>_Bool</code>, <code>inline</code>, variable-length arrays</td></tr>
+      <tr><td>C11, C17, C23</td><td>Further refinements for safety and modern features</td></tr>
+    </tbody>
+  </table></div>
+  <p>Why rewriting UNIX in C mattered: before that, an OS was written in the assembly language of one machine. In C, you port the compiler and recompile, which is how UNIX spread to every architecture.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Language</th><th>Relationship to C</th></tr></thead>
+    <tbody>
+      <tr><td>C++</td><td>Extends C with classes, templates, and OOP; largely C-compatible</td></tr>
+      <tr><td>Java</td><td>Derived from C++: similar syntax, but garbage-collected with no pointers</td></tr>
+      <tr><td>C#</td><td>Influenced by C++ and Java; Microsoft's managed language</td></tr>
+      <tr><td>Python</td><td>CPython, the standard interpreter, is itself written in C</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u2-properties">Core properties of C</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Property</th><th>Explanation</th></tr></thead>
+    <tbody>
+      <tr><td>Low-level</td><td>Direct access to memory and OS APIs (system calls)</td></tr>
+      <tr><td>Efficient</td><td>Compiles to machine code; designed to replace assembly</td></tr>
+      <tr><td>Portable</td><td>Write once, compile on many platforms with minimal changes</td></tr>
+      <tr><td>Small language</td><td>Minimal built-in features; relies on standard libraries</td></tr>
+      <tr><td>Permissive</td><td>Trusts the programmer; no automatic safety checks</td></tr>
+      <tr><td>No OOP</td><td>No classes or inheritance; structs group data instead</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Strengths:</strong> efficiency, portability, power (rich operators and types), flexibility, a standard library, and direct UNIX integration. <strong>Weaknesses:</strong> error-prone (no bounds checking), complex pointer management, no OOP support, and harder to read than Python.</p>
+
+  <h3 id="u2-compare">C vs. Java vs. Python</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Feature</th><th>C</th><th>Java</th><th>Python</th></tr></thead>
+    <tbody>
+      <tr><td>OOP support</td><td>None (structs only)</td><td>Full OOP (classes)</td><td>Optional OOP</td></tr>
+      <tr><td>Type system</td><td>Static, explicit</td><td>Static, explicit</td><td>Dynamic, inferred</td></tr>
+      <tr><td>Memory management</td><td>Manual (malloc/free)</td><td>Garbage collected</td><td>Garbage collected</td></tr>
+      <tr><td>Pointers</td><td>Yes, explicit</td><td>No (references only)</td><td>No</td></tr>
+      <tr><td>Boolean type</td><td><code>int</code>: 0 = false, non-zero = true</td><td><code>boolean</code></td><td><code>bool</code></td></tr>
+      <tr><td>String type</td><td>None (char arrays)</td><td><code>String</code> object</td><td><code>str</code> object</td></tr>
+      <tr><td>do-while loop</td><td>Yes</td><td>Yes</td><td><strong>No</strong></td></tr>
+      <tr><td>switch statement</td><td>Yes</td><td>Yes</td><td><code>match</code> (3.10+)</td></tr>
+      <tr><td>Array bounds check</td><td>No: undefined behavior</td><td>Yes: exception</td><td>Yes: IndexError</td></tr>
+      <tr><td>Entry point</td><td><code>main()</code> function</td><td><code>main()</code> method in a class</td><td>Top-level script</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u2-pipeline">The compilation pipeline</h3>
+  <div class="box proc"><span class="lbl">Process: source code to executable</span>
+    <ol>
+      <li><strong>Preprocessing.</strong> The preprocessor handles every <code>#</code> directive: expands <code>#include</code> files, substitutes <code>#define</code> macros, and strips comments, producing pure C.</li>
+      <li><strong>Compiling.</strong> The compiler translates preprocessed C into machine instructions (object code, <code>.o</code> files). Syntax errors surface here.</li>
+      <li><strong>Linking.</strong> The linker combines object files with standard library code into the final executable (<code>a.out</code> by default).</li>
+    </ol>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Command</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td><code>gcc file.c</code></td><td>Compile, producing <code>a.out</code></td></tr>
+      <tr><td><code>gcc -o myprog file.c</code></td><td>Compile, producing <code>myprog</code></td></tr>
+      <tr><td><code>gcc -lm file.c</code></td><td>Link the math library (<code>&lt;math.h&gt;</code>)</td></tr>
+      <tr><td><code>cc file.c</code></td><td>Alternative compiler command on UNIX</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: which stage reports the error?</span>
+    <p><strong>Missing semicolon</strong> → compiling. <strong><code>#include &lt;stdioh&gt;</code> (typo)</strong> → preprocessing: the file cannot be found. <strong>Called <code>sqrt()</code> but forgot <code>-lm</code></strong> → linking: "undefined reference to sqrt". Knowing the stage tells you where to look.</p>
+  </div>
+
+  <h3 id="u2-types">Basic data types</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Type</th><th>Size (32-bit)</th><th>Size (64-bit)</th><th>Range / notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>char</code></td><td>1 byte</td><td>1 byte</td><td>−128 to 127; ASCII encoding</td></tr>
+      <tr><td><code>short</code></td><td>2 bytes</td><td>2 bytes</td><td>−32,768 to 32,767</td></tr>
+      <tr><td><code>int</code></td><td>4 bytes</td><td>4 bytes</td><td>±2.15 billion</td></tr>
+      <tr><td><code>long</code></td><td>4 bytes</td><td><strong>8 bytes</strong></td><td>Expands on 64-bit systems</td></tr>
+      <tr><td><code>long long</code></td><td>8 bytes</td><td>8 bytes</td><td>−2⁶³ to 2⁶³ − 1</td></tr>
+      <tr><td><code>float</code></td><td>4 bytes</td><td>4 bytes</td><td>~3.4e−38 to 3.4e+38; <code>F</code> suffix</td></tr>
+      <tr><td><code>double</code></td><td>8 bytes</td><td>8 bytes</td><td>~1.7e−308 to 1.7e+308; the default for float literals</td></tr>
+      <tr><td>pointer</td><td>4 bytes</td><td>8 bytes</td><td>Stores a memory address</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><code>unsigned</code> variants hold only non-negative values, with double the positive range.</li>
+    <li><code>sizeof(type)</code> returns the size in bytes at compile time.</li>
+    <li>Floating-point literals default to <code>double</code>; use the <code>F</code> suffix for float: <code>3.14F</code>.</li>
+    <li>Integer literals: decimal <code>42</code>, octal <code>052</code> (leading 0), hex <code>0x2A</code>.</li>
+  </ul>
+  <div class="box warn"><span class="lbl">Pitfall: "long is the only type whose size changes"</span>
+    <p>That is the guide's wording and the exam answer, but read the table: pointers also change, 4 bytes on 32-bit and 8 on 64-bit. The precise claim is that <code>long</code> is the only <em>basic arithmetic</em> type that changes. Watch the leading-zero trap too: <code>052</code> is octal 42, not decimal 52.</p>
+  </div>
+
+  <h3 id="u2-structure">Program structure, identifiers, and booleans</h3>
+<pre class="code"><code>#include &lt;stdio.h&gt;        // preprocessor directive: pulls in the I/O library
+
+#define MAX 100           // macro: MAX is replaced by 100 before compiling
+
+int my_func(void) {       // function defined before main
+    return 42;
+}
+
+int main(void) {          // mandatory entry point
+    int result = my_func();
+    printf("%d\n", result);
+    return 0;             // 0 = successful termination
+}</code></pre>
+  <ul>
+    <li>Identifiers must start with a letter or underscore, may contain digits, and are case-sensitive.</li>
+    <li>Variables must be declared with a type before use.</li>
+    <li><strong>Uninitialized local variables contain garbage</strong>, not zero.</li>
+    <li><code>int a, b, c = 5;</code> sets only <code>c</code>; <code>a</code> and <code>b</code> are still garbage.</li>
+  </ul>
+  <p>C had no boolean type until C99 added <code>_Bool</code>. Before that (and still commonly), integers stand in: 0 is false, any non-zero value is true.</p>
+<pre class="code"><code>typedef int BOOL;     // user-defined alias
+BOOL flag = 1;        // true
+#define true  1
+#define false 0</code></pre>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>What does int a, b, c = 5; leave in a and b?</summary><div><p>Garbage. Only <code>c</code> is initialized. Each variable needs its own initializer: <code>int a = 0, b = 0, c = 5;</code></p></div></details>
+    <details><summary>Why does 3.14 default to double rather than float?</summary><div><p>The C standard makes unsuffixed floating-point literals <code>double</code> for precision. Write <code>3.14F</code> when you specifically want a float.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u3">
+  <div class="plate"><span class="num" aria-hidden="true">U3</span><p class="ttl">C fundamentals: I/O, strings &amp; preprocessor</p><p class="src">Unit 3 of the CSC 3320 study guide</p></div>
+
+  <h3 id="u3-pre">Preprocessor directives</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Directive</th><th>Purpose and example</th></tr></thead>
+    <tbody>
+      <tr><td><code>#include &lt;stdio.h&gt;</code></td><td>Include a standard library header, which declares printf and scanf</td></tr>
+      <tr><td><code>#include "myfile.h"</code></td><td>Include a user-defined header from the current directory</td></tr>
+      <tr><td><code>#define MAX 100</code></td><td>Object-like macro: MAX is replaced by 100 everywhere before compiling</td></tr>
+      <tr><td><code>#define SQ(x) ((x)*(x))</code></td><td>Function-like macro: <code>SQ(5)</code> expands to <code>((5)*(5))</code></td></tr>
+      <tr><td><code>#ifdef</code> / <code>#endif</code></td><td>Conditional compilation: include code only if a macro is defined</td></tr>
+    </tbody>
+  </table></div>
+  <p>Header files (<code>.h</code>) declare function signatures only; the actual implementation lives in library code linked at the linking stage.</p>
+  <div class="box warn"><span class="lbl">Pitfall: macro parentheses</span>
+    <p>A macro is pure text substitution, so <code>#define SQ(x) x*x</code> turns <code>SQ(2+3)</code> into <code>2+3*2+3</code> = 11, not 25. Wrap every parameter and the whole body in parentheses: <code>((x)*(x))</code>.</p>
+  </div>
+
+  <h3 id="u3-io">Standard I/O: printf and scanf</h3>
+  <p>Both are declared in <code>&lt;stdio.h&gt;</code>. The OS automatically opens <strong>stdin</strong> (keyboard) and <strong>stdout</strong> (terminal) when a program starts.</p>
+<pre class="code"><code>printf("Name: %s, Age: %d, GPA: %.2f\n", name, age, gpa);
+
+scanf("%d", &amp;age);      // &amp; gives scanf the address to write into
+scanf("%s", name);      // arrays: NO &amp; needed, the name is already a pointer</code></pre>
+  <div class="box proc"><span class="lbl">Process: the critical scanf rules</span>
+    <ol>
+      <li>Always use <code>&amp;</code> for scalar variables (int, float, char), never for arrays or strings.</li>
+      <li><code>scanf</code> does not display a prompt; call <code>printf</code> first.</li>
+      <li>Input values are separated by whitespace, and <code>%s</code> reads until the next whitespace (so it cannot read a line with spaces).</li>
+      <li>Use a width specifier to prevent overflow: <code>scanf("%10s", name);</code></li>
+      <li>The return value is the number of items successfully read, or EOF at end of file.</li>
+    </ol>
+  </div>
+
+  <h3 id="u3-format">Format specifiers</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Specifier</th><th>Type</th><th>Example</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>%d</code> / <code>%i</code></td><td>int (signed)</td><td><code>printf("%d", 42)</code></td><td>The common integer specifier</td></tr>
+      <tr><td><code>%u</code></td><td>unsigned int</td><td><code>printf("%u", 42u)</code></td><td>Non-negative integers</td></tr>
+      <tr><td><code>%f</code></td><td>float / double</td><td><code>printf("%f", 3.14)</code></td><td>Fixed decimal, 6 places by default</td></tr>
+      <tr><td><code>%e</code> / <code>%E</code></td><td>float / double</td><td><code>printf("%e", 3.14)</code></td><td>Scientific notation</td></tr>
+      <tr><td><code>%g</code></td><td>float / double</td><td><code>printf("%g", 3.14)</code></td><td>Auto-selects %f or %e, drops trailing zeros</td></tr>
+      <tr><td><code>%c</code></td><td>char</td><td><code>printf("%c", 'A')</code></td><td>Single character</td></tr>
+      <tr><td><code>%s</code></td><td>char* (string)</td><td><code>printf("%s", name)</code></td><td>Reads until <code>\0</code></td></tr>
+      <tr><td><code>%ld</code> / <code>%li</code></td><td>long int</td><td><code>printf("%ld", x)</code></td><td></td></tr>
+      <tr><td><code>%lf</code></td><td>double (scanf)</td><td><code>scanf("%lf", &amp;x)</code></td><td>Use <code>%lf</code> to read a double</td></tr>
+      <tr><td><code>%o</code></td><td>int as octal</td><td><code>printf("%o", 8)</code></td><td>Prints 10</td></tr>
+      <tr><td><code>%x</code> / <code>%X</code></td><td>int as hex</td><td><code>printf("%x", 255)</code></td><td>Prints ff / FF</td></tr>
+      <tr><td><code>%%</code></td><td>literal %</td><td><code>printf("100%%")</code></td><td>Prints 100%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Optional parameters follow the pattern <code>%[flags][width][.precision][length]type</code>: <code>%-10.2f</code> is left-justified in 10 columns with 2 decimals, <code>%+d</code> always shows a sign, and <code>%08d</code> pads with leading zeros to width 8.</p>
+
+  <h3 id="u3-escape">Escape sequences</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Escape</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>\n</code></td><td>Newline</td></tr>
+      <tr><td><code>\t</code></td><td>Horizontal tab</td></tr>
+      <tr><td><code>\\</code></td><td>Literal backslash</td></tr>
+      <tr><td><code>\"</code></td><td>Literal double quote</td></tr>
+      <tr><td><code>\r</code></td><td>Carriage return</td></tr>
+      <tr><td><code>\0</code></td><td>Null character (string terminator)</td></tr>
+      <tr><td><code>\a</code></td><td>Alert / bell</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u3-strings">Strings in C</h3>
+  <div class="box def"><span class="lbl">Definition: C string</span>
+    <dl>
+      <dt>Plain English</dt><dd>An array of characters with a zero byte marking the end.</dd>
+      <dt>Technical</dt><dd>C has no native string type. A string is a null-terminated character array; the terminator <code>\0</code> marks the end, so <code>"Hello"</code> occupies 6 bytes: <code>{'H','e','l','l','o','\0'}</code>.</dd>
+      <dt>Why it matters</dt><dd>Every string bug in C traces back to this: the length is not stored, so the code must find <code>\0</code>, and losing it means reading past the end of the array.</dd>
+    </dl>
+  </div>
+<pre class="code"><code>char str1[6] = "Hello";                      // fixed size; must include room for \0
+char str2[] = "Hello";                       // size inferred as 6
+char *str3 = "Hello";                        // pointer to a string literal (read-only!)
+char str4[] = {'H','e','l','l','o','\0'};    // explicit character init</code></pre>
+  <div class="box warn"><span class="lbl">Pitfall</span>
+    <p><code>str1 = str2</code> is illegal: you cannot assign strings with <code>=</code>, because an array name is not a modifiable value. Use <code>strcpy(str1, str2)</code>. Likewise <code>s1 == s2</code> compares <em>addresses</em>, not contents; use <code>strcmp</code>.</p>
+  </div>
+
+  <h3 id="u3-strfun">String functions in &lt;string.h&gt;</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Function</th><th>Signature</th><th>Returns</th><th>Key notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>strlen</code></td><td><code>strlen(char *s)</code></td><td>Length, excluding <code>\0</code></td><td>Does not count the terminator</td></tr>
+      <tr><td><code>strcpy</code></td><td><code>strcpy(char *dst, char *src)</code></td><td>dst pointer</td><td>Copies including <code>\0</code>; <strong>no bounds check</strong></td></tr>
+      <tr><td><code>strncpy</code></td><td><code>strncpy(dst, src, int n)</code></td><td>dst pointer</td><td>Copies at most n chars; may <strong>omit</strong> <code>\0</code></td></tr>
+      <tr><td><code>strcat</code></td><td><code>strcat(char *dst, char *src)</code></td><td>dst pointer</td><td>Appends src to dst; <strong>no bounds check</strong></td></tr>
+      <tr><td><code>strncat</code></td><td><code>strncat(dst, src, int n)</code></td><td>dst pointer</td><td>Appends at most n chars and always adds <code>\0</code></td></tr>
+      <tr><td><code>strcmp</code></td><td><code>strcmp(char *s1, char *s2)</code></td><td>int</td><td>0 = equal; positive or negative otherwise</td></tr>
+      <tr><td><code>strncmp</code></td><td><code>strncmp(s1, s2, int n)</code></td><td>int</td><td>Compares only the first n characters</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: strcmp return values</span>
+    <div class="tw"><table>
+      <thead><tr><th>Expression</th><th>Result and reason</th></tr></thead>
+      <tbody>
+        <tr><td><code>strcmp("hello", "hello")</code></td><td><strong>0</strong>: identical</td></tr>
+        <tr><td><code>strcmp("yello", "hello")</code></td><td><strong>17</strong>: 'y' − 'h' = 17</td></tr>
+        <tr><td><code>strcmp("Hello", "hello")</code></td><td><strong>−32</strong>: 'H' − 'h' = −32 (uppercase sorts before lowercase in ASCII)</td></tr>
+        <tr><td><code>strncmp("some diff", "some DIFF", 4)</code></td><td><strong>0</strong>: the first four characters match</td></tr>
+        <tr><td><code>!strcmp(s1, s2)</code></td><td>True (1) when the strings match: the idiomatic equality test</td></tr>
+      </tbody>
+    </table></div>
+    <p>Only the <em>sign</em> is guaranteed by the standard; this course's exact differences come from subtracting ASCII codes.</p>
+  </div>
+  <div class="box warn"><span class="lbl">String pitfalls the guide flags</span>
+    <ol>
+      <li><strong>Buffer overflow:</strong> <code>strcpy(dst, src)</code> has no size check; dst must hold src plus <code>\0</code>.</li>
+      <li><strong>strncpy may not terminate:</strong> if src is n characters or longer, set <code>dst[n-1] = '\0'</code> yourself.</li>
+      <li>Accessing beyond array bounds causes segmentation faults or silent corruption.</li>
+      <li>Never compare strings with <code>==</code>; use <code>strcmp</code>.</li>
+      <li><code>%s</code> on a buffer with no terminator is undefined behavior: printf runs off the end.</li>
+    </ol>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>char name[5]; strcpy(name, "Alexander"); — what happens?</summary><div><p>"Alexander" needs 10 bytes (9 characters plus <code>\0</code>) but the buffer holds 5, so strcpy writes 5 bytes past the end: a buffer overflow. It may crash, corrupt nearby variables, or appear to work. Use a bigger buffer or <code>strncpy</code> with manual termination.</p></div></details>
+    <details><summary>What does strlen("Hello") return, and how many bytes does the string occupy?</summary><div><p>strlen returns 5 (it does not count <code>\0</code>), but the array occupies 6 bytes. Off-by-one array sizing is the classic mistake.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u4">
+  <div class="plate"><span class="num" aria-hidden="true">U4</span><p class="ttl">Flow control &amp; scope rules</p><p class="src">Unit 4 of the CSC 3320 study guide</p></div>
+
+  <h3 id="u4-scope">Variable scope and lifetime</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Variable type</th><th>Declared where</th><th>Lifetime</th><th>Scope / visibility</th></tr></thead>
+    <tbody>
+      <tr><td>Local (automatic)</td><td>Inside a function</td><td>That function's execution</td><td>That function only</td></tr>
+      <tr><td>Global (external)</td><td>Outside all functions</td><td>Entire program</td><td>Whole file; other files via <code>extern</code></td></tr>
+      <tr><td>Static local</td><td>Inside a function, with <code>static</code></td><td>Entire program</td><td>That function only, but persists between calls</td></tr>
+      <tr><td>Static global</td><td>Outside functions, with <code>static</code></td><td>Entire program</td><td>That source file only (file-level encapsulation)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Read the table as two independent questions: <em>how long does it live</em> (lifetime) and <em>who can see it</em> (scope). <code>static</code> extends lifetime for a local, and <em>restricts</em> visibility for a global.</p>
+<pre class="code"><code>// file1.c
+int counter = 0;         // definition: memory allocated here
+
+// file2.c
+extern int counter;      // declaration: no memory, links to file1.c's counter
+counter++;               // modifies the same variable</code></pre>
+  <div class="box ex"><span class="lbl">Worked example: static local</span>
+<pre class="code"><code>void countCalls(void) {
+    static int count = 0;   // initialized ONCE, retained between calls
+    count++;
+    printf("Called %d times\n", count);
+}
+// three calls print: Called 1 times, Called 2 times, Called 3 times</code></pre>
+    <p>Without <code>static</code>, <code>count</code> would be re-created and reset to 0 on every call, printing 1 each time.</p>
+  </div>
+
+  <h3 id="u4-operators">Operators</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Category</th><th>Operators</th><th>Notes</th><th>Example</th></tr></thead>
+    <tbody>
+      <tr><td>Arithmetic</td><td><code>+ - * / % ++ --</code></td><td><code>%</code> is remainder</td><td>7 % 3 = 1</td></tr>
+      <tr><td>Relational</td><td><code>&lt; &gt; &lt;= &gt;= == !=</code></td><td>Return 0 (false) or 1 (true)</td><td>5 &gt; 3 → 1</td></tr>
+      <tr><td>Logical</td><td><code>&amp;&amp; || !</code></td><td><code>&amp;&amp;</code> and <code>||</code> short-circuit</td><td>1 &amp;&amp; 0 → 0</td></tr>
+      <tr><td>Assignment</td><td><code>= += -= *= /= %=</code></td><td>Compound assignment</td><td><code>x += 5</code> is <code>x = x + 5</code></td></tr>
+      <tr><td>Bitwise</td><td><code>&amp; | ^ ~ &lt;&lt; &gt;&gt;</code></td><td>Operate on individual bits</td><td>5 &amp; 3 = 1</td></tr>
+      <tr><td>Ternary</td><td><code>expr ? a : b</code></td><td>Inline if-else</td><td><code>x &gt; 0 ? x : -x</code></td></tr>
+      <tr><td>Address-of</td><td><code>&amp;var</code></td><td>Returns a pointer to var</td><td><code>&amp;x</code></td></tr>
+      <tr><td>Dereference</td><td><code>*ptr</code></td><td>The value at that address</td><td><code>*p</code></td></tr>
+      <tr><td><code>sizeof</code></td><td><code>sizeof(type)</code></td><td>Size in bytes, at compile time</td><td><code>sizeof(int)</code> = 4</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: bitwise with x = 1 (0001) and y = 2 (0010)</span>
+    <div class="tw"><table>
+      <thead><tr><th>Expression</th><th>Result and explanation</th></tr></thead>
+      <tbody>
+        <tr><td><code>x &amp; y</code></td><td>0 — 0001 &amp; 0010 = 0000</td></tr>
+        <tr><td><code>x | y</code></td><td>3 — 0001 | 0010 = 0011</td></tr>
+        <tr><td><code>x ^ y</code></td><td>3 — 0001 ^ 0010 = 0011</td></tr>
+        <tr><td><code>x &lt;&lt; 1</code></td><td>2 — shifting left multiplies by 2</td></tr>
+        <tr><td><code>y &gt;&gt; 1</code></td><td>1 — shifting right divides by 2</td></tr>
+        <tr><td><code>~x</code></td><td>Inverts every bit; on any two's-complement machine (all of them in practice) <code>~1</code> is −2</td></tr>
+      </tbody>
+    </table></div>
+    <p>Short-circuiting matters: in <code>if (p != NULL &amp;&amp; *p == 5)</code> the dereference never runs when p is NULL, which is a standard safety idiom.</p>
+  </div>
+
+  <h3 id="u4-selection">Selection: if, else, and switch</h3>
+<pre class="code"><code>if (condition) {
+    // runs if condition != 0
+} else if (condition2) {
+    // runs if condition2 != 0
+} else {
+    // runs if all above were false (zero)
+}</code></pre>
+  <div class="box warn"><span class="lbl">Pitfall: the dangling else</span>
+    <p>An <code>else</code> always pairs with the <strong>nearest unmatched if</strong>, no matter how the code is indented. In <code>if (a) if (b) x = 1; else x = 2;</code> the else belongs to <code>if (b)</code>, not <code>if (a)</code>. Always use braces.</p>
+  </div>
+<pre class="code"><code>switch (expression) {          // evaluated ONCE
+    case constant1:            // must be an integer or char constant
+        statements;
+        break;                 // without break, control FALLS THROUGH
+    case constant2:
+        statements;
+        break;
+    default:                   // optional; runs when nothing matches
+        statements;
+}</code></pre>
+  <div class="tw"><table>
+    <thead><tr><th>switch vs. if-else if</th><th>Details</th></tr></thead>
+    <tbody>
+      <tr><td>switch is faster</td><td>The compiler can build a jump table, giving O(1) dispatch instead of sequential O(n) tests</td></tr>
+      <tr><td>Equality only</td><td>switch tests equality against constants; no ranges, no floats</td></tr>
+      <tr><td>Fall-through</td><td>A missing <code>break</code> continues into the next case</td></tr>
+      <tr><td>Python note</td><td>Python had no switch until <code>match</code>/<code>case</code> in 3.10</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box bg"><span class="lbl">Background: "switch is faster" has conditions</span>
+    <p>The jump table only appears when the case values are dense integers. For a handful of scattered values, compilers generate the same comparisons an if-else chain would. Know the guide's answer for the exam, and the nuance for real code.</p>
+  </div>
+
+  <h3 id="u4-loops">Loops</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Loop</th><th>Skeleton</th><th>Condition checked</th><th>Minimum iterations</th></tr></thead>
+    <tbody>
+      <tr><td><code>while</code></td><td><code>while (cond) { body; }</code></td><td>Before each iteration</td><td>0</td></tr>
+      <tr><td><code>do-while</code></td><td><code>do { body; } while (cond);</code></td><td>After each iteration</td><td><strong>1</strong></td></tr>
+      <tr><td><code>for</code></td><td><code>for (init; test; update) { body; }</code></td><td>Before each iteration</td><td>0</td></tr>
+    </tbody>
+  </table></div>
+<pre class="code"><code>for (int i = 0; i &lt; 10; i++) {
+//   ^^^^^^^^^  ^^^^^^  ^^^
+//   init       test    update
+//   (once)     (before (after each
+//               each)   iteration)
+}
+
+int input;
+do {
+    printf("Enter a positive number: ");
+    scanf("%d", &amp;input);
+} while (input &lt;= 0);       // body always runs at least once</code></pre>
+  <div class="box warn"><span class="lbl">Common operator pitfalls</span>
+    <div class="tw"><table>
+      <thead><tr><th>Pitfall</th><th>Explanation and fix</th></tr></thead>
+      <tbody>
+        <tr><td><code>=</code> vs. <code>==</code></td><td><code>if (x = 5)</code> assigns 5 and is always true. Use <code>==</code>; defensively write <code>if (5 == x)</code> so a typo becomes a compiler error.</td></tr>
+        <tr><td>Missing <code>break</code></td><td>Execution falls through to the next case.</td></tr>
+        <tr><td>Integer division</td><td><code>5/2</code> is 2, not 2.5. Cast: <code>(double)5/2</code> = 2.5.</td></tr>
+        <tr><td>Non-zero is true</td><td>C treats any non-zero value as true, so <code>if (-5)</code> executes.</td></tr>
+        <tr><td>Precedence</td><td><code>&amp;</code> vs <code>&amp;&amp;</code>, <code>|</code> vs <code>||</code>: use parentheses to force your intent.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>When must you use do-while instead of while?</summary><div><p>When the body must run at least once before the condition can be evaluated: menu loops and input validation, where you have to read a value before you can test it.</p></div></details>
+    <details><summary>What prints? int i = 0; switch(i) { case 0: printf("A"); case 1: printf("B"); break; default: printf("C"); }</summary><div><p><code>AB</code>. Case 0 matches and prints A, then falls through to case 1 and prints B, where <code>break</code> finally stops it.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u5">
+  <div class="plate"><span class="num" aria-hidden="true">U5</span><p class="ttl">Arrays, functions &amp; pointers</p><p class="src">Unit 5 of the CSC 3320 study guide</p></div>
+
+  <h3 id="u5-arrays">Arrays</h3>
+  <p>Arrays are statically allocated, fixed-size collections of same-type elements stored consecutively in memory.</p>
+<pre class="code"><code>int a[10];                    // 10 ints, UNINITIALIZED (garbage)
+int b[5] = {1, 2, 3, 4, 5};   // fully initialized
+int c[10] = {1, 2, 3};        // partial: the remaining 7 are 0
+int d[10] = {0};              // all 10 elements = 0
+int e[] = {10, 20, 30};       // compiler infers size 3</code></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Feature</th><th>C array</th><th>Java array</th><th>Python list</th></tr></thead>
+    <tbody>
+      <tr><td>Is an object?</td><td>No</td><td>No</td><td>Yes</td></tr>
+      <tr><td>Has methods?</td><td>No</td><td>No</td><td>Yes (<code>.append()</code>)</td></tr>
+      <tr><td>Size flexibility</td><td>Fixed at declaration</td><td>Fixed at creation</td><td>Dynamic</td></tr>
+      <tr><td>Auto-initialized?</td><td>No: garbage</td><td>Yes: zeros/null</td><td>Built manually</td></tr>
+      <tr><td>Bounds checking?</td><td><strong>No</strong>: undefined behavior</td><td>Yes: exception</td><td>Yes: IndexError</td></tr>
+      <tr><td>Index base</td><td>0</td><td>0</td><td>0</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>Indexing is 0-based: the first element is index 0, the last is n−1.</li>
+    <li>Out-of-bounds access is undefined behavior; C raises no error.</li>
+    <li>The array name acts as a pointer to the first element: <code>a == &amp;a[0]</code>.</li>
+    <li>Element count trick: <code>int n = sizeof(arr)/sizeof(arr[0]);</code> (only where the real array is visible).</li>
+    <li>Multi-dimensional arrays are stored in row-major order: <code>int m[3][4];</code> is 12 elements laid out row by row.</li>
+  </ul>
+
+  <h3 id="u5-functions">Functions</h3>
+<pre class="code"><code>// PROTOTYPE (declaration) — tells the compiler the function exists
+double average(double a, double b);
+
+// DEFINITION
+double average(double a, double b) {
+    return (a + b) / 2.0;
+}
+
+// CALL
+double result = average(15.0, 35.0);</code></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+    <tbody>
+      <tr><td>Parameter</td><td>The variable in the definition: <code>a</code> and <code>b</code> above</td></tr>
+      <tr><td>Argument</td><td>The actual value passed in the call: 15.0 and 35.0</td></tr>
+      <tr><td>Return type</td><td>The type returned: <code>double</code>, <code>int</code>, or <code>void</code></td></tr>
+      <tr><td>Prototype</td><td>A declaration before the definition, giving the compiler the signature</td></tr>
+      <tr><td><code>void</code></td><td>Returns nothing (or, as a parameter list, takes nothing)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u5-byvalue">Pass by value</h3>
+  <div class="box def"><span class="lbl">Definition: pass by value</span>
+    <dl>
+      <dt>Plain English</dt><dd>A function gets a copy of what you pass, so changing it does not change your variable.</dd>
+      <dt>Technical</dt><dd>C always passes arguments by value: the function receives a copy of each argument, and modifying a parameter has no effect on the caller's variable.</dd>
+      <dt>Why it matters</dt><dd>It is why swap functions silently fail, and why <code>scanf</code> needs <code>&amp;</code>: to change a caller's variable you must pass its address.</dd>
+    </dl>
+  </div>
+<pre class="code"><code>void tryToChange(int x) { x = 999; }   // changes the COPY only
+int main(void) {
+    int a = 5;
+    tryToChange(a);
+    printf("%d\n", a);                 // still prints 5
+}
+
+void increment(int *x) { (*x)++; }     // pointer to int
+int main(void) {
+    int a = 5;
+    increment(&amp;a);                     // pass the ADDRESS
+    printf("%d\n", a);                 // prints 6 — the original changed
+}</code></pre>
+
+  <h3 id="u5-arrayparam">Passing arrays to functions</h3>
+  <p>An array passed to a function <strong>decays to a pointer</strong> to its first element. The function does not get a copy, and the size is not carried along, so you must pass the length yourself.</p>
+<pre class="code"><code>int sum_array(int arr[], int n) {   // int arr[] is the same as int *arr
+    int total = 0;
+    for (int i = 0; i &lt; n; i++) {   // n must be passed separately
+        total += arr[i];
+    }
+    return total;
+}
+int main(void) {
+    int data[5] = {1,2,3,4,5};
+    int s = sum_array(data, 5);     // pass the name (a pointer) plus the size
+}</code></pre>
+  <div class="box warn"><span class="lbl">Pitfall: sizeof on a parameter</span>
+    <p>Inside the function, <code>sizeof(arr)</code> gives the <em>pointer</em> size (8 bytes on 64-bit), not the array size, so the <code>sizeof</code> element-count trick silently computes 2 instead of 5. Always pass the length as its own parameter. Because arrays decay to pointers, a function <em>can</em> modify the caller's array, which is the one exception that feels like pass-by-reference.</p>
+  </div>
+
+  <h3 id="u5-recursion">Recursion</h3>
+  <p>A recursive function calls itself. Every recursive solution needs a <strong>base case</strong> that stops the recursion and a <strong>recursive case</strong> that shrinks the problem.</p>
+<pre class="code"><code>int factorial(int n) {
+    if (n &lt;= 1) return 1;            // BASE CASE
+    return n * factorial(n - 1);     // RECURSIVE CASE
+}
+// factorial(5) = 5 * 4 * 3 * 2 * 1 = 120</code></pre>
+  <p>Each call gets its own stack frame with its own copy of <code>n</code>, which is exactly the mechanism CSC 3210 shows in assembly and CSC 4320 describes as the process stack. Miss the base case and the frames pile up until the stack overflows.</p>
+
+  <h3 id="u5-pointers">Pointers</h3>
+  <div class="box def"><span class="lbl">Definition: pointer</span>
+    <dl>
+      <dt>Plain English</dt><dd>A variable that holds the address of another variable.</dd>
+      <dt>Technical</dt><dd>Memory is byte-addressable and each variable occupies one or more consecutive bytes; a pointer stores the address of the first byte and has a reference type telling the compiler how to interpret what it points at.</dd>
+      <dt>Why it matters</dt><dd>Pointers are how C does pass-by-reference, dynamic memory, arrays, and strings. Nearly every hard C bug is a pointer bug.</dd>
+    </dl>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Syntax</th><th>Name and purpose</th></tr></thead>
+    <tbody>
+      <tr><td><code>int *p;</code></td><td>Declaration: p is a pointer to int (the <code>*</code> here means "pointer to")</td></tr>
+      <tr><td><code>p = &amp;x;</code></td><td>Address-of: stores x's address in p</td></tr>
+      <tr><td><code>*p</code></td><td>Dereference: the value stored at the address p holds</td></tr>
+      <tr><td><code>*p = 42;</code></td><td>Dereference and assign: writes 42 into the location p points to</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box ex"><span class="lbl">Worked example: pointer basics</span>
+<pre class="code"><code>#include &lt;stdio.h&gt;
+int main(void) {
+    int x = 10;
+    int *p = &amp;x;            // p holds the address of x
+    printf("%d\n", x);      // 10, direct access
+    printf("%d\n", *p);     // 10, through the pointer
+    *p = 50;                // modifies x through the pointer
+    printf("%d\n", x);      // 50 — x changed
+    return 0;
+}</code></pre>
+    <p>Note the two meanings of <code>*</code>: in a declaration it means "pointer to"; in an expression it dereferences.</p>
+  </div>
+  <div class="box warn"><span class="lbl">Pointer danger zones (undefined behavior)</span>
+    <ol>
+      <li><strong>Uninitialized pointer:</strong> <code>int *p; *p = 5;</code> writes to a garbage address: crash or corruption.</li>
+      <li><strong>NULL dereference:</strong> <code>int *p = NULL; *p = 1;</code> is a segmentation fault.</li>
+      <li><strong>Dangling pointer:</strong> a pointer to a local variable after its function returned.</li>
+      <li><strong>Pointer to freed memory:</strong> use-after-free, a real security vulnerability class.</li>
+    </ol>
+    <p><strong>Rule:</strong> always initialize pointers before use; set them to NULL if you have nothing to point at yet.</p>
+  </div>
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Write a function that swaps two ints in the caller.</summary><div><pre class="code"><code>void swap(int *a, int *b) {
+    int tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+// call as: swap(&amp;x, &amp;y);</code></pre><p>Taking <code>int a, int b</code> instead would swap only the copies.</p></div></details>
+    <details><summary>Inside int sum(int arr[], int n), what does sizeof(arr)/sizeof(arr[0]) evaluate to on a 64-bit machine?</summary><div><p>8 / 4 = 2, regardless of the real array length, because <code>arr</code> is a pointer here. This is why <code>n</code> is passed separately.</p></div></details>
+  </div>
+</section>
+
+<section class="lecture prose" id="u6">
+  <div class="plate"><span class="num" aria-hidden="true">U6</span><p class="ttl">Exam toolkit</p><p class="src">Quick reference and common pitfalls from the CSC 3320 study guide</p></div>
+
+  <h3 id="u6-commands">UNIX command cheat sheet</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Command</th><th>Purpose</th><th>Key flags</th></tr></thead>
+    <tbody>
+      <tr><td><code>pwd</code></td><td>Print working directory</td><td>—</td></tr>
+      <tr><td><code>ls</code></td><td>List files</td><td><code>-a</code> hidden, <code>-l</code> long, <code>-R</code> recursive</td></tr>
+      <tr><td><code>cd dir</code></td><td>Change directory</td><td>—</td></tr>
+      <tr><td><code>mkdir dir</code></td><td>Create a directory</td><td>—</td></tr>
+      <tr><td><code>rm file</code></td><td>Delete a file (irreversible)</td><td><code>-f</code> force, <code>-r</code> recursive, <code>-i</code> prompt</td></tr>
+      <tr><td><code>cp src dst</code></td><td>Copy</td><td><code>-i -r</code></td></tr>
+      <tr><td><code>mv src dst</code></td><td>Move or rename</td><td><code>-i</code></td></tr>
+      <tr><td><code>cat file</code></td><td>Display a whole file</td><td>—</td></tr>
+      <tr><td><code>head</code> / <code>tail</code></td><td>First / last n lines</td><td><code>-n</code></td></tr>
+      <tr><td><code>chmod</code></td><td>Change permissions</td><td><code>u/g/o/a</code> <code>+/-</code> <code>r/w/x</code></td></tr>
+      <tr><td><code>wc file</code></td><td>Count lines, words, bytes</td><td><code>-l -w -c</code></td></tr>
+      <tr><td><code>man cmd</code></td><td>Manual page</td><td><code>-s section</code></td></tr>
+      <tr><td><code>script</code></td><td>Record a terminal session</td><td>—</td></tr>
+      <tr><td><code>ssh user@host</code></td><td>Encrypted remote login</td><td>—</td></tr>
+      <tr><td><code>sftp user@host</code></td><td>Secure file transfer</td><td>—</td></tr>
+      <tr><td><code>get</code> / <code>put</code></td><td>SFTP download / upload</td><td><code>-r</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u6-keywords">C keyword and syntax reference</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Keyword / symbol</th><th>Category</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>#include</code></td><td>Preprocessor</td><td>Pulls in a library header</td></tr>
+      <tr><td><code>#define</code></td><td>Preprocessor</td><td>Text substitution before compiling</td></tr>
+      <tr><td><code>int / char / float / double</code></td><td>Types</td><td>Fundamental data types; know the sizes</td></tr>
+      <tr><td><code>sizeof</code></td><td>Operator</td><td>Size in bytes at compile time</td></tr>
+      <tr><td><code>printf()</code> / <code>scanf()</code></td><td>I/O</td><td>Formatted output / input; scanf needs <code>&amp;</code> for scalars</td></tr>
+      <tr><td><code>if / else</code></td><td>Control</td><td>Selection on a condition</td></tr>
+      <tr><td><code>switch</code></td><td>Control</td><td>Jump to a matching integer or char constant; needs <code>break</code></td></tr>
+      <tr><td><code>while</code> / <code>do-while</code> / <code>for</code></td><td>Control</td><td>Pre-test / post-test / counted loops</td></tr>
+      <tr><td><code>break</code> / <code>continue</code></td><td>Control</td><td>Exit a loop or switch / skip to the next iteration</td></tr>
+      <tr><td><code>return</code></td><td>Function</td><td>Exit a function, optionally with a value</td></tr>
+      <tr><td><code>void</code></td><td>Type</td><td>No value returned, or no parameters</td></tr>
+      <tr><td><code>static</code></td><td>Storage</td><td>Persists between calls (local); file-only visibility (global)</td></tr>
+      <tr><td><code>extern</code></td><td>Storage</td><td>Declares a variable defined in another file</td></tr>
+      <tr><td><code>typedef</code></td><td>Type alias</td><td><code>typedef int BOOL;</code></td></tr>
+      <tr><td><code>struct</code></td><td>Aggregate</td><td>Groups variables of different types: C's substitute for objects</td></tr>
+      <tr><td><code>&amp;var</code> / <code>*ptr</code></td><td>Pointer</td><td>Address-of / dereference</td></tr>
+      <tr><td><code>NULL</code></td><td>Pointer</td><td>Points to nothing</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u6-specifiers">Format specifier summary</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Specifier</th><th>Type</th><th>Example output</th></tr></thead>
+    <tbody>
+      <tr><td><code>%d</code> / <code>%i</code></td><td>signed int</td><td><code>printf("%d", -42)</code> → -42</td></tr>
+      <tr><td><code>%u</code></td><td>unsigned int</td><td>42</td></tr>
+      <tr><td><code>%f</code></td><td>float/double, fixed</td><td>3.140000</td></tr>
+      <tr><td><code>%e</code> / <code>%E</code></td><td>scientific</td><td>3.140000e+00</td></tr>
+      <tr><td><code>%g</code></td><td>auto</td><td>3.14</td></tr>
+      <tr><td><code>%c</code></td><td>char</td><td>A</td></tr>
+      <tr><td><code>%s</code></td><td>string</td><td>Hi</td></tr>
+      <tr><td><code>%ld</code></td><td>long int</td><td>1000000</td></tr>
+      <tr><td><code>%lf</code></td><td>double (scanf)</td><td><code>scanf("%lf", &amp;d)</code></td></tr>
+      <tr><td><code>%o</code> / <code>%x</code></td><td>octal / hex</td><td>10 / ff</td></tr>
+      <tr><td><code>%%</code></td><td>literal percent</td><td>100%</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="u6-pitfalls">Common pitfalls and exam traps</h3>
+  <div class="box exam"><span class="lbl">The full pitfall list</span>
+    <ul class="checklist">
+      <li><code>=</code> vs <code>==</code>: <code>if (x = 0)</code> assigns; write <code>if (0 == x)</code> so typos fail to compile.</li>
+      <li>Dangling else: without braces, <code>else</code> binds to the nearest unmatched <code>if</code>.</li>
+      <li>Missing <code>break</code> in a switch causes fall-through.</li>
+      <li>Uninitialized local variables hold garbage, never 0.</li>
+      <li>Array out of bounds: <code>int a[5]; a[5] = 10;</code> is invalid (0–4) and C gives no error.</li>
+      <li><code>strcpy</code> buffer overflow: the destination must hold the source plus <code>\0</code>.</li>
+      <li><code>strncpy</code> may omit the null terminator; set <code>dst[n-1] = '\0'</code>.</li>
+      <li>Comparing strings with <code>==</code> compares addresses; use <code>strcmp</code>.</li>
+      <li><code>sizeof</code> on an array parameter gives the pointer size.</li>
+      <li>Pass-by-value: changes to parameters do not affect the caller; use pointers.</li>
+      <li>Integer division truncates: <code>5/2</code> = 2; cast one operand to double.</li>
+      <li>Uninitialized pointer: <code>int *p; *p = 5;</code> writes to a garbage address.</li>
+      <li>Python has no do-while loop; that is C and Java only.</li>
+      <li><code>long</code> is 4 bytes on 32-bit and 8 on 64-bit.</li>
+      <li>switch cannot use floats or ranges, only integer and character constants.</li>
+      <li><code>strcmp</code> returns <strong>0</strong> for equal, not 1; use <code>!strcmp(s1, s2)</code>.</li>
+      <li>SSH is a remote terminal; SFTP transfers files; FTP and Telnet are unencrypted.</li>
+      <li>C has no string type: strings are char arrays and <code>str1 = str2</code> is illegal.</li>
+      <li><code>static</code> local persists between calls; <code>static</code> global limits visibility to one file.</li>
+      <li><code>return 0</code> from main signals success to the OS; non-zero signals an error.</li>
+    </ul>
+  </div>
+</section>
+</template>
