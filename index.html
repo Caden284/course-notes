@@ -369,6 +369,10 @@ docker compose exec kali bash        # open a bash shell inside the "kali" conta
   <div class="box warn"><span class="lbl">Misconception</span>
     <p>Grouping bits from the left instead of the right. <code>101101</code> is <code>0010 1101</code> = <code>0x2D</code>, not <code>1011 01</code>. Pad with leading zeros first.</p>
   </div>
+
+  <div class="box proc"><span class="lbl">L00 in one breath</span>
+    <p>This course is face-to-face, 4 credit hours, and cumulative: assignments and labs 30%, midterm 25%, final 25%, term project 15%, participation 5%, with late work at 90% after one day, 70% after two, and closed after that. All hands-on work happens only in <strong>authorized environments</strong> (the Docker labs), never on real third-party systems. The prerequisite skill you will use constantly is <strong>moving between decimal, binary, and hex</strong>: one hex digit is 4 bits, one byte is 2 hex digits, and a 64-hex-digit hash is 256 bits.</p>
+  </div>
 </section>
 
 <!-- ===================== L00B ===================== -->
@@ -631,6 +635,10 @@ flowchart TD
       <tr><td>Metasploit</td><td>Exploitation framework</td><td>Launching a known exploit in a lab</td><td>Meta-exploit toolbox</td><td>Exploit kit</td><td>—</td></tr>
     </tbody>
   </table></div>
+
+  <div class="box proc"><span class="lbl">L00B in one breath</span>
+    <p>The only line between a security professional and a criminal is <strong>authorization</strong>. Hackers access systems without permission; crackers do it to steal or destroy; black, white, and grey hats differ by intent and predictability. Attacks follow <strong>footprinting → scanning → gaining access → maintaining access</strong>. Duty-based ethics says "no damage" is no defense, the law treats information as property, and a computer can be the <strong>target, tool, or accessory</strong> of a crime. Penetration tests report findings; security tests add policy review and fixes; white, black, and gray box describe how much the tester knows.</p>
+  </div>
 
   <div class="box exam"><span class="lbl">L00B exam checklist</span>
     <ul class="checklist">
@@ -1378,6 +1386,10 @@ flowchart LR
       <tr><td>Access control matrix</td><td>Subjects × objects table of rights</td><td>Gradebook example</td><td>Rows who, columns what</td><td>ACL (column), capability list (row)</td><td>—</td></tr>
     </tbody>
   </table></div>
+
+  <div class="box proc"><span class="lbl">L01a in one breath</span>
+    <p>Security protects <strong>confidentiality, integrity, and availability</strong>, plus assurance, authenticity, and anonymity. Threat agents create threats that raise risk (impact × likelihood) to assets; owners impose countermeasures. Attacks are <strong>passive</strong> (release of contents, traffic analysis: prevent them) or <strong>active</strong> (replay, masquerade, modification, DoS: detect and recover). Cryptography rests on the key, not a secret algorithm: the Caesar cipher falls to brute force or frequency analysis, symmetric crypto needs n(n−1)/2 keys while public-key needs n pairs, each key bit doubles brute-force work, and passwords are judged by <strong>C<sup>L</sup></strong> against the attacker's guessing rate. Hashes, MACs, signatures, and certificates supply integrity and authenticity; an access control matrix records who may do what.</p>
+  </div>
 
   <div class="box exam"><span class="lbl">L01a exam checklist (the professor's "worth notice" list is marked ★)</span>
     <ul class="checklist">
@@ -2272,6 +2284,10 @@ flowchart TD
     </tbody>
   </table></div>
 
+  <div class="box proc"><span class="lbl">L03a in one breath</span>
+    <p>A good cipher is consistent (D<sub>K</sub>(E<sub>K</sub>(P)) = P) and resists brute force and cryptanalysis; English redundancy sets the <strong>unicity distance</strong> n = k/(1−β). DES (64-bit block, 56-bit key) fell to brute force; 3DES patched it; <strong>AES</strong> (128-bit blocks, 128/192/256-bit keys, SubBytes–ShiftRows–MixColumns–AddRoundKey) replaced it. <strong>ECB leaks patterns; CBC chains blocks</strong> with an IV; stream ciphers must never reuse a key stream. <strong>RSA</strong>: n = pq, φ = (p−1)(q−1), ed ≡ 1 mod φ via extended Euclid, C = M<sup>e</sup> mod n, and it is secure because factoring is hard. Hashes need preimage, second-preimage, and collision resistance, and the <strong>birthday bound</strong> cuts a b-bit hash to b/2 bits; HMAC fixes h(K‖M); hash chains and Merkle trees authenticate long sequences cheaply.</p>
+  </div>
+
   <div class="box exam"><span class="lbl">L03a exam checklist</span>
     <ul class="checklist">
       <li>State consistency D<sub>K</sub>(E<sub>K</sub>(P)) = P and why E must be a bijection.</li>
@@ -2758,6 +2774,10 @@ setuid(0);           # allowed: 0 equals RUID/SUID → back to root</code></pre>
       <tr><td>Integrity level</td><td>Windows trust tier: untrusted → system</td><td>Low-integrity renderer</td><td>Can't write up</td><td>—</td><td>—</td></tr>
     </tbody>
   </table></div>
+
+  <div class="box proc"><span class="lbl">L04a in one breath</span>
+    <p>Bugs are inevitable, so systems use <strong>defense in depth, least privilege, and privilege separation</strong>. UNIX subjects are users and processes, objects are files, and ls -l permissions are checked <strong>owner → group → other</strong>, stopping at the first match (octal digit = 4r + 2w + 1x). Processes carry EUID, RUID, and SUID; <strong>setuid() drops privilege, the setuid bit gains it</strong>, and the SSH seteuid bug shows why you must drop completely. Linux capabilities split root; Windows uses SIDs, DACLs, SACLs, and tokens; capabilities are tickets while ACLs are guest lists. Sandboxes isolate apps within one user, and Chrome layers process isolation, site isolation, a broker, and four Windows sandbox mechanisms.</p>
+  </div>
 
   <div class="box exam"><span class="lbl">L04a exam checklist</span>
     <ul class="checklist">
@@ -3309,6 +3329,10 @@ robocopy C:\Reports D:\Backup /E /COPY:DATS</code></pre>
       <tr><td>Broker</td><td>Privileged process acting for sandboxed targets</td><td>Chrome browser process</td><td>Middleman with the keys</td><td>Reference monitor</td><td>—</td></tr>
     </tbody>
   </table></div>
+
+  <div class="box proc"><span class="lbl">L04b in one breath</span>
+    <p>Windows is an NT-based, modular, modified-microkernel OS: user-mode subsystems talk only to the <strong>executive</strong>, and only the <strong>HAL</strong> touches hardware. Access control comes in three models (<strong>DAC, MAC, RBAC</strong>), and Windows mixes DAC with RBAC. Identity is a permanent <strong>SID</strong>; logon builds a <strong>security access token</strong> of user SID, group SIDs, and privileges attached to every process. Active Directory centralizes accounts in domains, shares only token parts across the network, and authenticates with <strong>Kerberos</strong> (KDC as AS, then TGS). UAC gives admins a split token; DACLs of allow/deny ACEs decide access, where <strong>any deny wins</strong>; auditing records the attempts; AGULP keeps permissions on groups, never people.</p>
+  </div>
 
   <div class="box exam"><span class="lbl">L04b exam checklist</span>
     <ul class="checklist">

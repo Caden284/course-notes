@@ -43,6 +43,10 @@ Caden brings slides (PowerPoints/PDFs) or an existing notes document.
 
 When adding lectures to an in-progress class, append sections to its notes and questions the same way.
 
+## Printable study guide (PDF)
+
+`python3 tools/make_study_guide.py <course-id> ~/Downloads/<CODE>_Study_Guide.pdf` renders a course's notes as a PDF in the style of Caden's CSC 4320 guide (cover, how-to page, contents with page numbers, colored panels, "改善 · Complete Exam Study Notes" footer). It needs `courses/<id>/guide.json` (cover text, header, study order) and uses Word's Cambria/Calibri fonts plus Chrome headless. Regenerate it whenever that course's notes change and Caden wants an updated copy. Each lecture should end with an "<code> in one breath" `box proc` summary; the guide relies on it.
+
 ## Constraints
 
 - The page must stay one self-contained file: the artifact CSP only allows scripts from cdnjs/jsdelivr and fonts from Google Fonts. Mermaid loads from jsdelivr.
