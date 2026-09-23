@@ -12,6 +12,8 @@
       <ol><li><a href="#l04a-principles">Design principles</a></li><li><a href="#l04a-unix">UNIX security model</a></li><li><a href="#l04a-perms">File permissions</a></li><li><a href="#l04a-proc">Processes and user IDs</a></li><li><a href="#l04a-setuid">setuid, sudo, capabilities</a></li><li><a href="#l04a-win">Windows security model</a></li><li><a href="#l04a-sandbox">Sandboxing and Chrome</a></li><li><a href="#l04a-gloss">Glossary</a></li></ol></li>
     <li><a href="#l04b"><span class="code">L04b</span>OS security 2: Windows</a>
       <ol><li><a href="#l04b-warmup">Warm-up: setuid review</a></li><li><a href="#l04b-recap">Carried over from L04a</a></li><li><a href="#l04b-arch">Windows architecture</a></li><li><a href="#l04b-models">DAC, MAC, and RBAC</a></li><li><a href="#l04b-sids">SIDs and the access token</a></li><li><a href="#l04b-ad">Active Directory and Kerberos</a></li><li><a href="#l04b-lp">Least privilege, groups, UAC</a></li><li><a href="#l04b-perms">Permissions and access decisions</a></li><li><a href="#l04b-audit">Auditing, tools, AGULP</a></li><li><a href="#l04b-chrome">Chrome sandbox revisited</a></li><li><a href="#l04b-gloss">Glossary</a></li></ol></li>
+    <li><a href="#l05"><span class="code">L05</span>Buffer overflow</a>
+      <ol><li><a href="#l05-why">Why they still matter</a></li><li><a href="#l05-basic">The basic example</a></li><li><a href="#l05-c">C and unsafe routines</a></li><li><a href="#l05-stack">Stack buffer overflows</a></li><li><a href="#l05-shellcode">Shellcode and an attack</a></li><li><a href="#l05-compile">Compile-time defenses</a></li><li><a href="#l05-runtime">Run-time defenses</a></li><li><a href="#l05-other">Other overflow forms</a></li><li><a href="#l05-gloss">Glossary</a></li></ol></li>
     <li><a href="#formulas">Formula sheet</a></li>
   </ol></template>
 <template data-part="main">
@@ -3129,6 +3131,421 @@ robocopy C:\Reports D:\Backup /E /COPY:DATS</code></pre>
       <li>Know what cacls, icacls, and robocopy do.</li>
       <li>Expand AGULP and apply it to a scenario.</li>
       <li>Connect Chrome's restricted token, null SID, and job object to the Windows model; explain the broker diagram.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===================== L05 ===================== -->
+<section class="lecture prose" id="l05">
+  <div class="plate"><span class="num" aria-hidden="true">L05</span><p class="ttl">Buffer overflow</p><p class="src">Source: L05-Buffer overflow.pdf (Stallings &amp; Brown Chapter 10, figures and tables 10.1–10.12)</p></div>
+
+  <p>L04a and L04b were about keeping a <em>process</em> inside its box. This lecture is about the oldest way to break out of the box from the inside: hand a program more input than it reserved room for and overwrite whatever sits next in memory. It is the concrete version of the "vulnerabilities are inevitable" slide you have now seen three times, and it ties directly to CSC 3320's C pointers and arrays and CSC 3210's stack frames.</p>
+
+  <div class="box bg"><span class="lbl">Background: what you already know that this builds on</span>
+    <p>From <a href="#l04a-principles">L04a</a>: any buffer overflow, use-after-free, or null pointer dereference may let an attacker run code, so systems need defense in depth. From CSC 3320: C arrays have <strong>no bounds checking</strong> and <code>strcpy</code>/<code>gets</code> never check sizes. From CSC 3210: a stack frame holds the saved return address and old frame pointer above the local variables, and the stack grows <em>downward</em> while a string copy writes <em>upward</em>. Those two directions pointing at each other is the whole attack.</p>
+  </div>
+
+  <h3 id="l05-why">Why buffer overflows still matter</h3>
+  <h4>Big picture</h4>
+  <p>Buffer overflows are a very common attack mechanism, first used at scale by the Morris Worm in 1988. Prevention techniques are well known, yet they remain a major concern for two reasons the slide states plainly: a legacy of buggy code in widely deployed operating systems and applications, and continued careless programming practices.</p>
+
+  <div class="box def"><span class="lbl">Definition: buffer overflow</span>
+    <dl>
+      <dt>Plain English</dt><dd>Putting more data into a storage area than it was built to hold, so the extra spills into whatever is next door.</dd>
+      <dt>Technical</dt><dd>The NIST Glossary of Key Information Security Terms defines it as "a condition at an interface under which more input can be placed into a buffer or data holding area than the capacity allocated, overwriting other information. Adversaries exploit such a condition to crash a system or to insert specially crafted code that allows them to gain control of the system."</dd>
+      <dt>Why it matters</dt><dd>It is a programming error that turns into an attack: the same bug that crashes a program by accident can hand control of it to an attacker on purpose.</dd>
+    </dl>
+  </div>
+
+  <h4>Table 10.1: a brief history of buffer overflow attacks</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Year</th><th>Event</th></tr></thead>
+    <tbody>
+      <tr><td>1988</td><td>The <strong>Morris Internet Worm</strong> uses a buffer overflow in <code>fingerd</code> as one of its attack mechanisms.</td></tr>
+      <tr><td>1995</td><td>A buffer overflow in NCSA httpd 1.3 is discovered and published on the Bugtraq mailing list by Thomas Lopatic.</td></tr>
+      <tr><td>1996</td><td>Aleph One publishes <em>"Smashing the Stack for Fun and Profit"</em> in Phrack, a step-by-step introduction to exploiting stack-based overflows.</td></tr>
+      <tr><td>2001</td><td>The <strong>Code Red</strong> worm exploits a buffer overflow in Microsoft IIS 5.0.</td></tr>
+      <tr><td>2003</td><td>The <strong>Slammer</strong> worm exploits a buffer overflow in Microsoft SQL Server 2000.</td></tr>
+      <tr><td>2004</td><td>The <strong>Sasser</strong> worm exploits a buffer overflow in the Windows 2000/XP Local Security Authority Subsystem Service (LSASS).</td></tr>
+    </tbody>
+  </table></div>
+  <p>Memory hook for the dates: <strong>Morris 1988</strong> started it, <strong>Aleph One 1996</strong> documented it, and the worm years <strong>2001, 2003, 2004</strong> (Code Red, Slammer, Sasser) industrialized it.</p>
+
+  <h4>Buffer overflow basics</h4>
+  <div class="tw"><table>
+    <thead><tr><th>The error</th><th>The consequences</th></tr></thead>
+    <tbody>
+      <tr><td>A process attempts to store data beyond the limits of a fixed-size buffer, overwriting adjacent memory locations</td><td>Corruption of program data</td></tr>
+      <tr><td>Those locations can hold other program variables, parameters, or <strong>program control flow data</strong></td><td>Unexpected transfer of control</td></tr>
+      <tr><td>The buffer can live on the <strong>stack</strong>, in the <strong>heap</strong>, or in the <strong>data section</strong> of the process</td><td>Memory access violations</td></tr>
+      <tr><td></td><td><strong>Execution of code chosen by the attacker</strong></td></tr>
+    </tbody>
+  </table></div>
+  <p>Read the consequences as a ladder of severity: corrupt data is a bug, an unexpected transfer of control is a vulnerability, and attacker-chosen code is a compromise.</p>
+
+  <div class="box proc"><span class="lbl">Process: what an attacker needs, and how vulnerable programs are found</span>
+    <p><strong>To exploit an overflow, an attacker must:</strong></p>
+    <ol>
+      <li>Identify a buffer overflow vulnerability in a program that can be triggered using externally sourced data under the attacker's control.</li>
+      <li>Understand how that buffer is stored in memory and determine the potential for corruption.</li>
+    </ol>
+    <p><strong>Vulnerable programs are identified by:</strong> inspection of program source; tracing the execution of programs as they process oversized input; and tools such as <strong>fuzzing</strong>, which automatically feed large or malformed inputs to find crashes.</p>
+  </div>
+
+  <h3 id="l05-basic">The basic buffer overflow example (Figures 10.1 and 10.2)</h3>
+  <h4>Diagram explained: Figure 10.1, the vulnerable program</h4>
+  <p>The program declares <code>int valid = FALSE;</code> and two 8-byte buffers, <code>char str1[8]</code> and <code>char str2[8]</code>. It fills <code>str1</code> with a known tag, reads user input into <code>str2</code> with <code>gets()</code>, and sets <code>valid = TRUE</code> only when the first 8 characters match:</p>
+<pre class="code"><code>int main(int argc, char *argv[]) {
+    int valid = FALSE;
+    char str1[8];
+    char str2[8];
+
+    next_tag(str1);
+    gets(str2);
+    if (strncmp(str1, str2, 8) == 0)
+        valid = TRUE;
+    printf("buffer1: str1(%s), str2(%s), valid(%d)\n", str1, str2, valid);
+}</code></pre>
+  <p>The slide shows three runs:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Input typed</th><th>Output</th><th>What happened</th></tr></thead>
+    <tbody>
+      <tr><td><code>START</code></td><td>str1(START), str2(START), valid(1)</td><td>Normal, matching run</td></tr>
+      <tr><td><code>EVILINPUTVALUE</code></td><td>str1(TVALUE), str2(EVILINPUTVALUE), valid(0)</td><td>Input overflowed <code>str2</code> and <strong>overwrote str1</strong> with the tail of the input</td></tr>
+      <tr><td><code>BADINPUTBADINPUT</code></td><td>str1(BADINPUT), str2(BADINPUTBADINPUT), valid(1)</td><td>The overflow was crafted so the spilled half <em>equals</em> the first half, so the comparison passes: <strong>authentication bypassed without knowing the tag</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Diagram explained: Figure 10.2, the stack values before and after</h4>
+  <p>The figure is a three-column table of memory: addresses on the left (bfffbd0 through bfffbf4, rising), the 4-byte words before <code>gets(str2)</code>, the same words after, and a label saying what each word holds. Reading from the bottom (low addresses) up: <code>str2[0-3]</code>, <code>str2[4-7]</code>, <code>str1[0-3]</code>, <code>str1[4-7]</code>, then a gap, then <code>valid</code>, the <strong>old base pointer</strong>, the <strong>return address</strong>, <code>argc</code>, and <code>argv</code>.</p>
+  <p>What to notice, and the reason this figure exists:</p>
+  <ul>
+    <li><code>str2</code> sits at the <em>lowest</em> addresses, and <code>str1</code> sits immediately above it, so writing past the end of <code>str2</code> walks straight into <code>str1</code>.</li>
+    <li>After typing 16 characters, both <code>str1</code> and <code>str2</code> read <code>BADINPUT</code> (hex <code>42414449 4e505554</code>), and <code>valid</code> has flipped from <code>00000000</code> to <code>01000000</code>.</li>
+    <li>Continue far enough and the next things in the way are the saved base pointer and the <strong>return address</strong>. That is the whole idea of the next section.</li>
+  </ul>
+  <div class="box warn"><span class="lbl">Misconception</span>
+    <p>"An overflow just corrupts the next variable, so the program prints garbage." It can, but the dangerous case is that the next thing in memory is not data at all: it is the saved return address, a frame pointer, or a function pointer. Overwriting data changes what the program <em>computes</em>; overwriting control data changes what the program <em>does</em>.</p>
+  </div>
+
+  <h3 id="l05-c">Why C is exposed: languages and unsafe library routines</h3>
+  <h4>Programming language history</h4>
+  <p>At the machine level, data is held in processor registers or in memory, and an assembly language programmer is entirely responsible for interpreting any saved value correctly. From there the slide draws a three-way split:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Language family</th><th>Type safety</th><th>Buffer overflows?</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr><td>Assembly</td><td>None: the programmer interprets every value</td><td>Wide open</td><td>Maximum control</td></tr>
+      <tr><td>Modern high-level languages (Java, Python, C#)</td><td>Strong notion of type and valid operations</td><td><strong>Not vulnerable</strong></td><td>Run-time overhead and some limits on use</td></tr>
+      <tr><td>C and related languages</td><td>High-level control structures, but direct access to memory</td><td><strong>Vulnerable</strong>, with a large legacy of widely used unsafe code</td><td>Speed and closeness to the machine</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Table 10.2: some common unsafe C standard library routines</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Routine</th><th>What it does</th><th>Why it is unsafe</th></tr></thead>
+    <tbody>
+      <tr><td><code>gets(char *str)</code></td><td>Read a line from standard input into <code>str</code></td><td>No way at all to limit the length: the input decides</td></tr>
+      <tr><td><code>sprintf(char *str, char *format, ...)</code></td><td>Create <code>str</code> according to the supplied format and variables</td><td>Output length depends on the values formatted</td></tr>
+      <tr><td><code>strcat(char *dest, char *src)</code></td><td>Append <code>src</code> to <code>dest</code></td><td>No check that <code>dest</code> has room for both</td></tr>
+      <tr><td><code>strcpy(char *dest, char *src)</code></td><td>Copy <code>src</code> into <code>dest</code></td><td>No check that <code>dest</code> is as long as <code>src</code></td></tr>
+      <tr><td><code>vsprintf(char *str, char *fmt, va_list ap)</code></td><td>Create <code>str</code> from a format and an argument list</td><td>Same problem as <code>sprintf</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>The safer counterparts take a size: <code>fgets</code>, <code>snprintf</code>, <code>strncat</code>, <code>strncpy</code>, <code>vsnprintf</code>. CSC 3320 flagged the same pair (<code>strcpy</code> vs <code>strncpy</code>) and the same catch: <code>strncpy</code> may leave the result without a null terminator.</p>
+
+  <h3 id="l05-stack">Stack buffer overflows</h3>
+  <h4>Big picture</h4>
+  <p>A <strong>stack buffer overflow</strong> happens when the overflowed buffer is a local variable, so the spill lands in the function's own stack frame. It is also called <strong>stack smashing</strong>, it is what the Morris Worm used, and it is still widely exploited.</p>
+
+  <h4>Diagram explained: Figure 10.3, a stack frame with functions P and Q</h4>
+  <figure class="fig">
+<pre class="mermaid">
+flowchart TD
+  A["P's frame: return addr"] --> B["P: old frame pointer"]
+  B --> C["param 2"]
+  C --> D["param 1"]
+  D --> E["Q: return addr in P"]
+  E --> F["Q: old frame pointer  ← frame pointer"]
+  F --> G["local 1"]
+  G --> H["local 2  ← stack pointer"]
+  H --> I["free space (stack grows down)"]
+</pre>
+    <figcaption>Redrawn from the slide: high addresses at the top, and the stack growing downward into free space.</figcaption>
+  </figure>
+  <p>Function <strong>P</strong> calls function <strong>Q</strong>. Going down the figure: P's return address and old frame pointer, then the two parameters P pushed for Q, then <strong>Q's return address (an address inside P)</strong>, then the old frame pointer that the frame pointer register points at, then Q's local variables, and finally the free space the stack grows into. Why the frame exists at all, in the slide's words: when one function calls another it needs somewhere to save the return address, and locations to save the parameters passed in and possibly register values.</p>
+  <p><strong>The critical adjacency:</strong> the locals (where buffers live) sit <em>below</em> the saved frame pointer and return address, and a string copy writes upward. Overflow a local buffer far enough and the return address is what you hit.</p>
+
+  <h4>Diagram explained: Figure 10.4, program loading into process memory</h4>
+  <p>On the left is the program file, split into <em>global data</em> and <em>program machine code</em>. Dashed arrows map those into the process image on the right, which from the bottom (low addresses) up holds: the <strong>process control block</strong>, <strong>program machine code</strong>, <strong>global data</strong>, the <strong>heap</strong> (arrow pointing up), <strong>spare memory</strong>, the <strong>stack</strong> (arrow pointing down), and <strong>kernel code and data</strong> at the top of memory. What to notice: the heap and stack grow toward each other through the spare region, and there are three places a vulnerable buffer can live, which is exactly the list at the end of this chapter (stack, heap, global data).</p>
+
+  <h4>Diagram explained: Figures 10.5 and 10.6, the basic stack overflow</h4>
+<pre class="code"><code>void hello(char *tag)
+{
+    char inp[16];
+
+    printf("Enter value for %s: ", tag);
+    gets(inp);
+    printf("Hello your %s is %s\n", tag, inp);
+}</code></pre>
+  <p>The runs on the slide show the progression:</p>
+  <ol>
+    <li>Normal input (<code>Bill and Lawrie</code>) prints the greeting and the program finishes.</li>
+    <li>A long run of <code>X</code> characters produces <strong>Segmentation fault (core dumped)</strong>: the return address was overwritten with <code>XXXX</code>, which is not a valid code address, so the CPU faults when <code>hello</code> returns.</li>
+    <li>A <em>crafted</em> input (generated with a small script that writes exact bytes) overwrites both the <code>tag</code> pointer and the return address so that the function returns back into <code>hello</code> a second time with a different tag, and only then crashes. That second greeting is the proof that <strong>control flow itself was redirected</strong>.</li>
+  </ol>
+  <p><strong>Figure 10.6</strong> is the before-and-after stack table for this program. Before <code>gets(inp)</code>, the words from low to high are <code>inp[0-3]</code> through <code>inp[12-15]</code>, then two words of other data, then the <strong>old base pointer</strong> at bffffbd8, the <strong>return address</strong> at bffffbdc, and the <code>tag</code> pointer at bffffbe0. After typing a 24-character input, the <code>inp</code> words read <code>ABCD EFGH QRST UVWX</code> and the overflow continues into <code>abcd efgh</code>, changing the saved base pointer, the return address, and the <code>tag</code> pointer. Compare the "after" column with the labels on the right and you can see exactly which bytes of your input land on the return address.</p>
+  <div class="box ex"><span class="lbl">Worked example: counting the offset <span class="lvl">medium</span></span>
+    <p>With <code>char inp[16]</code> on a 32-bit system, the frame looks like this from the start of <code>inp</code>: bytes 0–15 are the buffer, bytes 16–19 are other saved data, bytes 20–23 are the saved frame pointer, and bytes 24–27 are the return address.</p>
+    <p>So an attacker who wants to control the return address writes <strong>24 filler bytes</strong> and then a 4-byte address. Typing 20 <code>X</code>s only corrupts the frame pointer; typing 28 <code>X</code>s reliably lands on the return address. This arithmetic, offset from the buffer to the saved return address, is what "understand how that buffer is stored in memory" means in the attacker's checklist.</p>
+  </div>
+
+  <h4>Diagram explained: Figure 10.7, another stack overflow</h4>
+  <p>The second example has three functions: <code>getinp(char *inp, int siz)</code>, which safely uses <code>fgets(inp, siz, stdin)</code>; <code>display(char *val)</code>, which copies into a local <code>char tmp[16]</code> using <code>sprintf(tmp, "read val: %s\n", val)</code>; and <code>main</code>, which calls <code>getinp(buf, sizeof(buf))</code> on its own <code>char buf[16]</code> and then <code>display(buf)</code>. The runs show <code>SAFE</code> working normally, and a long run of <code>X</code>s printing "buffer3 done" and <em>then</em> dying with a segmentation fault.</p>
+  <div class="box warn"><span class="lbl">Misconception: "I used a safe input function, so I'm safe"</span>
+    <p><code>getinp</code> does everything right; the bug is in <code>display</code>. <code>sprintf</code> writes the 11-character prefix "read val: " plus the value into a 16-byte buffer, so even a 16-byte input overflows <code>tmp</code>. Also notice <em>when</em> the crash appears: main finished printing "buffer3 done" first, because the corrupted return address only matters when the damaged frame returns. <strong>A crash can happen far away in time and place from the overflow.</strong></p>
+  </div>
+
+  <h3 id="l05-shellcode">Shellcode and a complete attack</h3>
+  <div class="box def"><span class="lbl">Definition: shellcode</span>
+    <dl>
+      <dt>Plain English</dt><dd>The attacker's own machine instructions, smuggled in as data, that the program is tricked into running.</dd>
+      <dt>Technical</dt><dd>Code supplied by the attacker, often saved in the buffer being overflowed, traditionally transferring control to a user command-line interpreter (a shell). It is machine code, so it is specific to the processor and operating system.</dd>
+      <dt>Why it matters</dt><dd>The overflow gets you control of the program counter; the shellcode decides what to do with it. Writing it traditionally needed good assembly skills, but sites and tools, notably the <strong>Metasploit Project</strong>, now automate the process.</dd>
+    </dl>
+  </div>
+  <p>The Metasploit Project provides useful information to people who perform penetration testing, IDS signature development, and exploit research; the same automation is why attack quality no longer depends on the attacker's assembly skill.</p>
+
+  <h4>Diagram explained: Figure 10.8, example UNIX shellcode</h4>
+  <p>The figure has three panels showing the same thing at three levels:</p>
+  <ol>
+    <li><strong>(a) The goal, written in C.</strong> Set <code>sh = "/bin/sh"</code>, build an argument array <code>args[0] = sh; args[1] = NULL;</code> and call <code>execve(sh, args, NULL)</code>. In other words: replace this process with a shell (the same <code>execve</code> from CSC 4320's process chapter).</li>
+    <li><strong>(b) The equivalent position-independent x86 assembly.</strong> It starts with <code>nop</code> instructions (the end of a <em>NOP sled</em>), then uses a <code>jmp</code>/<code>call</code> pair so that <code>call</code> pushes the address of the <code>"/bin/sh"</code> string onto the stack and <code>pop %esi</code> retrieves it. That trick is what makes the code <strong>position independent</strong>: it never hard-codes where it was loaded. It then zeroes a register with <code>xor</code>, writes a null terminator onto the end of the string, fills in the argument array, loads the syscall number for <code>execve</code>, and fires <code>int $0x80</code> to enter the kernel.</li>
+    <li><strong>(c) The compiled machine code</strong> as raw hex bytes, which is what actually gets typed into the vulnerable input.</li>
+  </ol>
+  <p>Two details worth remembering for exam questions: shellcode must avoid null bytes, because it travels inside a C string that would otherwise be cut short, and it usually begins with a <strong>NOP sled</strong> so the guessed return address only has to land <em>somewhere</em> in the sled rather than exactly on the first instruction.</p>
+
+  <h4>Table 10.3: common x86 assembly instructions</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Instruction</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>MOV src, dest</code></td><td>Copy (move) the value from <code>src</code> into <code>dest</code></td></tr>
+      <tr><td><code>LEA src, dest</code></td><td>Load effective address: copy the <em>address</em> of <code>src</code> into <code>dest</code></td></tr>
+      <tr><td><code>ADD / SUB src, dest</code></td><td>Add or subtract, leaving the result in <code>dest</code></td></tr>
+      <tr><td><code>AND / OR / XOR src, dest</code></td><td>Bitwise operation, result in <code>dest</code></td></tr>
+      <tr><td><code>CMP val1, val2</code></td><td>Compare, setting CPU flags</td></tr>
+      <tr><td><code>JMP / JZ / JNZ addr</code></td><td>Jump, jump if zero, jump if not zero</td></tr>
+      <tr><td><code>PUSH src</code> / <code>POP dest</code></td><td>Push onto / pop off the stack</td></tr>
+      <tr><td><code>CALL addr</code> / <code>RET</code></td><td>Call a function / return from it</td></tr>
+      <tr><td><code>LEAVE</code></td><td>Clean up the stack frame before leaving a function</td></tr>
+      <tr><td><code>INT num</code></td><td>Software interrupt used to access an operating system function</td></tr>
+      <tr><td><code>NOP</code></td><td>No operation: do nothing (the sled)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>Table 10.4: x86 registers</h4>
+  <div class="tw"><table>
+    <thead><tr><th>32-bit</th><th>16 / 8-bit forms</th><th>Use</th></tr></thead>
+    <tbody>
+      <tr><td><code>%eax</code></td><td><code>%ax</code>, <code>%ah</code>, <code>%al</code></td><td>Accumulator: arithmetic, I/O, and executing interrupt calls</td></tr>
+      <tr><td><code>%ebx</code></td><td><code>%bx</code>, <code>%bh</code>, <code>%bl</code></td><td>Base register: access memory, pass system call arguments, return values</td></tr>
+      <tr><td><code>%ecx</code></td><td><code>%cx</code>, <code>%ch</code>, <code>%cl</code></td><td>Counter register</td></tr>
+      <tr><td><code>%edx</code></td><td><code>%dx</code>, <code>%dh</code>, <code>%dl</code></td><td>Data register: arithmetic, interrupt calls, I/O</td></tr>
+      <tr><td><code>%ebp</code></td><td>—</td><td><strong>Base pointer</strong>: address of the current stack frame</td></tr>
+      <tr><td><code>%eip</code></td><td>—</td><td><strong>Instruction pointer</strong> (program counter): address of the next instruction</td></tr>
+      <tr><td><code>%esi</code></td><td>—</td><td>Source index: pointer for string or array operations</td></tr>
+      <tr><td><code>%esp</code></td><td>—</td><td><strong>Stack pointer</strong>: address of the top of the stack</td></tr>
+    </tbody>
+  </table></div>
+  <p>The three that matter for this chapter are <code>%esp</code> (top of stack), <code>%ebp</code> (current frame), and <code>%eip</code> (what executes next). An overflow attack is, in one line, <em>a way to write into %eip using nothing but data</em>. If you took CSC 3210, these are the x86 cousins of <code>sp</code>, <code>fp</code>, and the program counter.</p>
+
+  <h4>Diagram explained: Figure 10.9, an example stack overflow attack</h4>
+  <p>The figure is a terminal transcript, and the order of the commands is the lesson:</p>
+  <ol>
+    <li><code>dir -l buffer4</code> shows <code>-rwsr-xr-x 1 root knoppix</code>: the vulnerable program is <strong>setuid root</strong> (the <code>s</code> bit from <a href="#l04a-setuid">L04a</a>).</li>
+    <li><code>whoami</code> prints <code>knoppix</code>, and <code>cat /etc/shadow</code> is refused with "Permission denied": the ordinary user cannot read the password hashes.</li>
+    <li>An attack script builds an input made of a NOP sled, the shellcode bytes from Figure 10.8, and a guessed stack address repeated so that it lands on the saved return address, then appends the commands <code>whoami</code> and <code>cat /etc/shadow</code> for the spawned shell to read.</li>
+    <li>Piping that into <code>buffer4</code> prints the greeting with garbage, then <code>root</code>, then the full contents of <code>/etc/shadow</code>.</li>
+  </ol>
+  <p><strong>Why this is the punchline of the lecture:</strong> the overflow alone gave code execution, but it is the <em>setuid root</em> bit that turned code execution into <em>privilege escalation</em>. Least privilege (L04a) and buffer overflows are the same story told from two sides.</p>
+
+  <h4>Stack overflow variants</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Target program can be</th><th>Shellcode can</th></tr></thead>
+    <tbody>
+      <tr><td>A trusted system utility (often setuid)</td><td>Launch a remote shell when an attacker connects to it</td></tr>
+      <tr><td>A network service daemon</td><td>Create a <strong>reverse shell</strong> that connects back to the attacker</td></tr>
+      <tr><td>Commonly used library code</td><td>Use local exploits that establish a shell</td></tr>
+      <tr><td></td><td>Flush firewall rules that currently block other attacks</td></tr>
+      <tr><td></td><td>Break out of a <code>chroot</code> (restricted execution) environment, giving full access to the system</td></tr>
+    </tbody>
+  </table></div>
+  <p>Note the reverse shell entry: it exists because firewalls usually block inbound connections but allow outbound ones, so the victim dials out to the attacker.</p>
+
+  <h3 id="l05-compile">Compile-time defenses</h3>
+  <p>Defenses split into two broad approaches. <strong>Compile-time</strong> defenses aim to harden programs so new code resists attack; <strong>run-time</strong> defenses aim to detect and abort attacks in programs that already exist. You need both, because you cannot recompile the world.</p>
+
+  <h4>1. Choose a safer programming language</h4>
+  <p>Modern high-level languages are not vulnerable to buffer overflow attacks, because the compiler enforces range checks and permissible operations on variables. The slide is equally clear about the price:</p>
+  <ul>
+    <li>Extra code must run at run time to impose the checks.</li>
+    <li>Flexibility and safety cost resources.</li>
+    <li>Distance from the machine means losing access to some instructions and hardware resources, which limits these languages for code such as device drivers.</li>
+  </ul>
+
+  <h4>2. Safe coding techniques</h4>
+  <p>C's designers emphasized space efficiency and performance over type safety, assuming programmers would exercise due care. So programmers must inspect code and rewrite anything unsafe. The slide's example is the <strong>OpenBSD project</strong>, whose developers audited the entire code base, including the operating system, standard libraries, and common utilities, producing what is widely regarded as one of the safest operating systems in widespread use.</p>
+
+  <h4>Diagram explained: Figure 10.10, examples of unsafe C code</h4>
+  <p>Two functions that contain no obviously dangerous library call, which is the point:</p>
+<pre class="code"><code>/* (a) unsafe byte copy */
+int copy_buf(char *to, int pos, char *from, int len)
+{
+    int i;
+    for (i = 0; i &lt; len; i++) {
+        to[pos] = from[i];
+        pos++;
+    }
+    return pos;
+}
+
+/* (b) unsafe byte input */
+short read_chunk(FILE fil, char *to)
+{
+    short len;
+    fread(&amp;len, 2, 1, fil);      /* read length of binary data */
+    fread(to, 1, len, fil);      /* read len bytes of binary data */
+    return len;
+}</code></pre>
+  <ul>
+    <li><strong>(a)</strong> copies <code>len</code> bytes into <code>to</code> starting at <code>pos</code> and never checks the size of <code>to</code>. The caller's numbers decide whether this is safe, so the bug lives in a different function from the crash.</li>
+    <li><strong>(b)</strong> reads a length <em>from the file itself</em> and then trusts it. The length is a <code>short</code>, so a negative or huge value from an attacker-supplied file turns the second <code>fread</code> into an overflow. Rule: <strong>never trust a length field that came from the same untrusted source as the data.</strong></li>
+  </ul>
+
+  <h4>3. Language extensions and safe libraries</h4>
+  <p>Handling <em>dynamically</em> allocated memory is harder, because the size is not known at compile time, so checking it requires language extensions and library routines; programs and libraries must be recompiled, which creates problems with third-party applications. A second approach replaces the unsafe standard routines with safer variants. <strong>Libsafe</strong> is the slide's example: it is implemented as a dynamic library arranged to load <em>before</em> the standard libraries, so calls such as <code>strcpy</code> reach the checked version first.</p>
+
+  <h4>4. Stack protection (canaries)</h4>
+  <div class="box def"><span class="lbl">Definition: stack canary</span>
+    <dl>
+      <dt>Plain English</dt><dd>A known value placed just below the return address; if it changes, something overflowed and the program stops.</dd>
+      <dt>Technical</dt><dd>Function entry and exit code is added to check the stack for signs of corruption. The canary value must be <strong>random and unpredictable</strong>, and should differ on different systems, so an attacker cannot simply include the right value in the overflow.</dd>
+      <dt>Why it matters</dt><dd>It converts a silent compromise into a controlled crash, which is the same trade every run-time defense makes.</dd>
+    </dl>
+  </div>
+  <p><strong>Stackshield</strong> and <strong>Return Address Defender (RAD)</strong> are GCC extensions that take a different route to the same goal: function entry code writes a copy of the return address to a safe region of memory, function exit code compares the return address in the stack frame against that saved copy, and if it has changed, the program aborts.</p>
+  <p>Memory hook: a canary detects <em>collateral damage</em> next to the return address; Stackshield/RAD detect a <em>changed return address</em> directly.</p>
+
+  <h3 id="l05-runtime">Run-time defenses</h3>
+  <h4>Executable address space protection (NX)</h4>
+  <p>Use virtual memory support to mark some regions of memory <strong>non-executable</strong>, so shellcode sitting in a data buffer cannot run. This requires support from the memory management unit (MMU); it has long existed on SPARC/Solaris systems and is more recent on x86 Linux, UNIX, and Windows. The complication the slide notes: some legitimate programs need executable stack code (certain language runtimes and nested functions), so special provisions are needed.</p>
+
+  <h4>Address space randomization (ASLR)</h4>
+  <p>Manipulate the location of key data structures, the stack, heap, and global data, using a random shift for each process, and also randomize the location of heap buffers and of standard library functions. Because modern address spaces are large, wasting some of the range has negligible impact. The effect on the attacker is direct: the guessed return address in Figure 10.9 stops being guessable, and a wrong guess crashes the program instead of running shellcode.</p>
+
+  <h4>Guard pages</h4>
+  <p>Place <strong>guard pages</strong> between critical regions of memory, flagged in the MMU as illegal addresses, so any attempted access aborts the process. An extension places guard pages between stack frames and between heap buffers; the cost is execution time to support the large number of page mappings needed.</p>
+  <div class="box proc"><span class="lbl">Key idea: the layered defense</span>
+    <p>Line them up and each one removes a step the attack needs: <strong>safe languages and coding</strong> remove the overflow, <strong>canaries</strong> catch the overwritten return address, <strong>NX</strong> stops injected code from executing, <strong>ASLR</strong> stops the attacker from knowing where to jump, and <strong>guard pages</strong> stop the walk between regions. This is defense in depth from L04a applied to one bug class, and it is why real exploits today must chain several tricks together.</p>
+  </div>
+
+  <h3 id="l05-other">Other forms of overflow attack</h3>
+  <h4>Replacement stack frame and off-by-one</h4>
+  <p>A variant overwrites the buffer and the <strong>saved frame pointer</strong> rather than the return address. The saved frame pointer is changed to refer to a dummy stack frame the attacker built; the current function returns into that replacement frame, and control transfers to the shellcode in the overwritten buffer. This matters because of <strong>off-by-one attacks</strong>, a coding error that allows exactly one more byte to be copied than there is space for, which is enough to change the least significant byte of the saved frame pointer.</p>
+  <p><strong>Defenses:</strong> stack protection mechanisms that detect modification of the stack frame or return address at function exit, non-executable stacks, and randomization of the stack and of system libraries.</p>
+
+  <h4>Return to system call (return-to-libc)</h4>
+  <div class="box def"><span class="lbl">Definition: return to system call</span>
+    <dl>
+      <dt>Plain English</dt><dd>Instead of injecting code, point the return address at a function the program already contains, and hand it your arguments.</dd>
+      <dt>Technical</dt><dd>A stack overflow variant that replaces the return address with the address of a standard library function, developed in response to non-executable stack defenses. The attacker constructs suitable parameters on the stack above the return address; when the function returns, the library function executes with those parameters. The attacker may need the exact buffer address, and can even chain two library calls.</dd>
+      <dt>Why it matters</dt><dd>It defeats NX entirely, because no attacker-supplied code ever executes: existing, legitimately executable code does the work. It is the ancestor of modern return-oriented programming.</dd>
+    </dl>
+  </div>
+  <p><strong>Defenses</strong> are the same three: stack protection that detects the modified return address, non-executable stacks (which this partly bypasses), and randomization of the stack and of system library locations, which is the one that really bites, because the attack needs the library function's address.</p>
+
+  <h4>Heap overflow (Figure 10.11)</h4>
+  <p>The attacked buffer lives in the <strong>heap</strong>, typically located above the program code, in memory requested by the program for dynamic data structures such as linked lists of records. The heap has <strong>no return address</strong>, so there is no easy transfer of control; instead an attacker looks for a <strong>function pointer</strong> to overwrite, or manipulates the heap's own management data structures.</p>
+  <p>The figure's vulnerable program allocates a record that contains exactly that pairing:</p>
+<pre class="code"><code>typedef struct chunk {
+    char inp[64];               /* vulnerable input buffer */
+    void (*process)(char *);    /* pointer to function to process inp */
+} chunk_t;
+
+int main(int argc, char *argv[]) {
+    chunk_t *next;
+    setbuf(stdin, NULL);
+    next = malloc(sizeof(chunk_t));
+    next-&gt;process = showlen;
+    printf("Enter value: ");
+    gets(next-&gt;inp);
+    next-&gt;process(next-&gt;inp);   /* calls whatever the pointer now holds */
+    printf("buffer5 done\n");
+}</code></pre>
+  <p>Overflowing <code>inp</code> by more than 64 bytes overwrites <code>process</code>, and the very next line <em>calls</em> it. The attack transcript in part (b) does the same thing as the stack attack: a NOP sled plus shellcode inside the 64-byte buffer, then an address that points back into that buffer, and the program hands the attacker a root shell reading <code>/etc/shadow</code>.</p>
+  <p><strong>Defenses:</strong> make the heap non-executable, and randomize the allocation of memory on the heap.</p>
+
+  <h4>Global data overflow (Figure 10.12)</h4>
+  <p>The same structure, moved to the <strong>global data</strong> section: a global <code>struct chunk</code> holding <code>char inp[64]</code> and a <code>process</code> function pointer, filled by <code>gets(chunk.inp)</code> and then called as <code>chunk.process(chunk.inp)</code>. The buffer may be located above the program code, and an attacker aims to overwrite a function pointer that is later called, or adjacent process management tables. The attack script differs from the heap one only in the address it writes, because global data sits at a fixed, predictable location.</p>
+  <p><strong>Defenses:</strong> a non-executable or randomized global data region, moving function pointers away from data buffers, and guard pages between the global data region and its neighbors.</p>
+
+  <div class="box exam"><span class="lbl">Exam practice</span>
+    <details><summary>Why does a heap or global data overflow need a function pointer, while a stack overflow does not?</summary><div><p>A stack frame already contains control data (the saved return address and frame pointer) that the CPU will use automatically at function exit. The heap and the global data region contain only data, so an attacker needs something that will later be treated as an address to execute: a function pointer, or the allocator's own management structures.</p></div></details>
+    <details><summary>Which single defense most directly defeats return-to-libc, and why?</summary><div><p>Address space randomization of system libraries. The attack requires the exact address of a library function to put in the return address slot; non-executable memory does not help, because the library code is legitimately executable.</p></div></details>
+    <details><summary>A program compiled with stack canaries still gets compromised through a heap overflow. Why is that not a contradiction?</summary><div><p>Canaries protect the saved return address in a stack frame. A heap overflow overwrites a function pointer in heap memory, so no canary is anywhere near the data being corrupted. Each defense covers one specific mechanism, which is exactly why layering is required.</p></div></details>
+  </div>
+
+  <h3 id="l05-gloss">L05 glossary</h3>
+  <div class="tw"><table class="gloss">
+    <thead><tr><th>Term</th><th>Definition</th><th>Example</th><th>Memory trick</th><th>Similar</th><th>Opposite</th></tr></thead>
+    <tbody>
+      <tr><td>Buffer overflow</td><td>Writing more data into a buffer than it can hold, overwriting neighbors</td><td><code>gets</code> into <code>char inp[16]</code></td><td>The cup overflows onto the table</td><td>Buffer overrun</td><td>Bounds-checked write</td></tr>
+      <tr><td>Stack smashing</td><td>Buffer overflow where the buffer is a local variable</td><td>Morris Worm on fingerd</td><td>Smash the frame</td><td>Stack overflow</td><td>Heap overflow</td></tr>
+      <tr><td>Return address</td><td>Saved address a function returns to</td><td>bffffbdc in Figure 10.6</td><td>The way home</td><td>Saved %eip</td><td>—</td></tr>
+      <tr><td>Saved frame pointer</td><td>Caller's frame base, saved on entry</td><td>Target of off-by-one attacks</td><td>Old base ptr</td><td>Old %ebp</td><td>—</td></tr>
+      <tr><td>Shellcode</td><td>Attacker's machine code, usually spawning a shell</td><td><code>execve("/bin/sh")</code></td><td>Code that gets a shell</td><td>Payload</td><td>Legitimate code</td></tr>
+      <tr><td>NOP sled</td><td>Run of no-op instructions before shellcode</td><td><code>90 90 90 …</code></td><td>Slide into the payload</td><td>Landing zone</td><td>Exact-address jump</td></tr>
+      <tr><td>Position-independent code</td><td>Code that works wherever it is loaded</td><td>jmp/call trick in Figure 10.8</td><td>No fixed address</td><td>PIC</td><td>Absolute addressing</td></tr>
+      <tr><td>Fuzzing</td><td>Automatically feeding malformed input to find crashes</td><td>Finding vulnerable programs</td><td>Fuzzy random input</td><td>Dynamic testing</td><td>Source inspection</td></tr>
+      <tr><td>Metasploit</td><td>Framework providing exploit and payload tooling</td><td>Shellcode generation</td><td>Meta-exploit toolbox</td><td>Exploit kit</td><td>—</td></tr>
+      <tr><td>Unsafe library routine</td><td>C function with no length limit</td><td><code>gets</code>, <code>strcpy</code>, <code>sprintf</code></td><td>No size, no safety</td><td>Table 10.2</td><td><code>fgets</code>, <code>strncpy</code>, <code>snprintf</code></td></tr>
+      <tr><td>Stack canary</td><td>Random guard value checked at function exit</td><td>StackGuard-style protection</td><td>Canary in the coal mine</td><td>Stack protector</td><td>Unprotected frame</td></tr>
+      <tr><td>Stackshield / RAD</td><td>GCC extensions that save and re-check the return address</td><td>Abort on mismatch</td><td>Shield the return</td><td>Canary</td><td>—</td></tr>
+      <tr><td>Libsafe</td><td>Dynamic library loaded before the standard one, with checked routines</td><td>Safer <code>strcpy</code></td><td>Library that is safe</td><td>Safe libraries</td><td>libc as shipped</td></tr>
+      <tr><td>NX / executable space protection</td><td>Marking memory non-executable via the MMU</td><td>Non-executable stack</td><td>No eXecute</td><td>DEP</td><td>Executable stack</td></tr>
+      <tr><td>ASLR</td><td>Randomizing stack, heap, global data, and library locations</td><td>Random shift per process</td><td>Move the furniture</td><td>Randomization</td><td>Fixed addresses</td></tr>
+      <tr><td>Guard page</td><td>Page marked illegal between memory regions</td><td>Between stack frames</td><td>A fence with an alarm</td><td>Canary page</td><td>Contiguous regions</td></tr>
+      <tr><td>Off-by-one</td><td>Error allowing exactly one byte too many</td><td>Changes low byte of saved frame pointer</td><td>One too far</td><td>Fencepost error</td><td>—</td></tr>
+      <tr><td>Replacement stack frame</td><td>Overwriting the saved frame pointer to use a dummy frame</td><td>Off-by-one exploitation</td><td>Swap the frame</td><td>Frame pointer overwrite</td><td>Return address overwrite</td></tr>
+      <tr><td>Return to system call</td><td>Returning into existing library code instead of injected code</td><td>return-to-libc</td><td>Use their code, not yours</td><td>ROP ancestor</td><td>Code injection</td></tr>
+      <tr><td>Heap overflow</td><td>Overflow of a dynamically allocated buffer</td><td>Overwrite <code>process</code> pointer</td><td>Pile spills over</td><td>Global data overflow</td><td>Stack overflow</td></tr>
+      <tr><td>Function pointer</td><td>Variable holding a code address that is later called</td><td><code>next-&gt;process(...)</code></td><td>Data that becomes control</td><td>Callback</td><td>Plain data</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box proc"><span class="lbl">L05 in one breath</span>
+    <p>A buffer overflow puts more data into a fixed-size buffer than it holds, overwriting neighboring memory: at best corrupt data, at worst <strong>execution of attacker-chosen code</strong>. C is exposed because it has no bounds checking and a legacy of unsafe routines (<code>gets</code>, <code>strcpy</code>, <code>sprintf</code>, <code>strcat</code>, <code>vsprintf</code>). On the <strong>stack</strong>, locals sit below the saved frame pointer and return address, so a long input can overwrite the return address and redirect control into <strong>shellcode</strong> (often a NOP sled plus position-independent code that calls <code>execve("/bin/sh")</code>), and against a <strong>setuid root</strong> program that means privilege escalation. Defenses are compile-time (safe languages, audited code, safe libraries such as Libsafe, canaries and Stackshield/RAD) and run-time (<strong>non-executable memory, ASLR, guard pages</strong>). The variants exist to get around those: replacement stack frames and off-by-one errors target the saved frame pointer, <strong>return-to-libc</strong> defeats non-executable memory by reusing existing code, and <strong>heap</strong> and <strong>global data</strong> overflows have no return address, so they overwrite a function pointer that is called later.</p>
+  </div>
+
+  <div class="box exam"><span class="lbl">L05 exam checklist</span>
+    <ul class="checklist">
+      <li>Give the NIST definition of a buffer overflow and name the four consequences.</li>
+      <li>Name the milestones in Table 10.1: Morris 1988, Aleph One 1996, Code Red 2001, Slammer 2003, Sasser 2004.</li>
+      <li>State the two things an attacker needs, and the three ways vulnerable programs are found (source inspection, tracing oversized input, fuzzing).</li>
+      <li>Walk through Figure 10.1: explain how <code>BADINPUTBADINPUT</code> makes <code>valid</code> true without knowing the tag.</li>
+      <li>Explain why C is vulnerable and high-level languages are not, and what safety costs.</li>
+      <li>List the unsafe routines of Table 10.2 and their safe counterparts.</li>
+      <li>Draw the stack frame of Figure 10.3 and say why local buffers sit below the return address.</li>
+      <li>Given a buffer size, compute the offset from the buffer to the saved return address.</li>
+      <li>Define shellcode; explain the NOP sled, position independence, and why null bytes are avoided.</li>
+      <li>Identify <code>%esp</code>, <code>%ebp</code>, and <code>%eip</code> and their roles.</li>
+      <li>Explain why the setuid bit turns code execution into privilege escalation in Figure 10.9.</li>
+      <li>List the stack overflow variants and what shellcode can do (including reverse shells and chroot escape).</li>
+      <li>Contrast compile-time and run-time defenses, and name examples of each.</li>
+      <li>Explain canaries and how Stackshield/RAD differ from them.</li>
+      <li>Explain why both code samples in Figure 10.10 are unsafe, especially the trusted length field.</li>
+      <li>Describe NX, ASLR, and guard pages, and what each costs.</li>
+      <li>Explain replacement stack frames, off-by-one errors, and return-to-libc, with defenses.</li>
+      <li>Explain heap and global data overflows, why they need a function pointer, and their defenses.</li>
     </ul>
   </div>
 </section>

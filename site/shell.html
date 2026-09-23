@@ -386,9 +386,17 @@ var COURSE_TOOLS = {};
     }
     var el = anchor && document.getElementById(anchor);
     if (el) {
-      // Jump without smooth scrolling, then again once web fonts and diagrams have changed the layout.
-      var jump = function(){ if (location.hash.indexOf(encodeURIComponent(anchor)) >= 0) el.scrollIntoView({ block: 'start', behavior: 'instant' }); };
+      // Jump without smooth scrolling, then re-jump while fonts and diagrams are still
+      // changing the layout above us — but never fight the reader once they scroll.
+      var landed = null;
+      var jump = function(){
+        if (location.hash.indexOf(encodeURIComponent(anchor)) < 0) return;
+        if (landed !== null && Math.abs(window.scrollY - landed) > 4) return;
+        el.scrollIntoView({ block: 'start', behavior: 'instant' });
+        landed = window.scrollY;
+      };
       requestAnimationFrame(jump);
+      [120, 400, 1200, 2500].forEach(function(ms){ setTimeout(jump, ms); });
       if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(jump);
       if (drawn) drawn.then(jump, jump);
     }

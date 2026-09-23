@@ -1037,5 +1037,223 @@
 ],
 "answer": 1,
 "explain": "With the null SID and non-null security on disk root directories, the renderer can open essentially no files and has no network access."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Which worm first made buffer overflows widely known, and in what year?",
+"choices": [
+"Code Red, 2001",
+"The Morris Internet Worm, 1988",
+"Slammer, 2003",
+"Sasser, 2004"
+],
+"answer": 1,
+"explain": "The 1988 Morris Worm used an overflow in fingerd. Aleph One's \"Smashing the Stack for Fun and Profit\" documented the technique in 1996."
+},
+{
+"unit": "l05",
+"type": "short",
+"q": "Give the NIST definition of a buffer overflow and list the four consequences from the slides.",
+"answer": "NIST: \"A condition at an interface under which more input can be placed into a buffer or data holding area than the capacity allocated, overwriting other information. Adversaries exploit such a condition to crash a system or to insert specially crafted code that allows them to gain control of the system.\" The four consequences are corruption of program data, unexpected transfer of control, memory access violations, and execution of code chosen by the attacker.",
+"explain": "The consequences form a ladder: corrupt data is a bug, transfer of control is a vulnerability, attacker code is a compromise."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Two things an attacker needs to exploit an overflow are:",
+"choices": [
+"Root access and a debugger",
+"A vulnerability triggerable by attacker-controlled external data, and an understanding of how the buffer is stored in memory",
+"Physical access and a compiler",
+"A zero-day and a firewall rule"
+],
+"answer": 1,
+"explain": "Vulnerable programs are found by source inspection, tracing execution on oversized input, and fuzzing."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Why is the third run in Figure 10.1, typing BADINPUTBADINPUT, dangerous?",
+"choices": [
+"It crashes the program",
+"The overflow copies the input's first half into str1, so strncmp matches and valid becomes TRUE without knowing the tag",
+"It leaks the value of str1",
+"It overwrites the return address"
+],
+"answer": 1,
+"explain": "The overflow from str2 lands in str1, so the attacker makes both halves identical and the comparison passes. It is an authentication bypass through data corruption."
+},
+{
+"unit": "l05",
+"type": "tf",
+"q": "Modern high-level languages such as Java and Python are not vulnerable to buffer overflow attacks, but they pay for it in run-time checks and distance from the hardware.",
+"answer": true,
+"explain": "Compilers enforce range checks and permissible operations. The cost is overhead, reduced flexibility, and losing access to some instructions and hardware resources, which limits them for code like device drivers."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Which C library routine is unsafe because there is no way at all to limit how much it reads?",
+"choices": [
+"fgets",
+"gets",
+"strncpy",
+"snprintf"
+],
+"answer": 1,
+"explain": "gets reads a line with no size argument, so the input decides the length. The other unsafe routines in Table 10.2 are sprintf, strcat, strcpy, and vsprintf."
+},
+{
+"unit": "l05",
+"type": "short",
+"q": "A function has char inp[16] on a 32-bit system, with four bytes of other saved data, then the saved frame pointer, then the return address. How many filler bytes does an attacker write before the address that overwrites the return address?",
+"answer": "24 bytes: 16 for the buffer, 4 for the other saved data, and 4 for the saved frame pointer. The next four bytes land on the return address.",
+"explain": "This offset arithmetic is what \"understand how the buffer is stored in memory\" means in practice."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "In a stack frame, why can overflowing a local buffer reach the return address?",
+"choices": [
+"The return address is stored inside the buffer",
+"Local variables sit below the saved frame pointer and return address, and copies write upward toward them",
+"The compiler places the return address first",
+"Because the heap grows down"
+],
+"answer": 1,
+"explain": "The stack grows downward but a string copy writes upward, so a long enough write walks from the locals into the saved frame pointer and return address."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "What is a NOP sled and why is it used?",
+"choices": [
+"A decoy buffer that absorbs the overflow",
+"A run of no-op instructions before the shellcode, so an approximate guess of the return address still slides into the payload",
+"A compiler defense that pads buffers",
+"A list of library addresses"
+],
+"answer": 1,
+"explain": "The attacker rarely knows the exact stack address, so landing anywhere in the sled works. Shellcode is also position independent and avoids null bytes, which would terminate the string early."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Which x86 register holds the address of the next instruction to execute, and is effectively what an overflow attack is trying to control?",
+"choices": [
+"%esp",
+"%ebp",
+"%eip",
+"%eax"
+],
+"answer": 2,
+"explain": "%eip is the instruction pointer. %esp is the stack pointer and %ebp the base pointer of the current frame."
+},
+{
+"unit": "l05",
+"type": "short",
+"q": "In Figure 10.9 the vulnerable program buffer4 is -rwsr-xr-x owned by root. Why does that file mode turn code execution into a full compromise?",
+"answer": "The s in the owner's execute position is the setuid bit, so the program runs with the file owner's identity, root. The attacker's shellcode inherits that effective UID, so the spawned shell is a root shell and can read /etc/shadow, which the ordinary user knoppix was denied moments earlier.",
+"explain": "Buffer overflow gives code execution; least privilege decides how much that execution is worth. Compare L04a's setuid material."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Why do shellcode payloads often create a reverse shell rather than listening for a connection?",
+"choices": [
+"Reverse shells are faster",
+"Firewalls usually block inbound connections but allow outbound ones, so the victim connects back to the attacker",
+"Listening requires root",
+"Reverse shells avoid ASLR"
+],
+"answer": 1,
+"explain": "Other listed shellcode functions include launching a remote shell, using local exploits, flushing firewall rules, and breaking out of a chroot environment."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "What is the essential property of a stack canary value?",
+"choices": [
+"It must be a fixed, well-known constant",
+"It must be random and unpredictable, and differ across systems",
+"It must be stored inside the buffer",
+"It must be zero"
+],
+"answer": 1,
+"explain": "A predictable canary could simply be included in the overflow data. Stackshield and RAD take another route: save the return address elsewhere at entry and compare at exit."
+},
+{
+"unit": "l05",
+"type": "short",
+"q": "Why is read_chunk in Figure 10.10 unsafe, even though it uses fread rather than strcpy?",
+"answer": "It reads a length field from the file with fread and then trusts it for the second fread into the caller's buffer. The length came from the same untrusted source as the data, and it is a short, so a huge or negative value causes a write far beyond the buffer. Never trust a length supplied by the data itself; validate it against the real buffer size.",
+"explain": "The companion example, copy_buf, is unsafe because it never checks the size of its destination; the caller's numbers decide whether it overflows."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Which run-time defense most directly stops injected shellcode from executing?",
+"choices": [
+"Address space randomization",
+"Non-executable memory (executable address space protection)",
+"Guard pages",
+"Stack canaries"
+],
+"answer": 1,
+"explain": "Marking the stack and heap non-executable means injected bytes cannot run. It requires MMU support and complicates programs that legitimately need executable stacks."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "A return-to-system-call (return-to-libc) attack was developed in response to which defense?",
+"choices": [
+"Stack canaries",
+"Non-executable stacks",
+"Guard pages",
+"Safe libraries"
+],
+"answer": 1,
+"explain": "No attacker code executes: the return address points at an existing library function, with parameters placed on the stack above it, and the calls can even be chained. Randomizing library locations is the effective defense."
+},
+{
+"unit": "l05",
+"type": "tf",
+"q": "An off-by-one error is harmless because only a single extra byte is written.",
+"answer": false,
+"explain": "One byte is enough to change the least significant byte of the saved frame pointer, which supports a replacement stack frame attack: the function returns into a dummy frame the attacker built, transferring control to shellcode in the buffer."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Why does a heap overflow attack need a function pointer or allocator metadata, while a stack overflow does not?",
+"choices": [
+"The heap is read-only",
+"The heap contains no saved return address, so there is no control data that the CPU will use automatically",
+"The heap is always non-executable",
+"Heap buffers are smaller"
+],
+"answer": 1,
+"explain": "In Figure 10.11 the struct pairs a 64-byte input buffer with a process function pointer that is called immediately after gets, so overflowing the buffer overwrites the pointer that is about to be used."
+},
+{
+"unit": "l05",
+"type": "mc",
+"q": "Which defenses does the lecture list for global data overflows?",
+"choices": [
+"Canaries and safe libraries",
+"Non-executable or randomized global data, moving function pointers, and guard pages",
+"Fuzzing and code review",
+"Non-executable stack only"
+],
+"answer": 1,
+"explain": "Global data sits at a predictable address, which is why separating pointers from buffers and randomizing or fencing the region matter."
+},
+{
+"unit": "l05",
+"type": "short",
+"q": "Line up the main defenses against the steps of a stack overflow attack.",
+"answer": "Safe languages and safe coding (plus safe libraries like Libsafe) prevent the overflow from happening. Stack canaries, Stackshield, and RAD detect the overwritten return address at function exit and abort. Non-executable memory stops injected shellcode from running. Address space randomization removes the attacker's knowledge of where to jump. Guard pages stop writes from walking between memory regions. Each removes one required step, which is defense in depth applied to one bug class.",
+"explain": "It also explains why modern exploits must chain several techniques, such as return-to-libc plus an information leak to defeat ASLR."
 }
 ]
