@@ -47,6 +47,18 @@ When adding lectures to an in-progress class, append sections to its notes and q
 
 `python3 tools/make_study_guide.py <course-id> ~/Downloads/<CODE>_Study_Guide.pdf` renders a course's notes as a PDF in the style of Caden's CSC 4320 guide (cover, how-to page, contents with page numbers, colored panels, "改善 · Complete Exam Study Notes" footer). It needs `courses/<id>/guide.json` (cover text, header, study order) and uses Word's Cambria/Calibri fonts plus Chrome headless. Regenerate it whenever that course's notes change and Caden wants an updated copy. Each lecture should end with an "<code> in one breath" `box proc` summary; the guide relies on it.
 
+## Reading modes
+
+Notes render one `h3` section at a time ("paged"), with a sticky reader bar (lecture code, section title,
+`n / total`, prev/next, progress), "Back to / Up next" cards at the foot, left/right arrow keys, and the
+sidebar entry highlighted. `paginate()` in `site/shell.html` wraps each run of nodes between `h3`s in a
+`div.pg`; the wrappers exist in both modes and only CSS decides whether one shows at a time, so deep links,
+search, the exam, and printing all keep working. The "Scroll freely / Read in sections" button in the
+actions row toggles it, remembered in `localStorage` under `cn.read`. Printing always shows everything.
+
+Because of this, **give every `h3` an id** — it becomes a page's anchor and its TOC highlight. A section
+with no `h3` is a single page.
+
 ## Constraints
 
 - The page must stay one self-contained file: the artifact CSP only allows scripts from cdnjs/jsdelivr and fonts from Google Fonts. Mermaid loads from jsdelivr.

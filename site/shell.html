@@ -147,6 +147,53 @@ figure.fig pre.mermaid{margin:0;background:transparent;text-align:center}
 }
 [id]{scroll-margin-top:70px}
 
+/* ---------- paged reading ---------- */
+main.paged > section{display:none}
+main.paged > section.live{display:block}
+main.paged > header{display:none}
+main.paged.athome > header{display:block}
+main.paged .pg{display:none}
+main.paged .pg.on{display:block}
+main.paged section.lecture{margin-top:0}
+main.paged .pg.on > h3:first-child{margin-top:0;padding-top:0;border-top:0}
+main.paged [id]{scroll-margin-top:132px}
+.reader{display:none}
+main.paged .reader{display:block;position:sticky;top:52px;z-index:6;background:var(--bg);padding:9px 0 0;margin:0 0 26px;font-family:var(--cond)}
+.reader .rtop{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding-bottom:8px}
+.reader .rcode{color:var(--brass);font-weight:700;font-size:17px;letter-spacing:.05em}
+.reader .rttl{font-weight:600;font-size:19px;flex:1 1 180px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reader .rcount{color:var(--muted);font-size:16px;font-variant-numeric:tabular-nums}
+.reader .rbtns{display:flex;gap:6px}
+.rbtn{font-family:var(--cond);font-size:17px;font-weight:600;line-height:1.1;padding:5px 12px;border:1px solid var(--rule);background:transparent;color:var(--text);border-radius:3px;cursor:pointer}
+.rbtn:hover:not([disabled]){border-color:var(--brass);color:var(--brass)}
+.rbtn[disabled]{opacity:.35;cursor:not-allowed}
+.reader .rbar{height:3px;background:var(--rule)}
+.reader .rbar i{display:block;height:100%;width:0;background:var(--brass);transition:width .25s ease}
+.reader .rtoc{display:none}
+.pagenav{display:none;grid-template-columns:1fr 1fr;gap:14px;margin:60px 0 0;padding-top:22px;border-top:1px solid var(--rule);font-family:var(--cond)}
+main.paged .pagenav{display:grid}
+.pagenav button{display:block;width:100%;text-align:left;background:var(--panel);color:var(--text);border:1px solid var(--rule);border-radius:4px;padding:12px 16px;cursor:pointer;min-width:0}
+.pagenav button:hover{border-color:var(--brass)}
+.pagenav button.nx{text-align:right}
+.pagenav .k{display:block;font-size:15px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.pagenav .t{display:block;font-size:20px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pagenav .gap{display:block}
+nav.toc a.cur,.mobile-toc a.cur{color:var(--brass);font-weight:700}
+nav.toc > ol > li.curlec > a{color:var(--brass)}
+@media (max-width:900px){
+  main.paged .reader{top:calc(env(safe-area-inset-top,0px) + 50px)}
+  main.paged .reader .rtoc{display:inline-block}
+  body.reading .mobile-toc{position:static}
+  body.reading .mobile-toc > summary{display:none}
+  body.reading .mobile-toc:not([open]){display:none}
+  main.paged .pagenav{grid-template-columns:minmax(0,1fr)}
+  main.paged [id]{scroll-margin-top:150px}
+}
+@media print{
+  main.paged > section,main.paged > header,main.paged .pg{display:block!important}
+  .reader,.pagenav{display:none!important}
+}
+
 /* ---------- home ---------- */
 .home-wrap{max-width:1040px;margin:0 auto;padding-block:48px 120px;padding-inline:clamp(16px,4vw,40px)}
 .home-head{display:grid;gap:10px;margin-bottom:34px}
@@ -240,6 +287,12 @@ var COURSE_TOOLS = {};
   var crumb = document.getElementById('crumb');
   var root = document.documentElement;
   var rendered = null;          // which course's notes are in the DOM
+  // Paged reading: notes are split into one screen per section so the page has an end.
+  var PAGES = [], PAGE = -1, PAGED = true, MDRAWN = null;
+  try { PAGED = localStorage.getItem('cn.read') !== 'scroll'; } catch (e) {}
+  // We place the reader ourselves; the browser restoring a scroll position after a
+  // deep-linked load would land them in the middle of the section they asked for.
+  if ('scrollRestoration' in history) { try { history.scrollRestoration = 'manual'; } catch (e) {} }
   var sampleFn = null;          // Claude sampling, when this page runs as an Artifact
   var samplePromise = (window.claude && typeof window.claude.use === 'function')
     ? window.claude.use('sample').then(function(s){ sampleFn = s; return s; }, function(){ return null; })
@@ -290,7 +343,8 @@ var COURSE_TOOLS = {};
   function route(){
     var r = parse();
     if (r.view === 'notes') return showNotes(r.id, r.anchor);
-    rendered = null;
+    rendered = null; PAGES = []; PAGE = -1;
+    document.body.classList.remove('reading');
     if (r.view === 'exam') return showExam(r.id);
     showHome();
   }
@@ -306,7 +360,8 @@ var COURSE_TOOLS = {};
     if (!el || !rendered) return;
     e.preventDefault();
     history.replaceState(null, '', '#/c/' + rendered + '/s/' + encodeURIComponent(id));
-    el.scrollIntoView();
+    if (isPaged()) { var pi = pageOf(id); if (pi >= 0) goPage(pi, id); }
+    else el.scrollIntoView();
     var mt = a.closest('details.mobile-toc'); if (mt) mt.open = false;
   });
 
@@ -372,17 +427,31 @@ var COURSE_TOOLS = {};
       document.title = c.code + ' ' + c.title;
       crumb.textContent = c.code + ' · ' + c.title;
       var toc = tpl(id, 'toc');
-      var actions = '<div class="actions"><a class="btn solid" href="#/c/' + id + '/exam">Practice exam</a><a class="btn quiet" href="#/">All courses</a></div>';
+      var actions = '<div class="actions"><a class="btn solid" href="#/c/' + id + '/exam">Practice exam</a>' +
+        '<button class="btn quiet rmode" type="button"></button>' +
+        '<a class="btn quiet" href="#/">All courses</a></div>';
       app.innerHTML =
         '<details class="mobile-toc"><summary>Contents</summary>' + actions + toc + '</details>' +
         '<div class="shell"><nav class="toc" aria-label="Contents"><p class="brand">' + esc(c.code) + '<br>' + esc(c.title) + '</p>' +
         '<p class="sub">' + esc(c.term) + (c.instructor ? ' · ' + esc(c.instructor) : '') + '</p>' + actions + toc + '</nav>' +
-        '<main><header class="prose"><p class="meta-row"><span>' + esc(c.code) + '</span><span>' + esc(c.term) + '</span><span class="pill ' + (c.status === 'Completed' ? 'done' : 'live') + '">' + esc(c.status) + '</span></p>' +
+        '<main><div class="reader"><div class="rtop"><span class="rcode"></span><span class="rttl"></span>' +
+        '<span class="rcount"></span><span class="rbtns">' +
+        '<button class="rbtn rtoc" type="button">Contents</button>' +
+        '<button class="rbtn rprev" type="button" aria-label="Previous section">←</button>' +
+        '<button class="rbtn rnext" type="button" aria-label="Next section">→</button>' +
+        '</span></div><div class="rbar"><i></i></div></div>' +
+        '<header class="prose"><p class="meta-row"><span>' + esc(c.code) + '</span><span>' + esc(c.term) + '</span><span class="pill ' + (c.status === 'Completed' ? 'done' : 'live') + '">' + esc(c.status) + '</span></p>' +
         '<h1>' + esc(c.headline || c.title) + '</h1><p class="lead">' + esc(c.lead || '') + '</p></header>' +
-        tpl(id, 'main') + '</main></div>';
+        tpl(id, 'main') + '<div class="pagenav"></div></main></div>';
       rendered = id;
       if (COURSE_TOOLS[id]) { try { COURSE_TOOLS[id](); } catch (e) { console.error(e); } }
-      var drawn = renderMermaid();
+      paginate();
+      drawMode();
+      applyMode();
+    }
+    if (isPaged()) {
+      var i = anchor ? pageOf(anchor) : 0;
+      return goPage(i < 0 ? 0 : i, anchor);
     }
     var el = anchor && document.getElementById(anchor);
     if (el) {
@@ -398,18 +467,173 @@ var COURSE_TOOLS = {};
       requestAnimationFrame(jump);
       [120, 400, 1200, 2500].forEach(function(ms){ setTimeout(jump, ms); });
       if (document.fonts && document.fonts.status !== 'loaded') document.fonts.ready.then(jump);
-      if (drawn) drawn.then(jump, jump);
+      if (MDRAWN) MDRAWN.then(jump, jump);
     }
     else if (!anchor) window.scrollTo(0, 0);
   }
-  function renderMermaid(){
-    var nodes = app.querySelectorAll('pre.mermaid:not([data-processed])');
-    if (!nodes.length || !window.mermaid) return null;
+  function renderMermaid(scope){
+    var nodes = (scope || app).querySelectorAll('pre.mermaid:not([data-processed])');
+    if (!nodes.length || !window.mermaid) return (MDRAWN = null);
     try {
       window.mermaid.initialize({ startOnLoad: false, theme: 'neutral', securityLevel: 'strict' });
-      return window.mermaid.run({ nodes: nodes });
-    } catch (e) { console.error(e); return null; }
+      return (MDRAWN = window.mermaid.run({ nodes: nodes }));
+    } catch (e) { console.error(e); return (MDRAWN = null); }
   }
+
+  /* ---------- paged reading ---------- */
+  function isPaged(){ var m = app.querySelector('main'); return !!(m && m.classList.contains('paged')); }
+  function setPaged(v){ PAGED = v; try { localStorage.setItem('cn.read', v ? 'page' : 'scroll'); } catch (e) {} }
+
+  // Wrap each run of nodes between <h3>s in a .pg box. The wrappers exist in both modes;
+  // only CSS decides whether one shows at a time, so nothing else has to know about them.
+  function paginate(){
+    PAGES = []; PAGE = -1;
+    var main = app.querySelector('main');
+    if (!main) return;
+    main.querySelectorAll(':scope > section').forEach(function(sec){
+      var plate = sec.querySelector(':scope > .plate'), code = '', stitle = sec.id;
+      if (plate) {
+        var n = plate.querySelector('.num'), t = plate.querySelector('.ttl');
+        code = n ? n.textContent.trim() : '';
+        if (t) stitle = t.textContent.replace(/\s+/g, ' ').trim();
+      } else {
+        var h = sec.querySelector(':scope > h2, :scope > h1');
+        if (h) stitle = h.textContent.replace(/\s+/g, ' ').trim();
+      }
+      var chunks = [], cur = null;
+      Array.prototype.slice.call(sec.childNodes).forEach(function(nd){
+        if (nd.nodeType === 1 && nd.tagName === 'H3') { cur = { h: nd, nodes: [nd] }; chunks.push(cur); }
+        else { if (!cur) { cur = { h: null, nodes: [] }; chunks.push(cur); } cur.nodes.push(nd); }
+      });
+      var opener = true;
+      chunks.forEach(function(ch){
+        var box = document.createElement('div');
+        box.className = 'pg';
+        ch.nodes.forEach(function(nd){ box.appendChild(nd); });
+        if (!ch.h && !box.textContent.trim()) return;   // drop whitespace-only gaps
+        sec.appendChild(box);
+        // The section's own id belongs to whichever page actually opens it, so a link
+        // to #l06a lands on the lecture's first screen even if the plate chunk is gone.
+        PAGES.push({ el: box, sec: sec, code: code,
+          title: ch.h ? ch.h.textContent.replace(/\s+/g, ' ').trim() : stitle,
+          anchor: (ch.h && ch.h.id) ? ch.h.id : (opener ? sec.id : '') });
+        opener = false;
+      });
+    });
+  }
+  function pageOf(anchor){
+    if (!anchor) return -1;
+    var el = document.getElementById(anchor);
+    if (!el) return -1;
+    var box = el.closest ? el.closest('.pg') : null;
+    for (var i = 0; i < PAGES.length; i++) {
+      if (box ? PAGES[i].el === box : PAGES[i].sec === el) return i;
+    }
+    return -1;
+  }
+  function applyMode(){
+    var main = app.querySelector('main');
+    if (!main) return;
+    var on = PAGED && PAGES.length > 1;
+    main.classList.toggle('paged', on);
+    document.body.classList.toggle('reading', on);
+    if (on) { goPage(PAGE < 0 ? 0 : PAGE, null, true); return; }
+    PAGES.forEach(function(x){ x.el.classList.remove('on'); x.sec.classList.remove('live'); });
+    markToc(null);
+    renderMermaid(main);
+  }
+  function goPage(i, anchor, silent){
+    if (!PAGES.length) return;
+    i = Math.max(0, Math.min(PAGES.length - 1, i));
+    var p = PAGES[i];
+    PAGES.forEach(function(x){ x.el.classList.remove('on'); x.sec.classList.remove('live'); });
+    p.el.classList.add('on'); p.sec.classList.add('live');
+    PAGE = i;
+    var main = app.querySelector('main');
+    if (main) main.classList.toggle('athome', i === 0);
+    renderMermaid(p.el);
+    drawReader();
+    markToc(p.anchor);
+    var mark = anchor || p.anchor;
+    if (!silent && rendered && mark) history.replaceState(null, '', '#/c/' + rendered + '/s/' + encodeURIComponent(mark));
+    var tgt = (anchor && anchor !== p.anchor && document.getElementById(anchor)) || null;
+    place(tgt);
+  }
+  // Put the viewport where it belongs, and put it back if a late layout shift or the
+  // browser's own scroll restoration moves it — but stop as soon as the reader scrolls.
+  function place(tgt){
+    var landed = null;
+    var set = function(){
+      if (landed !== null && Math.abs(window.scrollY - landed) > 4) return;
+      if (tgt) tgt.scrollIntoView({ block: 'start', behavior: 'instant' });
+      else window.scrollTo({ top: 0, behavior: 'instant' });
+      landed = window.scrollY;
+    };
+    set();
+    requestAnimationFrame(set);
+    [60, 250, 800].forEach(function(ms){ setTimeout(set, ms); });
+  }
+  function drawReader(){
+    var r = app.querySelector('.reader');
+    if (!r || PAGE < 0 || !PAGES.length) return;
+    var p = PAGES[PAGE];
+    r.querySelector('.rcode').textContent = p.code || '';
+    r.querySelector('.rttl').textContent = p.title;
+    r.querySelector('.rcount').textContent = (PAGE + 1) + ' / ' + PAGES.length;
+    r.querySelector('.rbar i').style.width = ((PAGE + 1) / PAGES.length * 100).toFixed(1) + '%';
+    r.querySelector('.rprev').disabled = PAGE === 0;
+    r.querySelector('.rnext').disabled = PAGE === PAGES.length - 1;
+    var nav = app.querySelector('.pagenav');
+    if (nav) nav.innerHTML =
+      (PAGE > 0 ? stepBtn('pv', 'Back to', PAGES[PAGE - 1]) : '<span class="gap"></span>') +
+      (PAGE < PAGES.length - 1 ? stepBtn('nx', 'Up next', PAGES[PAGE + 1]) : '<span class="gap"></span>');
+  }
+  function stepBtn(cls, kicker, p){
+    return '<button class="' + cls + '" type="button"><span class="k">' + kicker +
+      (p.code ? ' · ' + esc(p.code) : '') + '</span><span class="t">' + esc(p.title) + '</span></button>';
+  }
+  function drawMode(){
+    app.querySelectorAll('button.rmode').forEach(function(b){
+      b.textContent = PAGED ? 'Scroll freely' : 'Read in sections';
+    });
+  }
+  function markToc(anchor){
+    app.querySelectorAll('a.cur').forEach(function(a){ a.classList.remove('cur'); });
+    app.querySelectorAll('li.curlec').forEach(function(l){ l.classList.remove('curlec'); });
+    if (!anchor) return;
+    app.querySelectorAll('nav.toc a[href="#' + anchor + '"], .mobile-toc a[href="#' + anchor + '"]').forEach(function(a){
+      a.classList.add('cur');
+      var li = a.closest('li'), parent = li && li.parentElement.closest('li');
+      if (parent) parent.classList.add('curlec');
+    });
+  }
+  app.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('button');
+    if (!b) return;
+    if (b.classList.contains('rmode')) {
+      var here = (PAGE >= 0 && PAGES[PAGE]) ? PAGES[PAGE].anchor : null;
+      setPaged(!PAGED); drawMode(); applyMode();
+      // Keep the reader on the section they were on when the mode changes.
+      if (!isPaged() && here) place(document.getElementById(here));
+      var mt = b.closest('details.mobile-toc'); if (mt) mt.open = false;
+      return;
+    }
+    if (b.classList.contains('rtoc')) {
+      var d = app.querySelector('details.mobile-toc');
+      if (d) { d.open = !d.open; if (d.open) window.scrollTo({ top: 0, behavior: 'instant' }); }
+      return;
+    }
+    if (!isPaged()) return;
+    if (b.classList.contains('rprev') || b.classList.contains('pv')) goPage(PAGE - 1);
+    else if (b.classList.contains('rnext') || b.classList.contains('nx')) goPage(PAGE + 1);
+  });
+  document.addEventListener('keydown', function(e){
+    if (!isPaged() || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey) return;
+    var t = e.target, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); goPage(PAGE + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); goPage(PAGE - 1); }
+  });
 
   /* ---------- practice exam ---------- */
   var TYPE_NAMES = { mc: 'Multiple choice', tf: 'True / false', short: 'Short answer' };
