@@ -47,6 +47,15 @@ When adding lectures to an in-progress class, append sections to its notes and q
 
 `python3 tools/make_study_guide.py <course-id> ~/Downloads/<CODE>_Study_Guide.pdf` renders a course's notes as a PDF in the style of Caden's CSC 4320 guide (cover, how-to page, contents with page numbers, colored panels, "改善 · Complete Exam Study Notes" footer). It needs `courses/<id>/guide.json` (cover text, header, study order) and uses Word's Cambria/Calibri fonts plus Chrome headless. Regenerate it whenever that course's notes change and Caden wants an updated copy. Each lecture should end with an "<code> in one breath" `box proc` summary; the guide relies on it.
 
+## Open-book exam reference (PDF)
+
+`python3 tools/make_exam_sheet.py <course-id> ~/Downloads/<CODE>_Exam_Reference.pdf` builds the same notes as a
+dense lookup document rather than a reading one: Part I the one-breath summaries, II the formula sheet, III one
+A–Z glossary merged from every lecture (tagged by lecture), IV every exam checklist, V the full reference in
+lecture order set in two columns. It drops `.box.bg` recaps and the `details` practice Q&A inside `.box.exam`,
+keeps everything else, and comes out around 40% of the study guide's length. Same Chrome + pdftotext two-pass
+machinery; both scripts also turn each cross-reference link into "L05 (p. 123)".
+
 ## Reading modes
 
 Notes render one `h3` section at a time ("paged"), with a sticky reader bar (lecture code, section title,

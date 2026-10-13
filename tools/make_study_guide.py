@@ -54,6 +54,8 @@ html{-webkit-print-color-adjust:exact; print-color-adjust:exact}
 body{margin:0; font-family:var(--sans); font-size:11pt; line-height:1.48; color:var(--ink)}
 p{margin:0 0 8pt} ul,ol{margin:0 0 8pt; padding-left:18pt} li{margin:0 0 3pt}
 a{color:inherit; text-decoration:none}
+a.xref{font-weight:700}
+a.xref .pg{font-weight:400; color:var(--blue); font-size:.9em; white-space:nowrap; font-variant-numeric:tabular-nums}
 strong{font-weight:700}
 code,kbd{font-family:var(--mono); font-size:.86em; color:var(--ink)}
 sub,sup{line-height:0}
@@ -211,6 +213,17 @@ JS = r"""
   });
   var PAGES = PAGEMAP;
   toc.querySelectorAll('.row').forEach(function(r){ var p = PAGES[r.getAttribute('data-for')]; if (p) r.querySelector('.p').textContent = p; });
+
+  // Cross-references in the notes are links; on paper they need a page number.
+  // The placeholder is the same width as a real number so pass 1 and pass 2 paginate alike.
+  main.querySelectorAll('a[href^="#"]').forEach(function(a){
+    var p = PAGES[a.getAttribute('href').slice(1)];
+    a.className = 'xref';
+    var tag = document.createElement('span');
+    tag.className = 'pg';
+    tag.textContent = ' (p. ' + (p || '000') + ')';
+    a.appendChild(tag);
+  });
   window.__headings = [].concat.apply([], chapters.map(function(c){ return [{id:c.id,label:c.label}].concat(c.sections); }));
   document.getElementById('heading-data').textContent = JSON.stringify(window.__headings);
 
