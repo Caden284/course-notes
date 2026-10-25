@@ -18,6 +18,8 @@
       <ol><li><a href="#l06a-what">What malware is and how it is classified</a></li><li><a href="#l06a-kits">Attack kits, sources, and APTs</a></li><li><a href="#l06a-virus">Viruses</a></li><li><a href="#l06a-worm">Worms</a></li><li><a href="#l06a-client">Mobile code and drive-by attacks</a></li><li><a href="#l06a-social">Social engineering and Trojans</a></li><li><a href="#l06a-payload">Payloads</a></li><li><a href="#l06a-counter">Countermeasures</a></li><li><a href="#l06a-gloss">Glossary</a></li></ol></li>
     <li><a href="#l06b"><span class="code">L06b</span>Network security I</a>
       <ol><li><a href="#l06b-switching">Circuit vs packet switching</a></li><li><a href="#l06b-layers">Layering and encapsulation</a></li><li><a href="#l06b-edge">Edge, core, and links</a></li><li><a href="#l06b-link">Link layer and Ethernet</a></li><li><a href="#l06b-arp">ARP</a></li><li><a href="#l06b-ip">The IP layer</a></li><li><a href="#l06b-transport">Transport: UDP and TCP</a></li><li><a href="#l06b-http">Anatomy of an HTTP GET</a></li><li><a href="#l06b-dns">DNS</a></li><li><a href="#l06b-attacks">Link and routing attacks</a></li><li><a href="#l06b-dnsattacks">DNS attacks</a></li><li><a href="#l06b-dos">Denial of service</a></li><li><a href="#l06b-gloss">Glossary</a></li></ol></li>
+    <li><a href="#l08a"><span class="code">L08a</span>Network defence</a>
+      <ol><li><a href="#l08a-services">Exposed services and scanning</a></li><li><a href="#l08a-firewall">Firewalls and packet filtering</a></li><li><a href="#l08a-nat">Network address translation</a></li><li><a href="#l08a-placement">Firewall placement and NGFW</a></li><li><a href="#l08a-ids">Intrusion detection</a></li><li><a href="#l08a-vpn">VPNs and remote access</a></li><li><a href="#l08a-zerotrust">Zero trust</a></li><li><a href="#l08a-gloss">Glossary</a></li></ol></li>
     <li><a href="#formulas">Formula sheet</a></li>
   </ol></template>
 <template data-part="main">
@@ -4976,6 +4978,421 @@ SN_s = ( T || mss || L )</code></pre>
       <li>Describe Mirai's seven steps, how it infected devices, and why it needed no amplification.</li>
       <li>Explain GET floods and the anonymity-versus-legitimacy trade-off.</li>
       <li>State the client puzzle construction, its benefit, its two limitations, and why it is rarely used.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="lecture prose" id="l08a">
+  <div class="plate"><span class="num" aria-hidden="true">L08a</span><p class="ttl">Network defence</p><p class="src">Source: L08a-Ch05 NetworkSecurity-III.pdf — 26 slides, title slide "Network Defence," from the same CSC 4222/6222 deck series as L06a.</p></div>
+
+  <p>L06b was the <em>attack</em> half of networking: every protocol in the stack trusting whatever arrived. This lecture is the <em>defence</em> half, and it follows one argument from start to finish. You have services listening on the Internet; attackers find them with a scanner or a search engine; <strong>Internet-facing services are now the single most common way into an organisation</strong>; so you put a firewall in front of them, an IDS beside them, and a VPN around the parts that must stay private. Then the last three slides pull the rug out: the VPN model assumes the inside is trustworthy, and it is not — which is why Google threw the perimeter away.</p>
+
+  <div class="box bg"><span class="lbl">Background: what you already know that this builds on</span>
+    <p>From <a href="#l06b-dos">L06b</a>: recursive DNS resolvers are the amplifiers behind a 300 Gbps DDoS, which is exactly why this lecture says not to leave one listening on the public Internet. From <a href="#l06b-transport">L06b</a>: TCP ports, the SYN that opens a connection, and the ACK bit — stateful filtering is built on both. From <a href="#l04a-principles">L04a</a>: defence in depth, which is the phrase the firewall slides use by name. From <a href="#l06a-counter">L06a</a>: ingress and egress monitors, which are the same idea as the border firewall and outbound inspection here.</p>
+  </div>
+
+  <div class="box warn"><span class="lbl">A gap in the numbering</span>
+    <p>This deck is <em>Network Security III</em>, and the site has <em>Network Security I</em> as <a href="#l06b">L06b</a>. <strong>Network Security II is not in these notes</strong> — if Dr. Wang posted a deck between them (TLS and certificates would be the usual content), send it over and it slots in as L07.</p>
+  </div>
+
+  <h3 id="l08a-services">What you are exposing: services, scanners, and search engines</h3>
+
+  <h4>Local network services</h4>
+  <p>Review from L06b: popular TCP and UDP services live on <strong>standardised ports</strong>. HTTPS servers listen on <strong>TCP/443</strong>; SSH on <strong>TCP/22</strong>. The security point is the next line: <strong>some services you don't want listening on the public Internet at all.</strong></p>
+  <div class="tw"><table>
+    <thead><tr><th>Service you should not expose</th><th>Why not</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recursive DNS resolvers</strong></td><td>Allows attackers to mount <strong>DDoS attacks</strong> — this is the open resolver from <a href="#l06b-dos">L06b</a>, the one that answers an <code>ANY</code> query from anybody and amplifies it 60–70× at a spoofed victim.</td></tr>
+      <tr><td><strong>Windows File Sharing</strong> (SMB, TCP/445)</td><td>Historically full of vulnerabilities. And the slide asks the quieter question: <em>what if a local machine doesn't have a secure password on it?</em> — exposing the service exposes every weak password behind it.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Note that Windows File Sharing is the <strong>WannaCry</strong> vector from <a href="#l06a-worm">L06a</a>: the SMB vulnerability it scanned for is this service, and the reason it reached so many machines is that organisations had it reachable.</p>
+
+  <h4>Port scanning</h4>
+  <div class="box def"><span class="lbl">Definition: port scanning</span>
+    <dl>
+      <dt>Plain English</dt><dd>Knocking on every door of a building to see which ones open.</dd>
+      <dt>Technical</dt><dd>Send a <strong>SYN</strong> or an application-specific <strong>UDP</strong> packet to a port to see if any service is listening.</dd>
+      <dt>Why it matters</dt><dd>It is the reconnaissance step for everything else in this lecture, and it is cheap: a SYN is 40 bytes and the response tells you whether something is there.</dd>
+    </dl>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>Scan</th><th>Shape</th><th>Typical tool</th><th>What the attacker is asking</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Vertical scan</strong></td><td>A large number of <strong>ports</strong> on a <strong>single host</strong></td><td><strong>Nmap</strong></td><td>"What is this machine running?" — used once a target is chosen.</td></tr>
+      <tr><td><strong>Horizontal scan</strong></td><td>A <strong>single port</strong> on a <strong>large number of hosts</strong></td><td><strong>ZMap</strong></td><td>"Who on the Internet is running this?" — used when the attacker has an exploit and needs victims.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Hold the two words apart by the picture: a <em>vertical</em> scan goes up and down one machine's port list; a <em>horizontal</em> scan goes sideways across the address space at one port. Horizontal scanning is what the worms of <a href="#l06a-worm">L06a</a> do — random and hit-list scanning are both horizontal — and ZMap exists because the whole IPv4 space can be swept at one port in minutes.</p>
+
+  <h4>Diagram explained: service search engines</h4>
+  <p>Public services like <strong>Shodan</strong> and <strong>Censys</strong> index all of the publicly available services on the Internet. The slide shows both interfaces side by side, searching for <code>ssh</code>:</p>
+  <ul>
+    <li><strong>Shodan</strong> reports <strong>20,360,522 total results</strong>. Its sidebar breaks them down by top country — United States 5,966,175, China 2,598,110, Germany 1,772,565, Brazil 965,488, France 646,274 — and by top port: <strong>22</strong> with 17,088,724, then <strong>2222</strong> (672,952), <strong>22222</strong> (162,437), <strong>222</strong> (103,903), <strong>2022</strong> (84,865). The result list shows individual IP addresses with their banner, host organisation, country, and the server's SSH host key.</li>
+    <li><strong>Censys</strong> runs the query <code>services.service_name: ssh</code> and reports <strong>35,044,151 results in 11.07 seconds</strong>, with filters by label (remote-access, file-sharing, database, email, network-administration), by autonomous system (Amazon, Telefonica Brasil, Google Cloud, DigitalOcean), and by location. Each host is listed with every port it has open at once — <code>22/SSH, 25/SMTP, 53/DNS, 80/HTTP, 443/HTTPS, 3306/MYSQL</code>.</li>
+  </ul>
+  <div class="box warn"><span class="lbl">The point the two screenshots are making together</span>
+    <p>Those "top ports" numbers kill a common idea. Running SSH on <strong>2222</strong> instead of 22 is not hiding: Shodan has already indexed 672,952 of them. <strong>Security through obscurity fails against a search engine</strong>, because the scan already happened — the attacker does not scan you, they query a database of everyone. And the 11-second Censys query shows the cost of finding a target has gone to roughly zero, which is the economic fact behind the next slide.</p>
+  </div>
+
+  <h4>Diagram explained: the Internet is the #1 attack path</h4>
+  <p>The claim is that <strong>most attackers gain their initial foothold in an organisation through Internet-facing services</strong> — VPNs, Remote Desktop, enterprise applications. The slide backs it with four independent industry data sets, arranged in a 2×2 grid. They are worth reading as four groups agreeing:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Palo Alto Unit 42 — initial access vectors, 2023</th><th class="num">Share</th></tr></thead>
+    <tbody>
+      <tr><td>Software / API vulnerability</td><td class="num">38.6%</td></tr>
+      <tr><td>Previously compromised credentials</td><td class="num">20.5%</td></tr>
+      <tr><td>Social engineering / phishing</td><td class="num">17%</td></tr>
+      <tr><td>Brute force</td><td class="num">11.4%</td></tr>
+      <tr><td>Other</td><td class="num">12.5%</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tw"><table>
+    <thead><tr><th>At-Bay — ransomware attack vectors (direct ransomware claims)</th><th class="num">Share</th></tr></thead>
+    <tbody>
+      <tr><td><strong>VPN</strong></td><td class="num">37.4%</td></tr>
+      <tr><td><strong>RDP</strong></td><td class="num">20.8%</td></tr>
+      <tr><td>Email</td><td class="num">18.2%</td></tr>
+      <tr><td>Publicly exposed system</td><td class="num">11.3%</td></tr>
+      <tr><td>Credential abuse</td><td class="num">6.1%</td></tr>
+      <tr><td>Browser</td><td class="num">4.3%</td></tr>
+      <tr><td>Other</td><td class="num">1.7%</td></tr>
+    </tbody>
+  </table></div>
+  <p>The note beside the At-Bay table is the one to quote: <strong>58% of direct ransomware events are attributable to a remote access vulnerability</strong>, and <strong>in 2023 attackers shifted their focus from RDP to targeting self-managed VPNs</strong>.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Attack vector</th><th class="num">CyberCX</th><th class="num">Arctic Wolf</th></tr></thead>
+    <tbody>
+      <tr><td>Valid credentials on an external remote service</td><td class="num">36%</td><td class="num">39%</td></tr>
+      <tr><td>Exploitation of vulnerability</td><td class="num">23%</td><td class="num">29%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Two conclusions the grid supports, and either could be a short-answer question. First, the top two routes in every data set are <strong>a vulnerability in an exposed service</strong> and <strong>valid credentials on an exposed service</strong> — about 60% of incidents between them. Second, and more uncomfortable: <strong>the VPN is the number one ransomware vector in the At-Bay data</strong>. The device you installed to be safe is the device being attacked, which is exactly the argument the zero-trust slides close with.</p>
+
+  <h4>A worked case: MOVEit</h4>
+  <div class="box ex"><span class="lbl">Worked example: attacks against Internet services</span>
+    <p><strong>MOVEit</strong> is a piece of software that allows file transfer between organisations — so by design it is Internet-facing and by design it holds other people's data. It was <strong>vulnerable to multiple SQL injection vulnerabilities in its login fields</strong>, and attackers used them to <strong>ransom and extort companies based on the data sitting on their Internet-facing MOVEit servers</strong>.</p>
+    <p>Trace the chain against everything above: an <em>Internet-facing enterprise application</em> (the #1 attack path), found by <em>horizontal scanning or a service search engine</em>, exploited through a <em>software vulnerability</em> (38.6% in the Unit 42 table), delivering a <em>ransomware/extortion payload</em> (<a href="#l06a-payload">L06a</a>). And note what was <strong>not</strong> needed: no phishing, no malware on an employee's laptop, no insider. The login page itself was the way in, which is why a firewall that only asks "is port 443 allowed?" cannot help — the traffic was allowed and legitimate-looking. That is the gap the next-generation firewall later in this lecture exists to fill.</p>
+  </div>
+
+  <h3 id="l08a-firewall">Firewalls and packet filtering</h3>
+
+  <div class="box def"><span class="lbl">Definition: firewall</span>
+    <dl>
+      <dt>Plain English</dt><dd>A checkpoint between your network and everyone else's, which lets some traffic through and stops the rest.</dd>
+      <dt>Technical</dt><dd>Separates a local area network (LAN) from the Internet and only allows some traffic to transit. Sometimes it is a set of rules on a router; sometimes it is a standalone device.</dd>
+      <dt>Why it matters</dt><dd>It reduces the <em>attack surface</em> from "everything you happen to be running" to "the services you decided to publish" — which, given the previous section, is the single highest-leverage control in the lecture.</dd>
+    </dl>
+  </div>
+  <p><strong>Diagram explained.</strong> The slide draws a cluster of workstations labelled <em>Local network</em> on the left, a <em>Router</em> box in the middle with a <em>Firewall</em> sitting directly on top of it, and a globe labelled <em>Internet</em> on the right. Everything from the local network reaches the Internet through that one box. The picture is making two claims at once: the firewall is a <strong>choke point</strong> (all traffic passes it, so one rule set covers every host), and it is drawn <em>on</em> the router because filtering is often just a feature of the device that was routing anyway.</p>
+
+  <h4>Basic packet filtering</h4>
+  <p>Basic packet filtering uses <strong>transport and IP layer information only</strong> — nothing above layer 4:</p>
+  <ul>
+    <li>IP <strong>source address</strong> and <strong>destination address</strong></li>
+    <li><strong>Protocol</strong> (TCP, UDP, ICMP, etc.)</li>
+    <li>TCP and UDP <strong>source and destination ports</strong></li>
+  </ul>
+  <p>Those are exactly the fields of the IPv4 header and the first words of the TCP header from <a href="#l06b-ip">L06b</a>, which is the whole reason the filter is cheap: the decision can be made from the first few dozen bytes of a packet without reassembling anything. The lecture's example rule:</p>
+<pre class="code"><code>"Do not allow external hosts to connect to Windows File Sharing"
+    ->  DROP ALL INBOUND PACKETS TO TCP PORT 445</code></pre>
+
+  <div class="box ex"><span class="lbl">Worked example: "What's the rule?" — the trap on the slide</span>
+    <p><strong>The question.</strong> You have a network with lots of servers but you only want outsiders to be able to reach a web server. What is the rule?</p>
+    <p><strong>The tempting answer</strong>, which is the one the slide writes down:</p>
+<pre class="code"><code>DROP ALL INBOUND PACKETS IF DEST PORT != 80</code></pre>
+    <p><strong>Why it breaks.</strong> <em>All outbound connections also have a source port</em> — and their responses come back addressed to that port, not to 80. When one of your machines browses an external website, it opens the connection from an ephemeral port such as 51322; the reply arrives inbound with destination port 51322, which is not 80, so <strong>the rule drops it</strong>. You have not built a web-server-only network, you have built a network with no working Internet access.</p>
+    <p><strong>What this teaches.</strong> A stateless filter cannot tell "an unsolicited packet arriving at port 51322" from "the answer to a request we made." Both are inbound packets to a high port. The only way to tell them apart is to <em>remember that you sent the request</em> — which is the definition of stateful filtering, two slides later. The lecture sets up the problem before it names the solution, so expect the exam to ask the question in this order too.</p>
+  </div>
+
+  <h4>IANA port numbering</h4>
+  <div class="tw"><table>
+    <thead><tr><th>Range</th><th>Name</th><th>What lives there</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1 – 1023</strong></td><td><strong>System or well-known ports</strong></td><td>Common services: HTTP → 80, SSH → 22. (On UNIX, binding these needs privilege — the <code>CAP_NET_BIND_SERVICE</code> capability from <a href="#l04a-setuid">L04a</a>.)</td></tr>
+      <tr><td><strong>1024 – 49151</strong></td><td><strong>User or registered ports</strong></td><td>Less well-known services.</td></tr>
+      <tr><td><strong>49152 – 65535</strong></td><td><strong>Ephemeral / dynamic / private ports</strong></td><td>Short-lived connections — i.e. the client side of everything.</td></tr>
+    </tbody>
+  </table></div>
+  <p>This table is the formal version of the trap above. The ephemeral range is where <em>your</em> outbound connections live, so "inbound to a high port" is normal, expected traffic roughly as often as it is an attack. Memory hook: <strong>under 1024 is who you are, over 49152 is what you are doing right now.</strong></p>
+
+  <h4>Diagram explained: stateful filtering</h4>
+  <p>The figure has a <strong>Telnet Server</strong> on the left at port <strong>23</strong>, a <strong>Telnet Client</strong> on the right at port <strong>1234</strong>, and a vertical red line between them with a brick-wall-and-flame icon at its foot — the firewall. Two numbered arrows cross it:</p>
+  <ol>
+    <li><strong>"PORT 1234"</strong>, right to left: the client opens a channel to the server and tells the server its port number. The annotation is the part to memorise — <em>the ACK bit is not set while establishing the connection, but will be set on the remaining packets.</em></li>
+    <li><strong>"ACK"</strong>, left to right: the server acknowledges.</li>
+  </ol>
+  <div class="box def"><span class="lbl">Definition: stateful filtering</span>
+    <p>The firewall <strong>tracks outgoing connections and allows the associated inbound traffic back through</strong>. It keeps a table of connections it has seen start from the inside, and a packet is permitted inbound only if it belongs to one of them.</p>
+    <p>The ACK-bit note explains the cheap version of this trick: a packet that opens a <em>new</em> connection has SYN set and ACK clear, while every later packet of an established connection has ACK set. So even a filter with almost no memory can say "allow inbound TCP only if ACK is set," which blocks strangers from starting connections inward while letting replies through. A truly stateful firewall goes further and checks the four-tuple and sequence numbers against its connection table.</p>
+  </div>
+  <p>Now go back to the broken rule: stateful filtering solves it exactly. The reply to your browsing session is allowed not because of its port number but because <strong>the firewall remembers you started that conversation</strong>.</p>
+
+  <h3 id="l08a-nat">Network address translation</h3>
+
+  <p><strong>NATs map between two different address spaces.</strong> Most home routers are NATs <em>and</em> firewalls — one box doing both jobs, which is why the two ideas get confused.</p>
+  <p><strong>Diagram explained.</strong> The figure is split by a vertical line. On the left, labelled <em>local network (private IP address 192.168.X.X)</em>, three machines sit at <strong>192.168.100.3</strong>, <strong>192.168.100.4</strong> and <strong>192.168.100.5</strong>, all wired to a <em>Router/NAT Device</em> whose inside interface is the <strong>default gateway 192.168.1.1</strong>. On the right, labelled <em>The Internet</em>, the same device presents a single <strong>public IP address, 145.12.131.7</strong>. Three private addresses in, one public address out.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Private subnet (RFC 1918)</th><th>Size</th></tr></thead>
+    <tbody>
+      <tr><td><code>10.0.0.0 – 10.255.255.255</code></td><td>One /8 — 16.7 million addresses</td></tr>
+      <tr><td><code>172.16.0.0 – 172.31.255.255</code></td><td>Sixteen /16s — about 1 million addresses</td></tr>
+      <tr><td><code>192.168.0.0 – 192.168.255.255</code></td><td>256 /24s — 65,536 addresses; the home-router range</td></tr>
+    </tbody>
+  </table></div>
+  <p>These three ranges are <strong>not routable on the public Internet</strong>, which is what makes them safe to reuse in every building in the world — and is also, incidentally, why they were the addresses in L06b's <a href="#l06b-dnsattacks">DNS rebinding</a> attack: <code>192.168.0.100</code> is unreachable from outside, so the attacker had to borrow a browser that was already inside.</p>
+  <div class="box warn"><span class="lbl">Watch out: NAT is not a firewall</span>
+    <p>A NAT blocks unsolicited inbound connections as a <em>side effect</em> — an arriving packet has no entry in the translation table, so the device does not know which inside host to give it to and drops it. That looks like a firewall and is often described as one. But it is a consequence of address arithmetic, not a security policy: it filters nothing about traffic the inside host <em>did</em> ask for, it gives you no logging or rules, and protocols such as UPnP let an inside program punch a hole through it on request. Treat NAT as address reuse that happens to deny inbound, and put an actual firewall policy on top.</p>
+  </div>
+
+  <h3 id="l08a-placement">Where firewalls live, and next-generation firewalls</h3>
+
+  <h4>Local versus network firewalls</h4>
+  <p>Every firewall discussed so far has been a <strong>network firewall</strong>, and most have lived <strong>at the edge of the organisation</strong>. But firewalls also run <strong>on individual hosts</strong> — Linux servers use <strong>iptables</strong>. The two rules the slide shows are worth reading field by field, because together they are a complete minimal policy:</p>
+<pre class="code"><code>sudo iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+sudo iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT</code></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Fragment</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code>-A INPUT</code></td><td>Append to the chain for packets addressed to this host.</td></tr>
+      <tr><td><code>-m conntrack --ctstate ESTABLISHED,RELATED</code></td><td>Match packets belonging to a connection this host already has, or related to one. <strong>This is stateful filtering, spelled out.</strong></td></tr>
+      <tr><td><code>-p tcp --dport 22</code></td><td>TCP destined for port 22 — SSH.</td></tr>
+      <tr><td><code>--ctstate NEW,ESTABLISHED</code></td><td>Allow this one service to be <em>started</em> from outside, as well as continued.</td></tr>
+      <tr><td><code>-j ACCEPT</code></td><td>Jump to the ACCEPT target: let it through.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Read as a policy: <em>keep my own conversations working, and let the world start exactly one thing — SSH.</em> The first line is the general case, the second is the single deliberate exception.</p>
+
+  <div class="box proc"><span class="lbl">Process: how the two layers divide the work</span>
+    <p>Organisations typically have a <strong>combination of network and host firewalls</strong>.</p>
+    <ul>
+      <li>The <strong>border (network) firewall</strong> will block malicious traffic from the outside, and limit inbound traffic to accessing only servers intended to be accessed by the public.</li>
+      <li><strong>Host firewalls</strong> protect hosts <em>from other hosts</em> — e.g. protect against <strong>internal compromise and malicious insiders</strong>.</li>
+      <li>Think of firewall rules in terms of <strong>"defence in depth."</strong></li>
+    </ul>
+    <p>The middle bullet is the one that matters and the one students skip. A border firewall is useless the moment the attacker is already inside — which, per the attack-path data above, is the normal case. Host firewalls are what stop one compromised laptop from reaching all 400 other machines, and they are the same answer as the <strong>egress monitors at each LAN's exit</strong> from <a href="#l06a-counter">L06a</a>: perimeter-only defence cannot see an inside-out problem.</p>
+  </div>
+
+  <h4>Next-generation firewalls</h4>
+  <p>So far, firewalls operate by allowing access to a specific host or protocol — <strong>but what about malicious application traffic?</strong> If the rule is "port 443 is open," then an SQL injection delivered over HTTPS to your login form is permitted traffic, and the MOVEit attack above walks straight through.</p>
+  <div class="box def"><span class="lbl">Definition: next-generation firewall (NGFW)</span>
+    <p>The industry term for an <strong>application-layer firewall</strong>. NGFWs protect against attacks <em>within</em> L7 traffic — that is, against the content of the application protocol rather than the addresses and ports carrying it.</p>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th>What an NGFW does</th><th>What it has to understand to do it</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Virus scanning for SMTP</strong></td><td>The mail protocol, <strong>MIME encoding</strong>, <strong>ZIP files</strong> — it has to decode the attachment the way the recipient's client will, or the malware hides in the encoding.</td></tr>
+      <tr><td><strong>Look for SQL injection attacks in HTTP POSTs</strong></td><td>HTTP request structure, form encoding, and SQL syntax.</td></tr>
+      <tr><td><strong>Look for a large number of authentication attempts, or malformed requests</strong></td><td>Which requests are logins, and what "normal" volume looks like — i.e. a notion of session and rate, not just packets.</td></tr>
+    </tbody>
+  </table></div>
+  <p>Notice the cost hiding in the right-hand column. A packet filter decides from 40 bytes of header; an NGFW must <strong>reassemble the stream, parse the protocol, and decode nested formats</strong> — which is more work per byte, and is itself a large, complicated piece of software sitting in the path of all your traffic. "Parser that must handle hostile input" is the <a href="#l05-why">L05</a> problem all over again, which is why firewall appliances show up in vulnerability bulletins.</p>
+
+  <h3 id="l08a-ids">Intrusion detection systems</h3>
+
+  <div class="box def"><span class="lbl">Definition: intrusion detection system (IDS)</span>
+    <dl>
+      <dt>Plain English</dt><dd>A burglar alarm for the network. It does not lock the door; it tells somebody that a window just opened.</dd>
+      <dt>Technical</dt><dd>Software or a device that <strong>monitors network traffic for attacks or policy violations</strong>. Violations are reported to a central <strong>security information and event management (SIEM)</strong> system, where analysts can later investigate.</dd>
+      <dt>Why it matters</dt><dd>A firewall is a <em>preventive</em> control that makes a decision now; an IDS is a <em>detective</em> control that creates a record for a human. "Later investigate" is doing real work in that sentence — the IDS assumes something will get through.</dd>
+    </dl>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Signature detection</th><th>Anomaly detection</th></tr></thead>
+    <tbody>
+      <tr><td>How it works</td><td>Maintains a <strong>long list of traffic patterns (rules) associated with attacks</strong>.</td><td><strong>Attempts to learn normal behaviour and report deviations.</strong></td></tr>
+      <tr><td>Catches</td><td>Known attacks, precisely, with a name attached.</td><td>Novel attacks it has never seen a rule for.</td></tr>
+      <tr><td>Misses</td><td>Anything new, and anything that varies its pattern.</td><td>Attacks that look like ordinary traffic.</td></tr>
+      <tr><td>Fails by</td><td>False <em>negatives</em> — no rule, no alert.</td><td>False <em>positives</em> — "unusual" and "malicious" are not the same thing.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box warn"><span class="lbl">You have seen this pair before</span>
+    <p>Signature versus anomaly is exactly the <strong>first versus third generation of anti-virus</strong> from <a href="#l06a-counter">L06a</a> — "what does it look like" against "what is it doing" — moved from the host to the wire. The same consequence follows: signatures are defeated by <strong>polymorphism</strong>, which is why a defender runs both and why neither is retired.</p>
+  </div>
+
+  <h4>Open source IDS</h4>
+  <p>Three major open source IDS exist, alongside a tremendous number of commercial products: <strong>Snort</strong>, <strong>Zeek</strong>, and <strong>Suricata</strong>. On the slide, Zeek is written as "<del>Bro</del> Zeek" with the old name struck through — it was renamed from Bro to Zeek in 2018, and older material still calls it Bro, so recognise both.</p>
+
+  <h4>Diagram explained: an example Snort rule</h4>
+  <p>The slide shows one rule with every field labelled by an arrow. The rule itself:</p>
+<pre class="code"><code>alert icmp 192.168.1.10 any -&gt; any any (msg: "ICMP Attempt Attack"; sid:1000005)
+└─────────── Rule Header ──────────────┘ └─────────── Rule Option ───────────┘</code></pre>
+  <div class="tw"><table>
+    <thead><tr><th>Part</th><th>Field</th><th>Value here</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td rowspan="6"><strong>Rule header</strong></td><td><strong>Action</strong></td><td><code>alert</code></td><td>What to do on a match — raise an alert (rather than log it silently or drop it).</td></tr>
+      <tr><td><strong>Protocol</strong></td><td><code>icmp</code></td><td>Which protocol the rule applies to.</td></tr>
+      <tr><td><strong>Source address</strong></td><td><code>192.168.1.10</code></td><td>Traffic from this host.</td></tr>
+      <tr><td><strong>Source port</strong></td><td><code>any</code></td><td>Any source port. (ICMP has no ports, which is why this is <code>any</code>.)</td></tr>
+      <tr><td><strong>Direction</strong></td><td><code>-&gt;</code></td><td>Source to destination, one way. Snort also has <code>&lt;&gt;</code> for either direction.</td></tr>
+      <tr><td><strong>Destination address / port</strong></td><td><code>any any</code></td><td>Going anywhere, on any port.</td></tr>
+      <tr><td rowspan="2"><strong>Rule option</strong></td><td><strong>msg</strong></td><td><code>"ICMP Attempt Attack"</code></td><td>The text the analyst sees in the SIEM.</td></tr>
+      <tr><td><strong>sid</strong></td><td><code>1000005</code></td><td>Signature ID — the unique number for this rule. (Snort reserves IDs above 1,000,000 for locally written rules.)</td></tr>
+    </tbody>
+  </table></div>
+  <p>Read in English: <em>alert whenever host 192.168.1.10 sends ICMP to anywhere.</em> Two things to notice for the exam. First, the <strong>header is exactly the five-tuple a packet filter uses</strong> — protocol, source address, source port, destination address, destination port — so the structural difference between a firewall rule and an IDS rule is the <em>action</em> and the <em>options</em>, not the matching. Second, the direction arrow means this rule is watching <strong>outbound</strong> traffic from an internal host, which is the subject of the next slide.</p>
+
+  <h4>Outbound too</h4>
+  <p>Organisations will often inspect <strong>outbound</strong> traffic as well:</p>
+  <ul>
+    <li><strong>Block access to sites with known malicious behaviour</strong> — which also breaks malware's command-and-control channel from <a href="#l06a-payload">L06a</a>.</li>
+    <li><strong>Prevent exfiltrating data</strong>.</li>
+    <li><strong>Block services like BitTorrent</strong>.</li>
+  </ul>
+  <div class="box warn"><span class="lbl">Watch out: the slide's own warning</span>
+    <p><strong>Be careful on enterprise networks!</strong> Sometimes companies will even <strong>install their own root certificates on employee workstations to monitor TLS traffic.</strong></p>
+    <p>Work out what that means with <a href="#l03a-hash">L03a</a> in hand. TLS protects you because your browser only trusts certificates signed by a CA in its trust store. Add the company's own CA to that store and the company can mint a valid-looking certificate for <em>any</em> site, terminate your TLS connection at its proxy, read the plaintext, and open a second TLS connection onward. Your browser shows a padlock throughout. This is a deliberate, consensual <strong>man-in-the-middle</strong> — the exact attack of <a href="#l06b-attacks">L06b</a>, run by your employer, and the only thing separating it from an attack is the fact that you agreed to it when you accepted the managed device.</p>
+  </div>
+
+  <h3 id="l08a-vpn">Remote access: virtual private networks</h3>
+
+  <div class="box def"><span class="lbl">Definition: virtual private network</span>
+    <dl>
+      <dt>The problem</dt><dd>How do you provide secure communication for <strong>non-TLS protocols</strong> across the public Internet? Plenty of useful things — file shares, databases, internal web apps, printers — were designed for a trusted LAN and have no encryption of their own.</dd>
+      <dt>The answer</dt><dd>VPNs <strong>create a fake shared network on which traffic is encrypted</strong>. Machines behave as though they were plugged into the same LAN; the encryption happens underneath, so the applications need no changes.</dd>
+      <dt>Two broad types</dt><dd><strong>Remote client to corporate network</strong> (e.g. a traveller with a laptop), and <strong>connecting two remote networks across the Internet</strong> (site to site).</dd>
+    </dl>
+  </div>
+  <p>Note the phrasing "fake shared network." That is doing the work: a VPN's value is not only confidentiality but the <em>illusion of adjacency</em> — and, as the last section of this lecture argues, that illusion is also the problem.</p>
+
+  <h4>IPsec, and the diagram of its two modes</h4>
+  <p>Several VPN protocols exist — <strong>PPTP, L2TP, IPsec, OpenVPN</strong>. <strong>The most popular is IPsec</strong>, and <strong>OpenVPN is open source</strong>.</p>
+  <p><strong>Diagram explained.</strong> Three stacked packet layouts, each drawn as a row of labelled boxes, with <em>Encrypted</em> and <em>Authenticated</em> span-arrows underneath.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Row</th><th>Layout, left to right</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Original packet</strong></td><td><code>IP Header</code> · <code>Ext Hdrs</code> · <code>TCP</code> · <code>Data</code></td></tr>
+      <tr><td><strong>Transport mode</strong></td><td><code>IP Header</code> · <code>Ext Hdrs</code> · <strong><code>ESP Header</code></strong> · <code>TCP</code> · <code>Data</code> · <strong><code>ESP Trailer</code></strong> · <strong><code>ESP Auth</code></strong></td></tr>
+      <tr><td><strong>Tunnel mode</strong></td><td><strong><code>New IP Header</code></strong> · <code>Ext Hdrs</code> · <strong><code>ESP Header</code></strong> · <code>IP Header</code> · <code>Ext Hdrs</code> · <code>TCP</code> · <code>Data</code> · <strong><code>ESP Trailer</code></strong> · <strong><code>ESP Auth</code></strong></td></tr>
+    </tbody>
+  </table></div>
+  <div class="tw"><table>
+    <thead><tr><th>Mode</th><th>Encrypted span</th><th>Authenticated span</th><th>What an eavesdropper still learns</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Transport</strong></td><td><code>TCP</code> through <code>ESP Trailer</code> — the payload only</td><td><code>ESP Header</code> through <code>ESP Trailer</code></td><td>The <strong>original source and destination IP addresses</strong>, because the original IP header is left in the clear and reused.</td></tr>
+      <tr><td><strong>Tunnel</strong></td><td>The <strong>inner <code>IP Header</code></strong> through <code>ESP Trailer</code> — the entire original packet</td><td><code>ESP Header</code> through <code>ESP Trailer</code></td><td>Only the <strong>new</strong> outer addresses — i.e. the two VPN gateways, not the real endpoints.</td></tr>
+    </tbody>
+  </table></div>
+  <p>The one-line distinction to memorise: <strong>transport mode protects the payload; tunnel mode protects the whole packet by wrapping it in a new one.</strong> That is why tunnel mode is what site-to-site VPNs use — the new outer header is addressed gateway-to-gateway, so the Internet routes it without ever seeing the internal addresses — and why transport mode is for host-to-host traffic where both ends are already routable. In both modes <strong>authentication covers more than encryption does</strong>, because the ESP header carries the sequence number and SPI that must be checked before anything is decrypted.</p>
+
+  <h4>WireGuard</h4>
+  <p>A recently introduced VPN that has gained a significant following in the past five years over options like OpenVPN, for two stated reasons:</p>
+  <ul>
+    <li><strong>Simpler protocol and much more performant than OpenVPN. Relatively few configuration options reduces opportunity for error.</strong></li>
+    <li><strong>Utilises modern cryptographic primitives</strong>: the <strong>Noise protocol framework</strong>, <strong>Curve25519</strong>, <strong>ChaCha20</strong>, <strong>Poly1305</strong>.</li>
+  </ul>
+  <div class="box ex"><span class="lbl">Worked example: name the primitive's job</span>
+    <p>The four names are not interchangeable, and an exam can ask which does what. Mapping them onto <a href="#l03a-rsa">L03a</a>:</p>
+    <ul>
+      <li><strong>Curve25519</strong> — elliptic-curve Diffie–Hellman <em>key agreement</em>. It does the job RSA did in L03a (establish a shared secret over a public channel), with far shorter keys.</li>
+      <li><strong>ChaCha20</strong> — a <em>stream cipher</em>, so this is L03a's symmetric encryption, and it carries L03a's warning with it: never reuse a key stream.</li>
+      <li><strong>Poly1305</strong> — a <em>MAC</em>, giving the integrity and origin authentication that encryption alone does not.</li>
+      <li><strong>Noise</strong> — the <em>framework</em> that composes the handshake out of the other three, so the protocol designer is not inventing a handshake by hand.</li>
+    </ul>
+    <p>The deeper claim is the first bullet, and it is a security argument rather than a performance one: <strong>fewer configuration options means fewer ways to configure it wrongly.</strong> OpenVPN and IPsec are flexible enough to be set up insecurely by a competent administrator. That is the same reasoning as <em>economy of mechanism</em> from <a href="#l04a-principles">L04a</a>.</p>
+  </div>
+
+  <h4>Cisco AnyConnect</h4>
+  <p>Stanford and many other organisations use <strong>Cisco AnyConnect</strong>. It <strong>encapsulates traffic in TLS</strong>: the initial handshake uses normal <strong>TCP-based TLS</strong>, and then it switches to <strong>DTLS (UDP-based TLS)</strong> to transport the data.</p>
+  <div class="box warn"><span class="lbl">Why switch to UDP after the handshake?</span>
+    <p>Because of a problem the slide does not name but <a href="#l06b-transport">L06b</a> does: <strong>TCP-over-TCP meltdown</strong>. If you tunnel a TCP connection inside another TCP connection, both layers run their own retransmission timers and congestion control over the same loss. The inner connection retransmits while the outer one is already retransmitting the same bytes, each backing off on the other's behaviour, and throughput collapses under exactly the conditions you most need it. Running the tunnel over UDP leaves retransmission and congestion control to the one layer that can see the real end-to-end path — the application's own TCP. TLS over TCP is kept only for the handshake, where reliability is wanted and the volume is tiny.</p>
+  </div>
+
+  <h3 id="l08a-zerotrust">The gooey middle, and zero trust</h3>
+
+  <div class="box warn"><span class="lbl">The "gooey middle" — the slide's own critique of everything above</span>
+    <p>VPNs support the idea of having a <strong>secure internal network</strong> and an <strong>untrusted public Internet</strong>. Unfortunately, the attacker has <strong>a ton of access once the network perimeter is breached</strong>. And unfortunately, <strong>internal networks aren't that secure</strong> — computers are compromised all the time, and attackers have free rein.</p>
+    <p>The image behind the name is a hard-shell candy with a soft centre: crunchy on the outside, gooey in the middle. Every control in this lecture up to now builds the shell. None of them does anything once an attacker is inside it — and the data from the second slide said that attackers get inside routinely, with the VPN itself the single most common ransomware vector.</p>
+  </div>
+
+  <div class="box def"><span class="lbl">Definition: zero trust security (BeyondCorp)</span>
+    <p>Google's position: <strong>assume the internal network is also out to get you.</strong> Remove the privileged intranet and put all corporate applications on the Internet.</p>
+    <ul>
+      <li><strong>Access depends solely on device and user credentials, regardless of a user's network location.</strong></li>
+      <li><strong>Protect applications, not the network.</strong></li>
+    </ul>
+  </div>
+  <div class="tw"><table>
+    <thead><tr><th></th><th>Perimeter model (VPN)</th><th>Zero trust (BeyondCorp)</th></tr></thead>
+    <tbody>
+      <tr><td>What grants access</td><td><strong>Where you are</strong> — being on the internal network, or connected to the VPN</td><td><strong>Who you are and what device you are on</strong> — user credentials plus device state</td></tr>
+      <tr><td>Unit of protection</td><td>The network</td><td>The application</td></tr>
+      <tr><td>Effect of one compromised machine</td><td>The attacker is now "inside" and reaches everything on the LAN</td><td>The attacker has one machine's credentials and reaches only what that user and device are entitled to</td></tr>
+      <tr><td>Where the internal apps live</td><td>Behind the perimeter, unreachable without the VPN</td><td><strong>On the Internet</strong>, each authenticating every request</td></tr>
+    </tbody>
+  </table></div>
+  <p>The move is more radical than it first sounds, and the exam-friendly way to say it is: <strong>zero trust deletes the concept of "inside."</strong> If network location grants nothing, then breaching the perimeter gains nothing, and the gooey middle has no middle. The cost is that <em>every</em> application must now do its own strong authentication and authorisation correctly — you have not removed the work, you have moved it from one firewall to several hundred services, which is only an improvement if you can actually do it everywhere.</p>
+  <p>Connect it back to <a href="#l04a-principles">L04a</a>: this is <strong>complete mediation</strong> applied to a corporate network. Every access is checked, every time, against the requester's own credentials — rather than being checked once at a gate and trusted thereafter.</p>
+
+  <h3 id="l08a-gloss">L08a glossary</h3>
+  <div class="tw"><table class="gloss">
+    <thead><tr><th>Term</th><th>Definition</th><th>Example</th><th>Memory trick</th><th>Similar</th><th>Opposite</th></tr></thead>
+    <tbody>
+      <tr><td>Port scanning</td><td>Sending a SYN or UDP probe to a port to see if a service is listening</td><td>Nmap, ZMap</td><td>Knocking on every door</td><td>Fingerprinting</td><td>Passive reconnaissance</td></tr>
+      <tr><td>Vertical scan</td><td>Many ports on a single host</td><td>Nmap against one server</td><td>Up and down one machine</td><td>Service enumeration</td><td>Horizontal scan</td></tr>
+      <tr><td>Horizontal scan</td><td>A single port across many hosts</td><td>ZMap sweeping for port 445</td><td>Sideways across the Internet</td><td>Worm scanning</td><td>Vertical scan</td></tr>
+      <tr><td>Service search engine</td><td>Public index of every reachable service on the Internet</td><td>Shodan, Censys</td><td>Google for open ports</td><td>Pre-computed scan</td><td>Scanning it yourself</td></tr>
+      <tr><td>Firewall</td><td>Separates a LAN from the Internet, allowing only some traffic to transit</td><td>Rules on a router</td><td>Checkpoint at the gate</td><td>Packet filter</td><td>Open network</td></tr>
+      <tr><td>Packet filtering</td><td>Allow/deny using IP and transport fields only</td><td>DROP INBOUND TCP 445</td><td>Reads only the envelope</td><td>Stateless firewall</td><td>NGFW</td></tr>
+      <tr><td>Stateful filtering</td><td>Tracks outgoing connections and lets the matching replies back in</td><td>conntrack ESTABLISHED</td><td>Remembers you asked</td><td>Connection tracking</td><td>Stateless filtering</td></tr>
+      <tr><td>Well-known ports</td><td>Ports 1–1023, assigned to common services</td><td>80 HTTP, 22 SSH, 445 SMB</td><td>Who you are</td><td>System ports</td><td>Ephemeral ports</td></tr>
+      <tr><td>Registered ports</td><td>Ports 1024–49151, less well-known services</td><td>3306 MySQL</td><td>The middle band</td><td>User ports</td><td>—</td></tr>
+      <tr><td>Ephemeral ports</td><td>Ports 49152–65535, used by short-lived client connections</td><td>Your browser's source port</td><td>What you're doing now</td><td>Dynamic / private ports</td><td>Well-known ports</td></tr>
+      <tr><td>NAT</td><td>Maps between two address spaces, many private addresses to one public</td><td>192.168.100.3 → 145.12.131.7</td><td>One street address, many flats</td><td>Address translation</td><td>Public addressing</td></tr>
+      <tr><td>Private subnet</td><td>Address range not routable on the public Internet</td><td>10/8, 172.16/12, 192.168/16</td><td>Reusable everywhere</td><td>RFC 1918 space</td><td>Public IP address</td></tr>
+      <tr><td>Border firewall</td><td>Network firewall at the organisation's edge</td><td>Limits inbound to public servers</td><td>The outer wall</td><td>Ingress monitor</td><td>Host firewall</td></tr>
+      <tr><td>Host firewall</td><td>Firewall on an individual machine, protecting it from other hosts</td><td>iptables on a Linux server</td><td>Lock on each office door</td><td>Local firewall</td><td>Border firewall</td></tr>
+      <tr><td>iptables</td><td>The Linux host firewall command</td><td>-A INPUT --dport 22 -j ACCEPT</td><td>IP tables of rules</td><td>nftables</td><td>—</td></tr>
+      <tr><td>NGFW</td><td>Application-layer firewall inspecting L7 content</td><td>SQL injection in HTTP POSTs</td><td>Reads the letter, not the envelope</td><td>Application firewall</td><td>Packet filter</td></tr>
+      <tr><td>IDS</td><td>Monitors traffic for attacks or policy violations and reports them</td><td>Snort, Zeek, Suricata</td><td>Alarm, not a lock</td><td>Detective control</td><td>Firewall (preventive)</td></tr>
+      <tr><td>SIEM</td><td>Central system collecting violations for analysts to investigate</td><td>Where IDS alerts land</td><td>The alarm panel</td><td>Log aggregation</td><td>—</td></tr>
+      <tr><td>Signature detection</td><td>Matching traffic against a list of known attack patterns</td><td>A Snort rule</td><td>Mugshot book</td><td>First-gen anti-virus</td><td>Anomaly detection</td></tr>
+      <tr><td>Anomaly detection</td><td>Learning normal behaviour and reporting deviations</td><td>Unusual outbound volume</td><td>"That's not like you"</td><td>Activity traps</td><td>Signature detection</td></tr>
+      <tr><td>Snort rule header</td><td>Action, protocol, source address/port, direction, destination address/port</td><td>alert icmp 192.168.1.10 any -&gt; any any</td><td>Same five-tuple as a firewall</td><td>Filter rule</td><td>Rule option</td></tr>
+      <tr><td>Snort rule option</td><td>The message and signature ID attached to a match</td><td>msg:"…"; sid:1000005</td><td>What the analyst reads</td><td>Alert metadata</td><td>Rule header</td></tr>
+      <tr><td>Egress inspection</td><td>Monitoring outbound traffic for malicious destinations or exfiltration</td><td>Blocking BitTorrent</td><td>Checking what leaves</td><td>Egress monitor</td><td>Ingress-only filtering</td></tr>
+      <tr><td>Corporate root certificate</td><td>A CA added to employee workstations so the company can read TLS</td><td>Enterprise TLS inspection</td><td>Sanctioned MitM</td><td>TLS interception</td><td>End-to-end TLS</td></tr>
+      <tr><td>VPN</td><td>Creates a fake shared network on which traffic is encrypted</td><td>Traveller to corporate LAN</td><td>Private tunnel through a public road</td><td>Encrypted tunnel</td><td>Plain Internet transit</td></tr>
+      <tr><td>IPsec transport mode</td><td>Encrypts the payload; the original IP header stays visible</td><td>Host-to-host IPsec</td><td>Protects the cargo</td><td>ESP</td><td>Tunnel mode</td></tr>
+      <tr><td>IPsec tunnel mode</td><td>Encrypts the whole original packet inside a new IP header</td><td>Site-to-site VPN</td><td>Puts the packet in a new envelope</td><td>Encapsulation</td><td>Transport mode</td></tr>
+      <tr><td>WireGuard</td><td>Simple, fast VPN using Noise, Curve25519, ChaCha20, Poly1305</td><td>Replacing OpenVPN</td><td>Few knobs, few mistakes</td><td>Economy of mechanism</td><td>IPsec / OpenVPN</td></tr>
+      <tr><td>DTLS</td><td>TLS over UDP, used to carry tunnelled data</td><td>Cisco AnyConnect</td><td>D for datagram</td><td>TLS</td><td>TCP-based TLS</td></tr>
+      <tr><td>Gooey middle</td><td>Hard perimeter around a soft, unprotected internal network</td><td>Attacker free rein after breach</td><td>Crunchy shell, soft centre</td><td>Perimeter security</td><td>Zero trust</td></tr>
+      <tr><td>Zero trust / BeyondCorp</td><td>Access from device and user credentials alone, never network location</td><td>Google's model</td><td>There is no "inside"</td><td>Complete mediation</td><td>Perimeter model</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="box proc"><span class="lbl">L08a in one breath</span>
+    <p>Services listen on <strong>standardised ports</strong>, and some — <strong>recursive DNS resolvers</strong> (DDoS amplifiers) and <strong>Windows File Sharing</strong> — should never face the Internet. Attackers find them by <strong>vertical scanning</strong> (many ports, one host, <strong>Nmap</strong>) or <strong>horizontal scanning</strong> (one port, many hosts, <strong>ZMap</strong>), or skip scanning entirely and query <strong>Shodan</strong> or <strong>Censys</strong>, which have already indexed everything — so moving SSH to port 2222 hides nothing. This matters because <strong>Internet-facing services are the #1 attack path</strong>: across four industry data sets the top routes are an exposed vulnerability and valid credentials on an exposed remote service, <strong>58% of direct ransomware traces to a remote-access vulnerability</strong>, and the <strong>VPN is the single largest vector at 37.4%</strong>; <strong>MOVEit</strong> is the case study, breached by SQL injection in its login fields. The first defence is the <strong>firewall</strong>, which separates LAN from Internet; <strong>basic packet filtering</strong> uses IP and transport fields only, which is why "<code>DROP ALL INBOUND IF DEST PORT != 80</code>" breaks everything — replies to your own outbound connections come back to <strong>ephemeral ports (49152–65535)</strong>, not 80 — and the fix is <strong>stateful filtering</strong>, which tracks outgoing connections (cheaply: new connections have SYN without ACK). <strong>NAT</strong> maps private ranges (<strong>10/8, 172.16–31, 192.168</strong>) to one public address and denies inbound as a side effect, which is not the same as a firewall policy. Organisations combine a <strong>border firewall</strong> (blocks outside traffic, publishes only intended servers) with <strong>host firewalls</strong> such as <strong>iptables</strong> (protect hosts from other hosts, internal compromise, malicious insiders) — <strong>defence in depth</strong> — and add a <strong>next-generation (application-layer) firewall</strong> for attacks inside L7 traffic: SMTP virus scanning through MIME and ZIP, SQL injection in HTTP POSTs, floods of authentication attempts. An <strong>IDS</strong> detects rather than prevents, reporting to a <strong>SIEM</strong>, using <strong>signature detection</strong> (known patterns, misses the new) or <strong>anomaly detection</strong> (learned normality, false positives); <strong>Snort, Zeek and Suricata</strong> are the open-source options, and a Snort rule is a <strong>header</strong> (action, protocol, source, direction, destination) plus an <strong>option</strong> (msg, sid). Outbound traffic is inspected too — malicious sites, exfiltration, BitTorrent — sometimes by installing a <strong>corporate root certificate</strong> to break TLS, a sanctioned man-in-the-middle. For non-TLS protocols, <strong>VPNs</strong> create a fake shared encrypted network, remote-client or site-to-site; <strong>IPsec</strong> is most popular, in <strong>transport mode</strong> (payload encrypted, original IP header visible) or <strong>tunnel mode</strong> (whole packet encrypted inside a new header); <strong>WireGuard</strong> wins on simplicity and modern primitives (Noise, Curve25519, ChaCha20, Poly1305) and <strong>Cisco AnyConnect</strong> handshakes over TCP-based TLS then moves data over <strong>DTLS</strong>. Finally the lecture turns on itself: the perimeter model leaves a <strong>gooey middle</strong> where one breach grants free rein, so <strong>zero trust (BeyondCorp)</strong> removes the privileged intranet, puts applications on the Internet, and grants access on <strong>device and user credentials alone, regardless of network location — protecting applications, not the network</strong>.</p>
+  </div>
+
+  <div class="box exam"><span class="lbl">L08a exam checklist</span>
+    <ul class="checklist">
+      <li>Name two services that should not listen on the public Internet and say why each is dangerous.</li>
+      <li>Define port scanning and distinguish vertical from horizontal scans, with the tool used for each.</li>
+      <li>Explain what Shodan and Censys are, and why changing SSH to port 2222 is not protection.</li>
+      <li>State the claim that Internet-facing services are the #1 attack path and cite the supporting figures (VPN 37.4%, RDP 20.8%, 58% from remote-access vulnerabilities, software vulnerability 38.6%).</li>
+      <li>Describe the MOVEit attack and trace it through scanning, vulnerability class, and payload.</li>
+      <li>Define a firewall and list the fields basic packet filtering can use.</li>
+      <li>Write the rule for "block external access to Windows File Sharing."</li>
+      <li>Explain why <code>DROP ALL INBOUND PACKETS IF DEST PORT != 80</code> breaks the network, and what fixes it.</li>
+      <li>Give the three IANA port ranges with their numeric bounds and what lives in each.</li>
+      <li>Define stateful filtering and explain the role of the ACK bit in telling new connections from established ones.</li>
+      <li>Explain what a NAT does, list the three private address ranges, and say why NAT is not a firewall.</li>
+      <li>Read the two iptables rules field by field and state the policy they express.</li>
+      <li>Contrast border and host firewalls, and say what each protects against that the other cannot.</li>
+      <li>Define a next-generation firewall and give the three L7 inspection examples from the slide.</li>
+      <li>Define an IDS and a SIEM, and contrast signature with anomaly detection on what each misses.</li>
+      <li>Name the three open-source IDS, including Zeek's former name.</li>
+      <li>Label every field of <code>alert icmp 192.168.1.10 any -&gt; any any (msg:"…"; sid:1000005)</code> and split it into header and option.</li>
+      <li>Give three reasons organisations inspect outbound traffic, and explain how a corporate root certificate lets an employer read TLS.</li>
+      <li>State the problem VPNs solve and the two broad deployment types.</li>
+      <li>Draw IPsec transport and tunnel mode, marking what is encrypted and what is authenticated in each.</li>
+      <li>Say what an eavesdropper still learns under each IPsec mode, and which mode a site-to-site VPN uses.</li>
+      <li>Name WireGuard's four cryptographic primitives and what each one does.</li>
+      <li>Explain Cisco AnyConnect's handshake-over-TLS, data-over-DTLS split.</li>
+      <li>Explain the "gooey middle" criticism of perimeter security.</li>
+      <li>State the two BeyondCorp principles and contrast zero trust with the perimeter model on what grants access.</li>
     </ul>
   </div>
 </section>

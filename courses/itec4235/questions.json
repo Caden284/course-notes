@@ -1690,5 +1690,231 @@
   "q": "State the client puzzle construction and explain why it reverses the usual denial-of-service asymmetry, along with its two limitations.",
   "answer": "The server sends a challenge C, and the client must find an X such that the low n bits of SHA-1(C || X) are all zero. Finding X takes roughly 2^n work for the client — about 0.3 s on a 1 GHz core for the assumed parameters — while the server verifies with a single SHA-1. Denial of service normally depends on requests being cheap to send and expensive to serve; a client puzzle inverts that, making every connection expensive for the requester and nearly free for the server, and n can be raised as attack traffic increases. The limitations are that it requires changes to the protocols, the clients and the servers, and that it hurts low-power legitimate clients such as phones during an attack — a 200,000-device botnet absorbs the cost far better than one phone on battery. It is not frequently used in the real world.",
   "explain": "Proof of work applied to connection setup; it relies on the one-wayness of the hash, with no shortcut to finding X but one hash to check it."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "An attacker has a working exploit for a single vulnerable service and wants to find victims across the Internet. Which scan, and which tool?",
+  "choices": [
+   "Vertical scan with Nmap",
+   "Horizontal scan with ZMap",
+   "Vertical scan with ZMap",
+   "Horizontal scan with Nmap"
+  ],
+  "answer": 1,
+  "explain": "A horizontal scan tries a single port across a large number of hosts, typically with ZMap. A vertical scan (Nmap) tries many ports on one host, which is what you do after choosing a target."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "Why does moving an SSH server from port 22 to port 2222 provide almost no protection?",
+  "choices": [
+   "Nmap automatically tries every port anyway",
+   "Service search engines have already indexed it — Shodan lists 672,952 hosts on port 2222",
+   "Port 2222 is in the well-known range",
+   "Stateful firewalls rewrite the port number"
+  ],
+  "answer": 1,
+  "explain": "The scan has already happened. An attacker queries Shodan or Censys rather than scanning you, so obscurity costs them nothing."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "According to the At-Bay data on the slide, what is the single largest direct ransomware entry vector?",
+  "choices": [
+   "Email, at 18.2%",
+   "RDP, at 20.8%",
+   "VPN, at 37.4%",
+   "Credential abuse, at 6.1%"
+  ],
+  "answer": 2,
+  "explain": "VPN at 37.4%, ahead of RDP at 20.8%. The accompanying note adds that 58% of direct ransomware events trace to a remote access vulnerability, and that in 2023 attackers shifted from RDP to self-managed VPNs."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "Which fields can basic packet filtering use?",
+  "choices": [
+   "Any field, including HTTP request bodies",
+   "IP source and destination, protocol, and TCP/UDP source and destination ports",
+   "Only the destination IP address",
+   "MAC addresses and VLAN tags"
+  ],
+  "answer": 1,
+  "explain": "Basic packet filtering uses transport and IP layer information only. Inspecting an HTTP POST body requires an application-layer (next-generation) firewall."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "The rule DROP ALL INBOUND PACKETS IF DEST PORT != 80 is meant to publish only a web server. What actually goes wrong?",
+  "choices": [
+   "It blocks the web server's own replies",
+   "Replies to outbound connections arrive at ephemeral ports, so they are dropped and internal hosts lose Internet access",
+   "It allows inbound SSH on port 22",
+   "It only applies to UDP"
+  ],
+  "answer": 1,
+  "explain": "All outbound connections have a source port in the ephemeral range, and their responses arrive with that as the destination port. A stateless rule cannot tell those from unsolicited traffic, which is exactly why stateful filtering exists."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "What are the bounds of the ephemeral/dynamic/private port range?",
+  "choices": [
+   "1–1023",
+   "1024–49151",
+   "49152–65535",
+   "32768–65535"
+  ],
+  "answer": 2,
+  "explain": "Well-known 1–1023, registered 1024–49151, ephemeral 49152–65535."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "Which cheap test lets even a near-stateless firewall distinguish a new inbound connection from a reply to one you started?",
+  "choices": [
+   "Whether the ACK bit is set",
+   "Whether the source port is below 1024",
+   "Whether the IP checksum validates",
+   "Whether the TTL is above 64"
+  ],
+  "answer": 0,
+  "explain": "The packet that establishes a connection has SYN set and ACK clear; every later packet of an established connection has ACK set. The stateful-filtering slide calls this out explicitly."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "Which address range is NOT one of the three private subnets listed on the NAT slide?",
+  "choices": [
+   "10.0.0.0 – 10.255.255.255",
+   "172.16.0.0 – 172.31.255.255",
+   "192.168.0.0 – 192.168.255.255",
+   "169.254.0.0 – 169.254.255.255"
+  ],
+  "answer": 3,
+  "explain": "169.254/16 is link-local, not one of the three RFC 1918 private ranges given."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "A next-generation firewall scanning SMTP for viruses has to understand MIME encoding and ZIP files. Why?",
+  "choices": [
+   "To compress the traffic before forwarding",
+   "Because it must decode the attachment the way the recipient's client will, or malware hides in the encoding",
+   "Because SMTP requires compression",
+   "To compute the TCP checksum"
+  ],
+  "answer": 1,
+  "explain": "An application-layer firewall has to reassemble the stream and decode nested formats; anything it fails to decode is a place malware can hide."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "In alert icmp 192.168.1.10 any -> any any (msg:\"ICMP Attempt Attack\"; sid:1000005), which part is the rule option?",
+  "choices": [
+   "alert icmp",
+   "192.168.1.10 any",
+   "-> any any",
+   "(msg:\"ICMP Attempt Attack\"; sid:1000005)"
+  ],
+  "answer": 3,
+  "explain": "The rule header is action, protocol, source address, source port, direction, destination address and port. Everything in the parentheses — the message and the signature ID — is the rule option."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "In IPsec tunnel mode, what does an eavesdropper on the path learn?",
+  "choices": [
+   "The original source and destination IP addresses",
+   "Only the outer addresses, i.e. the two VPN gateways",
+   "The full plaintext payload",
+   "Nothing at all, including that IPsec is in use"
+  ],
+  "answer": 1,
+  "explain": "Tunnel mode encrypts the entire original packet, including its IP header, inside a new outer header addressed gateway-to-gateway. Transport mode is the one that leaves the original addresses visible."
+ },
+ {
+  "unit": "l08a",
+  "type": "mc",
+  "q": "Which WireGuard primitive provides key agreement?",
+  "choices": [
+   "ChaCha20",
+   "Poly1305",
+   "Curve25519",
+   "Noise"
+  ],
+  "answer": 2,
+  "explain": "Curve25519 is elliptic-curve Diffie–Hellman key agreement. ChaCha20 is the stream cipher, Poly1305 the MAC, and Noise the framework that composes the handshake."
+ },
+ {
+  "unit": "l08a",
+  "type": "tf",
+  "q": "A NAT is a firewall, because it blocks unsolicited inbound connections.",
+  "answer": false,
+  "explain": "It denies inbound traffic as a side effect of having no translation-table entry for it, not as a security policy. There are no rules, no logging, and protocols such as UPnP let inside programs open holes on request."
+ },
+ {
+  "unit": "l08a",
+  "type": "tf",
+  "q": "A border firewall protects hosts inside the organisation from each other.",
+  "answer": false,
+  "explain": "The border firewall blocks malicious traffic from outside and limits inbound access to intended public servers. Protecting hosts from other hosts — internal compromise and malicious insiders — is the job of host firewalls such as iptables."
+ },
+ {
+  "unit": "l08a",
+  "type": "tf",
+  "q": "An IDS blocks the traffic it identifies as malicious.",
+  "answer": false,
+  "explain": "An IDS monitors and reports; violations go to a SIEM where analysts can later investigate. Blocking is the firewall's job. The 'later investigate' wording assumes something already got through."
+ },
+ {
+  "unit": "l08a",
+  "type": "tf",
+  "q": "Signature detection is likely to miss a novel attack, while anomaly detection is likely to raise false positives.",
+  "answer": true,
+  "explain": "No rule means no alert for signature detection; for anomaly detection, 'unusual' and 'malicious' are not the same thing. It is the same trade-off as first- versus third-generation anti-virus in L06a."
+ },
+ {
+  "unit": "l08a",
+  "type": "tf",
+  "q": "Under zero trust (BeyondCorp), being connected to the corporate network grants a baseline level of access.",
+  "answer": false,
+  "explain": "Access depends solely on device and user credentials, regardless of the user's network location. Zero trust deletes the concept of 'inside' — the model protects applications, not the network."
+ },
+ {
+  "unit": "l08a",
+  "type": "short",
+  "q": "Explain the 'gooey middle' criticism of perimeter security, and how zero trust answers it.",
+  "answer": "VPNs and border firewalls assume a secure internal network and an untrusted public Internet — a hard shell around a soft centre. The problem is that once the perimeter is breached the attacker has a ton of access, and internal networks are not actually secure: machines are compromised routinely and the attacker then has free rein. Zero trust (Google's BeyondCorp) answers it by assuming the internal network is also hostile: remove the privileged intranet, put all corporate applications on the Internet, and grant access solely on device and user credentials regardless of network location. Protect applications, not the network. If location grants nothing, breaching the perimeter gains nothing. The cost is that every application must now authenticate and authorise correctly on its own.",
+  "explain": "The slide's own framing: crunchy outside, gooey middle. Zero trust removes the middle by removing the idea of inside."
+ },
+ {
+  "unit": "l08a",
+  "type": "short",
+  "q": "Walk through why the slide's proposed rule for publishing only a web server fails, and name the fix.",
+  "answer": "The rule is DROP ALL INBOUND PACKETS IF DEST PORT != 80. It fails because all outbound connections also have a source port, drawn from the ephemeral range 49152–65535, and the replies to those connections arrive inbound addressed to that port rather than to 80. The rule therefore drops every response to every request an internal machine makes, so the network has no working Internet access. A stateless filter cannot distinguish an unsolicited packet to a high port from the answer to a request it made. The fix is stateful filtering: the firewall tracks outgoing connections and allows the associated inbound traffic back through, which can be approximated cheaply by permitting inbound TCP only when the ACK bit is set, since a connection-opening packet has SYN set and ACK clear.",
+  "explain": "The lecture poses the problem before naming the solution, so expect the question in that order."
+ },
+ {
+  "unit": "l08a",
+  "type": "short",
+  "q": "Contrast IPsec transport mode with tunnel mode: packet layout, what is encrypted, what is authenticated, and which is used for a site-to-site VPN.",
+  "answer": "The original packet is IP Header, Ext Hdrs, TCP, Data. Transport mode inserts an ESP Header after the existing headers and appends an ESP Trailer and ESP Auth: IP Header, Ext Hdrs, ESP Header, TCP, Data, ESP Trailer, ESP Auth. Encryption covers TCP through the ESP Trailer — the payload only — and authentication covers the ESP Header through the ESP Trailer, so the original source and destination IP addresses remain visible. Tunnel mode wraps the whole original packet in a new one: New IP Header, Ext Hdrs, ESP Header, then the complete original IP Header, Ext Hdrs, TCP and Data, then ESP Trailer and ESP Auth. Encryption covers the inner IP header through the ESP Trailer, so an eavesdropper sees only the outer addresses, which are the two VPN gateways. Site-to-site VPNs use tunnel mode for exactly that reason. In both modes authentication covers more than encryption does, because the ESP header carries the sequence number and SPI that must be checked before decryption.",
+  "explain": "One line to remember: transport mode protects the payload, tunnel mode protects the whole packet by wrapping it in a new one."
+ },
+ {
+  "unit": "l08a",
+  "type": "short",
+  "q": "Why does Cisco AnyConnect use TCP-based TLS for its handshake but DTLS over UDP to carry data?",
+  "answer": "Tunnelling TCP inside TCP causes TCP-over-TCP meltdown: both the inner and the outer connection run their own retransmission timers and congestion control over the same packet loss, so the inner connection retransmits while the outer is already retransmitting the same bytes and each backs off in response to the other. Throughput collapses precisely when the path is lossy. Running the tunnel over UDP with DTLS leaves retransmission and congestion control to the single layer that can see the real end-to-end path — the application's own TCP. TLS over TCP is kept only for the handshake, where reliability is wanted and the data volume is tiny.",
+  "explain": "The slide states the split; the reason is the congestion-control interaction from L06b."
+ },
+ {
+  "unit": "l08a",
+  "type": "short",
+  "q": "Explain how a company installing its own root certificate on employee workstations is able to read TLS traffic, and what that is equivalent to.",
+  "answer": "TLS protects a session because the browser only accepts certificates signed by a certificate authority in its trust store. Adding the company's own CA to that store means the company can mint a certificate that the browser will accept for any site. Its proxy then terminates the employee's TLS connection, decrypts and inspects the plaintext, and opens a second TLS connection onward to the real server. The browser shows a valid padlock the whole time. This is precisely a man-in-the-middle attack of the kind L06b describes, run deliberately by the employer; the only thing separating it from an attack is that the employee consented by accepting the managed device.",
+  "explain": "Outbound inspection is why organisations do it: blocking malicious sites, preventing exfiltration, and blocking services like BitTorrent."
  }
 ]
