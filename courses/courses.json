@@ -1,5 +1,19 @@
 [
   {
+    "id": "rbt",
+    "code": "RBT",
+    "title": "Registered Behavior Technician Training",
+    "term": "Fall 2026",
+    "status": "In progress",
+    "instructor": "",
+    "headline": "RBT training, rewritten for practice and recall",
+    "lead": "Judah's RBT study site. All 47 modules of the BlueSprig RBT Training (TCO-3) course notes, rewritten with every terminology table, every Critical Information page, retrieval questions inside each module, and a practice exam you can rebuild as many times as you like.",
+    "unitWord": "Module",
+    "examExclude": [
+      "how"
+    ]
+  },
+  {
     "id": "itec4235",
     "code": "ITEC 4235",
     "title": "Computer Security",

@@ -1,0 +1,2940 @@
+[
+ {
+  "unit": "rbt01",
+  "type": "mc",
+  "q": "Which of these falls OUTSIDE an RBT's scope of practice?",
+  "choices": [
+   "Collecting and recording data during sessions",
+   "Implementing a behavior plan written by your supervisor",
+   "Changing a program when the client stops making progress",
+   "Following your supervisor's instructions exactly as given"
+  ],
+  "answer": 2,
+  "explain": "Creating goals, changing programs, and providing independent recommendations are all outside scope. Notice the concern is legitimate — the client isn't progressing — but the response must be to report it, not to change the plan."
+ },
+ {
+  "unit": "rbt01",
+  "type": "tf",
+  "q": "The RBT Ethics Code applies only after you are certified.",
+  "answer": false,
+  "explain": "The manual states it twice: you are expected to follow these guidelines now, even before you are certified. The code applies during training and after certification."
+ },
+ {
+  "unit": "rbt01",
+  "type": "mc",
+  "q": "A client's parent asks you whether their child's goals should be changed. What is the correct response?",
+  "choices": [
+   "Give them your professional opinion based on what you've seen",
+   "Tell them it isn't your job and change the subject",
+   "Listen, document objectively, and bring it to your supervisor",
+   "Make a small adjustment and see if it helps"
+  ],
+  "answer": 2,
+  "explain": "Providing independent recommendations is out of scope, but dismissing the parent fails the professional communication responsibility. Direct questions and concerns to your supervisor (RBT11, responsibility #6)."
+ },
+ {
+  "unit": "rbt01",
+  "type": "mc",
+  "q": "Offering a client choices whenever possible to promote autonomy is an example of which value?",
+  "choices": [
+   "Compassion",
+   "Dignity",
+   "Respect",
+   "Competence"
+  ],
+  "answer": 1,
+  "explain": "Dignity is about autonomy — choices, preferences, feeling heard and valued. Compassion is kindness in a hard moment; respect is conduct like punctuality, inclusive language, and using preferred names and pronouns."
+ },
+ {
+  "unit": "rbt01",
+  "type": "short",
+  "q": "You are not expected to know everything as an RBT. What three things ARE you expected to do?",
+  "answer": "Follow your supervisor's instructions; do tasks you've been trained on; and ask for help when unsure.",
+  "explain": "Asking for help is listed as an expectation, not a fallback — recognising the edge of your competence is part of doing the job correctly."
+ },
+ {
+  "unit": "rbt01",
+  "type": "short",
+  "q": "List the five key responsibilities that fall within an RBT's scope of practice.",
+  "answer": "Implement behavior plans created by your supervisor; collect data on your client's progress; communicate effectively and professionally; treat every client with dignity and respect; and recognise when something is outside your scope and speak up.",
+  "explain": "The manual's framing: you don't have to do it all, you just have to do your part and do it well."
+ },
+ {
+  "unit": "rbt02",
+  "type": "mc",
+  "q": "What does the mnemonic GET A CAB stand for?",
+  "choices": [
+   "Generalized, Effective, Technological, Applied, Conceptually Systematic, Analytic, Behavioral",
+   "Goals, Ethics, Training, Assessment, Competence, Analysis, Behavior",
+   "Generalized, Ethical, Teachable, Applied, Compassionate, Accurate, Behavioral",
+   "Graphing, Evaluation, Treatment, Assent, Consent, Antecedent, Baseline"
+  ],
+  "answer": 0,
+  "explain": "The 7 dimensions of ABA: Generalized, Effective, Technological, Applied, Conceptually Systematic, Analytic, Behavioral."
+ },
+ {
+  "unit": "rbt02",
+  "type": "mc",
+  "q": "A goal is written as 'the client will feel less anxious during transitions.' Which dimension of ABA does this violate?",
+  "choices": [
+   "Applied",
+   "Analytic",
+   "Behavioral",
+   "Effective"
+  ],
+  "answer": 2,
+  "explain": "Behavioral means ABA targets observable and measurable behaviors rather than internal thoughts or feelings. Rewrite it as something you can see and count."
+ },
+ {
+  "unit": "rbt02",
+  "type": "mc",
+  "q": "Which graph feature marks a shift from baseline to intervention?",
+  "choices": [
+   "The condition label",
+   "The phase change line",
+   "The data path",
+   "The Y-axis"
+  ],
+  "answer": 1,
+  "explain": "Phase change lines are vertical lines marking a shift from one phase of treatment to another. Condition labels are the miniature titles naming each phase."
+ },
+ {
+  "unit": "rbt02",
+  "type": "mc",
+  "q": "What are the four phases of an ABA program, in order?",
+  "choices": [
+   "Assessment, baseline, treatment, discharge",
+   "Baseline, intervention, generalization, maintenance",
+   "Intake, intervention, generalization, graduation",
+   "Baseline, acquisition, fluency, mastery"
+  ],
+  "answer": 1,
+  "explain": "Baseline (data before treatment), intervention, generalization (across settings, people, situations), maintenance (continues after teaching and reinforcement are faded)."
+ },
+ {
+  "unit": "rbt02",
+  "type": "tf",
+  "q": "On a line graph, the Y-axis represents time.",
+  "answer": false,
+  "explain": "The X-axis is horizontal and represents time (days, sessions, weeks). The Y-axis is vertical and represents the behavior being measured. 'Y to the sky.'"
+ },
+ {
+  "unit": "rbt02",
+  "type": "short",
+  "q": "Name the four primary goals of ABA, and explain why 'increase desired skills' and 'teach new skills' are not the same goal.",
+  "answer": "The four goals are: increase desired skills, decrease challenging behaviors, teach new skills, and generalize skills. Increasing a desired skill means the learner already does it and you want more of it; teaching a new skill means it isn't in their repertoire at all. They have different starting points and need different procedures — shaping and chaining build new skills, while reinforcement increases existing ones.",
+  "explain": "The distinction matters because it determines which teaching procedure you reach for."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "A learner screams during worksheets, you remove the worksheet, and screaming during worksheets increases. What is this?",
+  "choices": [
+   "Positive reinforcement",
+   "Negative reinforcement",
+   "Positive punishment",
+   "Negative punishment"
+  ],
+  "answer": 1,
+  "explain": "Something aversive (the worksheet) was removed and the behavior increased. Removed = negative; behavior up = reinforcement. This is also the escape function seen from the consequence side."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "You deliver a token after the learner labels 3 pictures, then after 7, then after 4, averaging about 5. Which schedule?",
+  "choices": [
+   "Fixed ratio",
+   "Variable ratio",
+   "Fixed interval",
+   "Variable interval"
+  ],
+  "answer": 1,
+  "explain": "You are counting responses (ratio) and the number changes (variable). VR."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "A child gets a break after 5 minutes of sitting. Which schedule?",
+  "choices": [
+   "Fixed ratio",
+   "Variable ratio",
+   "Fixed interval",
+   "Variable interval"
+  ],
+  "answer": 2,
+  "explain": "Time-based (interval) and always the same amount of time (fixed). FI — formally, the first correct response after the set time elapses gets reinforced."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "Offering bubbles to a child who loves bubbles instead of a random toy is an example of which dimension of reinforcement?",
+  "choices": [
+   "Immediacy",
+   "Magnitude",
+   "Quality",
+   "Rate"
+  ],
+  "answer": 2,
+  "explain": "Quality refers to how preferred or important the reinforcer is to the client. Magnitude is how big it is; rate is how often; immediacy is how quickly."
+ },
+ {
+  "unit": "rbt03",
+  "type": "tf",
+  "q": "In 'negative reinforcement,' negative means the consequence is unpleasant.",
+  "answer": false,
+  "explain": "Positive and negative describe whether something was added or subtracted, not whether it was pleasant. Both positive and negative reinforcement increase behavior."
+ },
+ {
+  "unit": "rbt03",
+  "type": "short",
+  "q": "Give the two questions you ask, in order, to identify any schedule of reinforcement from a scenario.",
+  "answer": "First: is reinforcement based on counting responses, or on watching a clock? Responses means Ratio; time means Interval. Second: is the number or time the same every time, or does it change? Same means Fixed; changes means Variable. Combining the two answers gives FR, VR, FI or VI.",
+  "explain": "Ratio vs interval first, then fixed vs variable."
+ },
+ {
+  "unit": "rbt03",
+  "type": "short",
+  "q": "Identify the antecedent, behavior and consequence in: 'Teacher tells you there will be a quiz tomorrow; you study; you get an A.'",
+  "answer": "Antecedent: the teacher telling you there will be a quiz tomorrow. Behavior: studying. Consequence: getting an 'A'. Because the consequence makes studying more likely in future, it functions as reinforcement — specifically positive reinforcement, since something was added.",
+  "explain": "The ABCs are the foundation for understanding behavior."
+ },
+ {
+  "unit": "rbt04",
+  "type": "mc",
+  "q": "Two children both hit. One hits to get a staff member's attention; the other hits to escape a demand. What is the same and what is different?",
+  "choices": [
+   "Same function, different topography",
+   "Same topography, different function",
+   "Both topography and function are the same",
+   "Neither is the same"
+  ],
+  "answer": 1,
+  "explain": "Topography is what the behavior looks like (hitting — same). Function is why it happens (attention vs escape — different). Different functions require different interventions, which is why function must be identified before a plan is written."
+ },
+ {
+  "unit": "rbt04",
+  "type": "mc",
+  "q": "Which function is NOT socially mediated?",
+  "choices": [
+   "Attention",
+   "Escape",
+   "Access to tangibles",
+   "Automatic"
+  ],
+  "answer": 3,
+  "explain": "Automatic means the behavior is reinforcing all on its own, not because of something someone else does. The other three all require another person to deliver something."
+ },
+ {
+  "unit": "rbt04",
+  "type": "mc",
+  "q": "A child plays with their favourite toy for 30 minutes and then stops working to earn tokens for it. What happened?",
+  "choices": [
+   "An establishing operation increased the toy's value",
+   "An abolishing operation decreased the toy's value",
+   "A setting event occurred",
+   "The toy stopped being a reinforcer permanently"
+  ],
+  "answer": 1,
+  "explain": "Satiation is an AO: too much access temporarily decreases the value of the reinforcer, and consequently decreases behaviors that earn it. Temporarily is the key word."
+ },
+ {
+  "unit": "rbt04",
+  "type": "mc",
+  "q": "A child slept badly and skipped breakfast, and engages in challenging behavior when a demand is placed. The poor sleep and missed breakfast are best described as:",
+  "choices": [
+   "An establishing operation",
+   "An abolishing operation",
+   "A setting event",
+   "An antecedent"
+  ],
+  "answer": 2,
+  "explain": "Setting events are prior conditions that don't occur immediately before the behavior and don't directly cause it, but set the stage. They describe the person's whole state rather than the value of one specific reinforcer."
+ },
+ {
+  "unit": "rbt04",
+  "type": "tf",
+  "q": "A single client can engage in the same behavior for more than one function.",
+  "answer": true,
+  "explain": "RBT33 states this explicitly about BIPs: clients can engage in the same behavior for multiple functions, so pay close attention to this in the plan."
+ },
+ {
+  "unit": "rbt04",
+  "type": "short",
+  "q": "Draw the 4-term contingency and explain what the added term does.",
+  "answer": "Setting events / Motivating operations → Antecedent → Behavior → Consequence. The added front term does not directly cause the behavior and is not the immediate trigger; it influences the likelihood of the behavior occurring, either by setting the stage (setting event) or by temporarily changing how much a particular consequence is wanted right now (MO).",
+  "explain": "EOs raise a reinforcer's value through deprivation; AOs lower it through satiation."
+ },
+ {
+  "unit": "rbt05",
+  "type": "mc",
+  "q": "You say 'The cow says…' and the child says 'moo.' Which verbal operant?",
+  "choices": [
+   "Mand",
+   "Tact",
+   "Echoic",
+   "Intraverbal"
+  ],
+  "answer": 3,
+  "explain": "Controlled by someone else's verbal behavior but related rather than identical, so intraverbal. If you had said 'moo' and they repeated 'moo', that would be an echoic."
+ },
+ {
+  "unit": "rbt05",
+  "type": "mc",
+  "q": "What controls a mand, and what reinforces it?",
+  "choices": [
+   "Contact with the environment; social praise",
+   "A motivating operation; access to the item requested",
+   "Someone else's verbal behavior; social praise",
+   "A discriminative stimulus; a token"
+  ],
+  "answer": 1,
+  "explain": "Mands are controlled by motivating operations — the client must want something before they can mand for it — and reinforced by access to the item or activity requested."
+ },
+ {
+  "unit": "rbt05",
+  "type": "mc",
+  "q": "A bird flies past the window and the child says 'bird.' You say, 'I saw the bird, it was flying fast.' Which operant?",
+  "choices": [
+   "Mand",
+   "Tact",
+   "Echoic",
+   "Intraverbal"
+  ],
+  "answer": 1,
+  "explain": "The child labeled something in their environment and was reinforced with a social consequence. Tact — note the MO column is N/A."
+ },
+ {
+  "unit": "rbt05",
+  "type": "tf",
+  "q": "A child who hands you a picture of a trampoline to request jumping has emitted a mand.",
+  "answer": true,
+  "explain": "A mand does not have to be spoken. A picture exchange or speech-generating device counts, as long as there is an MO and the response is reinforced by access to what was requested."
+ },
+ {
+  "unit": "rbt05",
+  "type": "short",
+  "q": "Explain the difference between an echoic and an intraverbal, using the term point-to-point correspondence.",
+  "answer": "Both are controlled by someone else's verbal behavior and both are typically reinforced with social consequences. An echoic repeats what was heard with point-to-point correspondence — the response matches the model piece for piece, so 'ma' produces 'ma'. An intraverbal responds to the verbal stimulus without directly copying it, so 'What's your name?' produces 'Ava'. The response is related but not identical.",
+  "explain": "Point-to-point correspondence is the technical marker of an echoic."
+ },
+ {
+  "unit": "rbt06",
+  "type": "mc",
+  "q": "Two observers watch the same session and record identical data, but both were trained to score the behavior incorrectly. What is true?",
+  "choices": [
+   "The data is reliable and accurate",
+   "The data is reliable but not accurate",
+   "The data is accurate but not reliable",
+   "Neither reliable nor accurate"
+  ],
+  "answer": 1,
+  "explain": "Reliability means consistency of measurement; accuracy means correctness. The manual states directly that reliability does not equal accuracy. IOA only measures the first."
+ },
+ {
+  "unit": "rbt06",
+  "type": "mc",
+  "q": "Which of these is written in observable terms?",
+  "choices": [
+   "Gets excited",
+   "Avoids the task",
+   "Walks out of the room",
+   "Wants attention"
+  ],
+  "answer": 2,
+  "explain": "Walking out of the room can be seen. 'Avoids the task' is the non-observable version of the same event — it adds an assumption about intent."
+ },
+ {
+  "unit": "rbt06",
+  "type": "mc",
+  "q": "What are the four key components of an operational definition?",
+  "choices": [
+   "Objective, clear, complete, individualized",
+   "Accurate, reliable, valid, measurable",
+   "Short, specific, written, approved",
+   "Observable, measurable, repeatable, graphed"
+  ],
+  "answer": 0,
+  "explain": "Objective, clear, complete, and individualized — which produce the same data in the same way, no guesswork, consistent data over time, and reliable data to inform treatment decisions."
+ },
+ {
+  "unit": "rbt06",
+  "type": "tf",
+  "q": "IOA requires that the two observers discuss what they saw before recording.",
+  "answer": false,
+  "explain": "IOA is the degree to which two or more INDEPENDENT observers record the same data after observing the exact same event. Discussing first would defeat the purpose."
+ },
+ {
+  "unit": "rbt06",
+  "type": "short",
+  "q": "Rewrite 'the client was being defiant during circle time' in observable terms, and explain why it matters.",
+  "answer": "Something like: 'During circle time, the client left his chair 6 times and said \"no\" when given an instruction 4 times.' It matters because the original describes an interpretation rather than an event — two RBTs would score 'defiant' differently, so the data would not be reliable, and unreliable data leads to poor treatment decisions, lack of client progress, uncertainty about whether the plan works, lost trust in the data, and wasted effort.",
+  "explain": "Observable language focuses on what can be seen and heard; non-observable language includes assumptions about internal states."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "A session is split into 10-second blocks and you mark a block if the behavior occurred at ANY point during it. Which procedure, and what is its bias?",
+  "choices": [
+   "Whole interval; it underestimates",
+   "Partial interval; it overestimates",
+   "Momentary time sampling; it misses instances",
+   "Duration; it is exact"
+  ],
+  "answer": 1,
+  "explain": "Partial-interval recording marks occurrence at any point during the interval, so one second of behavior scores the whole interval — it may overestimate the actual occurrence."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "You start a stopwatch when you give the instruction and stop it when the learner begins to respond. Which measure?",
+  "choices": [
+   "Duration",
+   "Latency",
+   "Interresponse time",
+   "Rate"
+  ],
+  "answer": 1,
+  "explain": "Latency is how long it takes for behavior to BEGIN. Duration is how long it lasts; IRT is the time between two responses."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "Which of these is a DISCONTINUOUS data collection procedure?",
+  "choices": [
+   "Trial-by-trial",
+   "Interresponse time",
+   "Momentary time sampling",
+   "Duration"
+  ],
+  "answer": 2,
+  "explain": "The three interval-based systems — partial interval, whole interval and MTS — are discontinuous because they estimate. Everything watched in real time is continuous."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "Counting completed worksheets at the end of a session without having watched the learner work is which procedure?",
+  "choices": [
+   "Permanent product recording",
+   "Frequency",
+   "Whole interval",
+   "Trial-by-trial"
+  ],
+  "answer": 0,
+  "explain": "Permanent product measures a physical product produced by the behavior, so you don't have to observe it directly. Its limitation is that it can be difficult to confirm who produced the product."
+ },
+ {
+  "unit": "rbt07",
+  "type": "tf",
+  "q": "Whole-interval recording may underestimate the actual occurrence of behavior.",
+  "answer": true,
+  "explain": "Whole interval requires the behavior to occur for the ENTIRE interval, so a single second of not doing it loses the whole interval. Partial interval is the mirror image and overestimates."
+ },
+ {
+  "unit": "rbt07",
+  "type": "short",
+  "q": "Sort all ten data collection procedures into continuous and discontinuous, and say where permanent product sits.",
+  "answer": "Continuous: frequency, rate, duration, latency, interresponse time, and trial-by-trial — all recorded on behavior as it occurs in real time. Discontinuous: partial interval, whole interval, and momentary time sampling — all estimates of occurrence. Permanent product sits outside both as a bonus category, because you are not observing the behavior at all; you are measuring the physical product it left behind.",
+  "explain": "Rule of thumb: anything with 'interval' or 'sampling' in the name is discontinuous."
+ },
+ {
+  "unit": "rbt08",
+  "type": "mc",
+  "q": "A skill acquisition graph shows a similar level to baseline with little variability after two weeks of intervention. What should you do?",
+  "choices": [
+   "Keep going — low variability means the program is stable",
+   "Talk with your supervisor",
+   "Increase the difficulty of the targets yourself",
+   "Switch to a different program"
+  ],
+  "answer": 1,
+  "explain": "A skill program that hasn't moved off baseline isn't working yet. Your options are keep going or talk with your supervisor — changing or switching programs is outside your scope."
+ },
+ {
+  "unit": "rbt08",
+  "type": "mc",
+  "q": "'The data path bounces sharply from one session to the next.' Which feature is being described?",
+  "choices": [
+   "Level",
+   "Trend",
+   "Variability",
+   "Phase change"
+  ],
+  "answer": 2,
+  "explain": "Variability is the bounce — how much the data go up or down from one data point to the next. Level is height; trend is direction."
+ },
+ {
+  "unit": "rbt08",
+  "type": "mc",
+  "q": "Compared to baseline, a challenging behavior shows a decreasing trend and lower level under a new BIP. What is the appropriate next step?",
+  "choices": [
+   "Talk with your supervisor — something is wrong",
+   "Keep going",
+   "Stop the BIP, the behavior is resolved",
+   "Collect baseline data again"
+  ],
+  "answer": 1,
+  "explain": "A problem behavior going down and sitting lower is exactly what the plan intended. Keep going."
+ },
+ {
+  "unit": "rbt08",
+  "type": "tf",
+  "q": "A decreasing trend is good news on any graph.",
+  "answer": false,
+  "explain": "It depends entirely on what is plotted. Decreasing is progress on a challenging behavior graph and a problem on a skill acquisition graph. Always check the title and Y-axis label first."
+ },
+ {
+  "unit": "rbt08",
+  "type": "short",
+  "q": "Define level, trend and variability, and explain why all three must be reported separately.",
+  "answer": "Level is the value on the vertical axis around which the data points fall — how high or low the data sit. Trend is the overall direction taken by the data path. Variability is the bounce, or how much the data move from one point to the next. They must be reported separately because they are independent: a graph can be at a high level, showing a decreasing trend, with high variability, all at once. Saying 'the behavior is going down' describes only the trend and tells you nothing about level or variability.",
+  "explain": "Exam items often give you a graph and ask for all three."
+ },
+ {
+  "unit": "rbt09",
+  "type": "mc",
+  "q": "Which component of a SAP tells you what to measure, how to score it, and how often to record?",
+  "choices": [
+   "Instructions and teaching procedures",
+   "Targets and examples",
+   "Data collection procedures",
+   "Short term goal"
+  ],
+  "answer": 2,
+  "explain": "Data collection procedures covers the operational definition, scoring, and frequency of recording."
+ },
+ {
+  "unit": "rbt09",
+  "type": "mc",
+  "q": "According to the pre-session checklist, where should teaching materials be?",
+  "choices": [
+   "Within the learner's reach so they can access them independently",
+   "Accessible to you but out of reach of the learner",
+   "Locked away until needed",
+   "Spread across the table to create choice"
+  ],
+  "answer": 1,
+  "explain": "Create a safe and functional seating arrangement: make sure you can access teaching materials, but they are out of reach of the learner."
+ },
+ {
+  "unit": "rbt09",
+  "type": "tf",
+  "q": "Every BCBA organises the Skill Acquisition Plan in exactly the same format.",
+  "answer": false,
+  "explain": "The manual says some BCBAs may organise the SAP differently or use slightly different language, and that is OK — just make sure you have all the key information before running a program, and ask if you have questions."
+ },
+ {
+  "unit": "rbt09",
+  "type": "short",
+  "q": "List the seven components of a Skill Acquisition Plan.",
+  "answer": "Short Term Goal (STG); Materials and Stimuli; Instructions and Teaching Procedures; Reinforcers and Reinforcement Schedule; Prompting and Error Correction; Targets and Examples; and Data Collection Procedures.",
+  "explain": "These seven are what 'check the SAP' means in every later module."
+ },
+ {
+  "unit": "rbt10",
+  "type": "mc",
+  "q": "How long should presession pairing take, and how often?",
+  "choices": [
+   "2–3 minutes, on difficult days",
+   "5–10 minutes at the beginning of every session",
+   "15 minutes, once a week",
+   "As long as it takes, only with new clients"
+  ],
+  "answer": 1,
+  "explain": "Take 5–10 minutes at the beginning of EVERY session to pair with your client."
+ },
+ {
+  "unit": "rbt10",
+  "type": "mc",
+  "q": "During pairing, a learner reaches for their favourite toy. What should you do?",
+  "choices": [
+   "Require one simple response first, then give it",
+   "Give them access with no strings attached",
+   "Redirect them to a teaching task",
+   "Offer a choice between the toy and work"
+  ],
+  "answer": 1,
+  "explain": "Step five is 'be the giver of good stuff — no strings attached.' Give access to favourite items without requiring them to work for it yet, so they associate you with free, fun reinforcement."
+ },
+ {
+  "unit": "rbt10",
+  "type": "mc",
+  "q": "Which sign of readiness means the learner is willingly participating, even without words?",
+  "choices": [
+   "Joint attention",
+   "Attending",
+   "Assent",
+   "Instructional control"
+  ],
+  "answer": 2,
+  "explain": "Assent is when a learner willingly participates in an activity or interaction, even if they can't say yes with words. It looks like staying near the activity, engaging with you, and appearing calm or interested."
+ },
+ {
+  "unit": "rbt10",
+  "type": "tf",
+  "q": "A learner sitting quietly through a task they dislike is giving assent.",
+  "answer": false,
+  "explain": "Assent is about willingness, not compliance. A learner who is still because they have learned resisting doesn't help is complying. Assent is read from behavior that shows willing participation."
+ },
+ {
+  "unit": "rbt10",
+  "type": "short",
+  "q": "Name the three signs that a learner is ready for instruction, and what happens if each is missing.",
+  "answer": "Joint attention — two people sharing focus on the same object or event, both knowing they're sharing it. If you are not intentionally focused on the same thing, the learner is not ready to learn. Attending — actively paying attention to the relevant instruction, person or activity. If the learner isn't paying attention, they're likely to miss instruction. Assent — willingly participating, even without words. If the learner isn't willing, teaching is less effective and more likely to lead to frustration.",
+  "explain": "All three are read off observable behavior."
+ },
+ {
+  "unit": "rbt11",
+  "type": "mc",
+  "q": "Your BCBA has written a response cost procedure into a client's BIP. What else is required before you may implement it?",
+  "choices": [
+   "Nothing — it is documented in the plan",
+   "Your supervisor must verify your competence on the procedure",
+   "Written consent from the caregiver each session",
+   "Approval from another RBT"
+  ],
+  "answer": 1,
+  "explain": "Responsibility #5 requires BOTH conditions: the procedure must be in a documented behavior-change plan AND the supervisor must have verified the RBT's competence."
+ },
+ {
+  "unit": "rbt11",
+  "type": "mc",
+  "q": "Which is NOT one of the four core principles of the RBT Ethics Code?",
+  "choices": [
+   "Benefit others",
+   "Treat others with dignity and respect",
+   "Act with integrity",
+   "Maximise billable hours"
+  ],
+  "answer": 3,
+  "explain": "The four core principles are benefit others, treat others with dignity and respect, act with integrity, and stay within your competence."
+ },
+ {
+  "unit": "rbt11",
+  "type": "tf",
+  "q": "Posting a photo of a client's artwork with no name or face visible is permitted on personal social media.",
+  "answer": false,
+  "explain": "Responsibility #9 prohibits sharing identifying information — photos, videos, or written information — about clients on social media or websites. Client material does not go on social media."
+ },
+ {
+  "unit": "rbt11",
+  "type": "short",
+  "q": "Define competence and explain how it differs from scope of practice.",
+  "answer": "Competence is the ability to consistently apply the appropriate skills and knowledge to perform your responsibilities to a high standard of quality. Scope of practice is what you are trained and allowed to do. Scope is the boundary set by the role and your supervisor; competence is whether you can actually perform a given task within that boundary to standard. A task can be inside your scope but still outside your competence if you haven't been trained and verified on it.",
+  "explain": "This is why responsibility #4 bars unfamiliar interventions and unfamiliar client populations without proper training."
+ },
+ {
+  "unit": "rbt12",
+  "type": "mc",
+  "q": "Which activity belongs to the BCBA rather than the RBT during an assessment?",
+  "choices": [
+   "Following procedures",
+   "Collecting data",
+   "Interpreting results",
+   "Reporting observations"
+  ],
+  "answer": 2,
+  "explain": "BCBAs select assessments, interpret results and design treatment. RBTs follow procedures, collect data and report observations. Anything involving choosing or deciding belongs to the BCBA."
+ },
+ {
+  "unit": "rbt12",
+  "type": "mc",
+  "q": "When do assessments occur?",
+  "choices": [
+   "Only at intake",
+   "At the initial assessment and throughout services as progress updates",
+   "Only when a client stops progressing",
+   "Annually"
+  ],
+  "answer": 1,
+  "explain": "There is an initial assessment, then progress updates that continue throughout services."
+ },
+ {
+  "unit": "rbt12",
+  "type": "short",
+  "q": "Name the four questions assessments answer, and the three families of assessment in ABA.",
+  "answer": "The four questions: what skills does the learner already have; what skills are missing; what motivates the learner; and what behaviors interfere with learning. The three families: skill-based assessments (curriculum-based, developmental, social skills), preference assessments (indirect, free operant, paired choice, MSWO), and functional assessments (indirect, descriptive, functional analysis).",
+  "explain": "The map of all assessments covered across RBT12–RBT15."
+ },
+ {
+  "unit": "rbt13",
+  "type": "mc",
+  "q": "During a skill-based assessment the learner hesitates on an item. What should you do?",
+  "choices": [
+   "Give a hint to keep them moving",
+   "Make the task slightly easier",
+   "Wait, observe, and record what actually happens",
+   "Model the correct response"
+  ],
+  "answer": 2,
+  "explain": "Think of a skill-based assessment like a test: you are evaluating, not teaching. Giving hints, making the task easier, and showing them what to do are all prohibited during assessment."
+ },
+ {
+  "unit": "rbt13",
+  "type": "mc",
+  "q": "During a skill-based assessment, what do you reinforce?",
+  "choices": [
+   "Only correct responses",
+   "Participation, engagement, and completing tasks — even if incorrect",
+   "Nothing at all",
+   "Only independent correct responses"
+  ],
+  "answer": 1,
+  "explain": "You reward participation, engagement, and completing tasks even if incorrect. Praising only correct responses turns the assessment into teaching and contaminates the measure."
+ },
+ {
+  "unit": "rbt13",
+  "type": "mc",
+  "q": "Which assessment compares a learner's skills to typical milestones for their age?",
+  "choices": [
+   "Curriculum-based assessment",
+   "Developmental assessment",
+   "Social skills assessment",
+   "Functional assessment"
+  ],
+  "answer": 1,
+  "explain": "Developmental assessment compares to age-based expectations. Curriculum-based compares to a structured teaching outline."
+ },
+ {
+  "unit": "rbt13",
+  "type": "short",
+  "q": "Differentiate formal from informal skill-based assessment.",
+  "answer": "Formal assessment uses a standardized tool, manual, or structured procedure to measure specific skills: expect to use specific materials, follow a specific set of steps, and record data in a set way, often on a standardized data sheet. Informal assessment is less structured and involves observing the learner demonstrate a skill given the opportunity: you observe performance during regular activities, across different situations, without following a strict step-by-step protocol. What matters most is recognising when you must follow a strict plan and when you can assess performance under more natural conditions.",
+  "explain": "You don't need to memorise every assessment type — you need to know which mode you're in."
+ },
+ {
+  "unit": "rbt14",
+  "type": "mc",
+  "q": "Which preference assessment requires a timer?",
+  "choices": [
+   "Indirect",
+   "Free operant",
+   "Paired choice",
+   "MSWO"
+  ],
+  "answer": 1,
+  "explain": "Free operant gives the client free access to a variety of items at once and records how much TIME they spend engaging with each. The manual notes 'timer for free operant only'."
+ },
+ {
+  "unit": "rbt14",
+  "type": "mc",
+  "q": "In an MSWO, what happens to an item once the client selects it?",
+  "choices": [
+   "It is returned to the array",
+   "It is removed from the array",
+   "It is paired with a second item",
+   "It is given to the client permanently"
+  ],
+  "answer": 1,
+  "explain": "MSWO is multiple stimulus WITHOUT replacement — items chosen are removed from the array."
+ },
+ {
+  "unit": "rbt14",
+  "type": "mc",
+  "q": "Interviewing a caregiver about what their child enjoys is which type of preference assessment?",
+  "choices": [
+   "Free operant",
+   "Indirect",
+   "Paired choice",
+   "MSWO"
+  ],
+  "answer": 1,
+  "explain": "Indirect preference assessment identifies potential reinforcers by asking caregivers, parents, teachers or staff. The other three are direct."
+ },
+ {
+  "unit": "rbt14",
+  "type": "tf",
+  "q": "Once a preference assessment has been completed at intake, it does not need to be repeated.",
+  "answer": false,
+  "explain": "Preferences change over time — check often. A reinforcer that worked last month may be satiated now, which is an abolishing operation."
+ },
+ {
+  "unit": "rbt14",
+  "type": "short",
+  "q": "Tell free operant, paired choice and MSWO apart.",
+  "answer": "Free operant gives the client free access to a variety of items and activities at once and records how long they engage with each — it is the only one needing a timer, and nothing is removed. Paired choice presents exactly two items at a time and asks the client to choose one. MSWO presents an array of around 5–8 items, asks the client to select one, and removes the chosen item from the array so the array shrinks across trials.",
+  "explain": "Tell them apart by the array and by what is recorded."
+ },
+ {
+  "unit": "rbt15",
+  "type": "mc",
+  "q": "What is the relationship between a functional assessment and a functional analysis?",
+  "choices": [
+   "They are two words for the same thing",
+   "Functional analysis is the whole process; functional assessment is one method inside it",
+   "Functional assessment is the whole process; functional analysis is one method inside it",
+   "They are unrelated procedures"
+  ],
+  "answer": 2,
+  "explain": "The functional assessment (FBA) is the whole process. The functional analysis (FA) is one method inside it — the only one that experimentally manipulates conditions — and the flowchart marks it 'if needed'."
+ },
+ {
+  "unit": "rbt15",
+  "type": "mc",
+  "q": "Being scolded for shouting out, and continuing to shout out, is consistent with which function?",
+  "choices": [
+   "Escape",
+   "Attention",
+   "Tangible",
+   "Automatic"
+  ],
+  "answer": 1,
+  "explain": "RBT15's wording is that the behavior gets a reaction from others — and the reaction could be positive OR negative. Disapproving attention is still attention."
+ },
+ {
+  "unit": "rbt15",
+  "type": "mc",
+  "q": "Which of these do RBTs NOT do during functional assessment?",
+  "choices": [
+   "Follow instructions",
+   "Collect accurate data",
+   "Report observations clearly",
+   "Interpret and write up assessment results"
+  ],
+  "answer": 3,
+  "explain": "RBTs do not design assessment conditions, interpret or write up results, or choose interventions and write BIPs."
+ },
+ {
+  "unit": "rbt15",
+  "type": "mc",
+  "q": "Observing and recording a behavior in real time, without manipulating anything, is which part of a functional assessment?",
+  "choices": [
+   "Indirect assessment",
+   "Descriptive assessment",
+   "Functional analysis",
+   "Preference assessment"
+  ],
+  "answer": 1,
+  "explain": "Descriptive assessment involves observing and recording the behavior in real time. Indirect uses interviews and rating scales; functional analysis systematically tests conditions."
+ },
+ {
+  "unit": "rbt15",
+  "type": "short",
+  "q": "Order the three parts of a functional assessment by how much the assessor controls, and say which steps of the nine-step FBA an RBT will likely assist with.",
+  "answer": "In order of increasing control: indirect assessment (ask — interviews, rating scales, questionnaires), descriptive assessment (watch — observe and record in real time), and functional analysis (test — systematically manipulate conditions). RBTs may be asked to assist with steps 1 to 3 and 6, and will likely assist with step 4 (conduct descriptive assessment) and step 8 (implement and monitor intervention). The supervisor takes the lead on all steps, especially 5 to 7 and 9.",
+  "explain": "Ask, watch, test."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "Which is the correct way to deliver an SD?",
+  "choices": [
+   "\"Can you touch your head?\"",
+   "\"Touch head.\"",
+   "\"Let's try touching your head, okay?\"",
+   "\"Where is your head? Can you show me?\""
+  ],
+  "answer": 1,
+  "explain": "Use simple, clear, consistent wording as written in the SAP, in a firm neutral tone. Avoid extra words and avoid phrasing the instruction as a question — a question invites 'no' as a legitimate answer."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "How long do you wait after delivering the SD and any prompt before scoring a response?",
+  "choices": [
+   "1–2 seconds",
+   "3–5 seconds",
+   "10 seconds",
+   "Until the learner responds, however long it takes"
+  ],
+  "answer": 1,
+  "explain": "Give the learner about 3–5 seconds after the SD and any prompt. Reinforcement, by contrast, is delivered within 1–2 seconds of a correct response."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "A learner consistently selects the card on the right regardless of what you ask for. Which red flag is this, and which procedural step addresses it?",
+  "choices": [
+   "Scrolling; intermix targets",
+   "Side bias; random rotation",
+   "Overselectivity; complex discrimination",
+   "Prompt dependency; time delay"
+  ],
+  "answer": 1,
+  "explain": "Side bias is consistently selecting one side of an array regardless of the SD. Step 10, random rotation, changes stimulus positions so the learner attends to the item and not its location."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "A learner labels every four-legged animal 'dog'. Which red flag is this?",
+  "choices": [
+   "Overselectivity",
+   "Overgeneralization",
+   "Scrolling",
+   "Prompt dependency"
+  ],
+  "answer": 1,
+  "explain": "Overgeneralization is responding the same way to different stimuli that are not appropriate to group together. Overselectivity is the opposite failure — attending to too narrow a feature."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "Which phase of discrimination training presents one SD and one S-delta that are typically very different from each other?",
+  "choices": [
+   "Mass trials",
+   "Simple discrimination",
+   "Complex discrimination",
+   "Conditional discrimination"
+  ],
+  "answer": 1,
+  "explain": "Simple discrimination introduces one SD and one S-delta, typically very different. Mass trials have no S-delta at all; complex adds multiple or similar S-deltas."
+ },
+ {
+  "unit": "rbt17",
+  "type": "tf",
+  "q": "When a learner responds incorrectly you should say 'no, that's wrong' so they learn the difference.",
+  "answer": false,
+  "explain": "Withhold reinforcement and remain neutral — no emotional reactions or negative language like 'no' or 'that's wrong.' Say 'Let's try again' and repeat the trial with a prompt to guide success."
+ },
+ {
+  "unit": "rbt17",
+  "type": "short",
+  "q": "Define SD, S-delta and stimulus control, and say what both halves of stimulus control require.",
+  "answer": "An SD (discriminative stimulus) is a signal that reinforcement IS available if a specific behavior occurs. An S-delta is a stimulus signalling that reinforcement is NOT available. Stimulus control occurs when a learner reliably responds in the presence of the SD AND not in the presence of the S-delta. Both halves are required — responding correctly to the SD isn't stimulus control if the learner also responds to everything else.",
+  "explain": "Everyday example: green light is the SD for stepping on the gas, red light is the S-delta."
+ },
+ {
+  "unit": "rbt17",
+  "type": "short",
+  "q": "List the 7 steps to gaining instructional control.",
+  "answer": "1. Control reinforcement — you hold the good stuff, keep preferred items out of reach. 2. Be a fun person — pair yourself with things they like. 3. Follow through — if a learner doesn't follow an instruction, prompt cooperation or help them request a break; predictability builds trust. 4. Do NOT reward challenging behavior. 5. Say what you mean, mean what you say — clear simple language, firm neutral instructions not questions. 6. Teach clients that cooperation benefits them — catch and reinforce every good response early on. 7. Know priorities — stay focused on what matters most and use preference assessments and choices to motivate.",
+  "explain": "Use these throughout every session to establish rapport and foster motivation and cooperation."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "What is the difference between prompting and error correction?",
+  "choices": [
+   "Prompting happens before the response; error correction happens after a mistake",
+   "Prompting is physical; error correction is verbal",
+   "Prompting is for new skills; error correction is for mastered skills",
+   "There is no difference"
+  ],
+  "answer": 0,
+  "explain": "Prompting provides extra help BEFORE the behavior occurs to make a correct response likely. Error correction occurs AFTER a mistake, to help the learner learn the correct response."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "You are teaching a brand-new skill and want to avoid errors entirely. Which fading procedure?",
+  "choices": [
+   "Least-to-most",
+   "Most-to-least",
+   "Progressive time delay",
+   "Graduated guidance"
+  ],
+  "answer": 1,
+  "explain": "Most-to-least begins with the most intrusive support and reduces it gradually as the learner succeeds. The manual pairs it explicitly with teaching brand-new skills and avoiding errors, which is why errorless learning is almost always MTL."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "Order these prompts from MOST to LEAST intrusive.",
+  "choices": [
+   "Verbal, gestural, model, partial physical, full physical",
+   "Full physical, partial physical, model, gestural, verbal",
+   "Model, full physical, verbal, gestural, partial physical",
+   "Gestural, verbal, model, full physical, partial physical"
+  ],
+  "answer": 1,
+  "explain": "The hierarchy from more to less intrusive: full physical, partial physical, model, gestural, verbal, visual, independence."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "Always waiting exactly 3 seconds before prompting is which procedure?",
+  "choices": [
+   "Progressive time delay",
+   "Constant time delay",
+   "Graduated guidance",
+   "Least-to-most"
+  ],
+  "answer": 1,
+  "explain": "Constant time delay always waits the same amount of time. Progressive time delay gradually increases it (0 s, 3 s, 5 s)."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "The environment is noisy and distracting, and the target is brand new. What does this mean for prompting?",
+  "choices": [
+   "Use less intrusive prompts",
+   "Use more intrusive prompts",
+   "Stop prompting entirely",
+   "Prompting level is unaffected by the environment"
+  ],
+  "answer": 1,
+  "explain": "Both factors push the same way: a noisy or distracting environment may require more intrusive prompts, and newer targets should have more intrusive prompts than maintenance targets."
+ },
+ {
+  "unit": "rbt18",
+  "type": "tf",
+  "q": "The prompting hierarchy must be followed in strict order every time.",
+  "answer": false,
+  "explain": "The manual states these aren't steps you always follow in order — the type of prompt depends on the skill and the learner. You can also fade within a prompt type rather than jumping to a new one."
+ },
+ {
+  "unit": "rbt18",
+  "type": "short",
+  "q": "List the five steps of errorless learning.",
+  "answer": "1. Present the SD — a clear instruction. 2. Immediately prompt — provide the least intrusive prompt necessary to ensure success, often a full physical prompt when first introducing a new target. 3. Reinforce correct responses, including prompted ones, saving the best reinforcers for more independent responses. 4. Fade the prompt, gradually reducing intrusiveness as the learner succeeds. 5. Intersperse easy tasks to keep momentum and motivation high.",
+  "explain": "Errorless learning combines prompting and fading into one process and is almost always done using MTL."
+ },
+ {
+  "unit": "rbt18",
+  "type": "short",
+  "q": "Explain graduated guidance and say what makes it different from most-to-least.",
+  "answer": "Graduated guidance uses physical prompts and fades by adjusting the level of support moment by moment based on the learner's performance — for example in tooth brushing, starting with full hand-over-hand, shifting to light touch as the learner takes control, stepping back when they do it on their own, and providing increased assistance again if they struggle. The difference from MTL is timescale: graduated guidance fades WITHIN a single trial, moment to moment, while MTL fades ACROSS trials over time. That is why graduated guidance suits motor sequences and self-help routines with multiple steps.",
+  "explain": "Both start with physical prompts; only graduated guidance adjusts in real time."
+ },
+ {
+  "unit": "rbt19",
+  "type": "mc",
+  "q": "Placing the correct card closest to the learner is which kind of prompt?",
+  "choices": [
+   "Gesture prompt",
+   "Position prompt",
+   "Redundancy prompt",
+   "Visual prompt"
+  ],
+  "answer": 1,
+  "explain": "A position prompt places the correct item in a location that makes it easier to select — closest to the learner, in the centre, or in front of the others."
+ },
+ {
+  "unit": "rbt19",
+  "type": "mc",
+  "q": "Making the correct card bigger and brighter than the others is which prompt, and what are the commonly manipulated features?",
+  "choices": [
+   "Visual prompt; pictures, symbols, icons, text",
+   "Redundancy prompt; color, size, shape/bolding, auditory emphasis",
+   "Position prompt; distance, centre, front",
+   "Gesture prompt; point, glance, hover, tap"
+  ],
+  "answer": 1,
+  "explain": "A redundancy prompt changes part of the correct stimulus to make it stand out. The commonly manipulated features are color, size, shape/bolding, and auditory emphasis."
+ },
+ {
+  "unit": "rbt19",
+  "type": "mc",
+  "q": "What does a fully faded redundancy prompt look like?",
+  "choices": [
+   "The correct item is slightly larger than the others",
+   "All items look the same",
+   "The correct item is removed from the array",
+   "The learner is given a verbal hint instead"
+  ],
+  "answer": 1,
+  "explain": "Fade by gradually reducing the salience — the correct item becomes less different, and by the final trial all items look the same."
+ },
+ {
+  "unit": "rbt19",
+  "type": "tf",
+  "q": "Stimulus prompts change what the RBT does to the learner.",
+  "answer": false,
+  "explain": "Stimulus prompts change the environment, usually the materials. Response prompts (RBT20) are actions the RBT takes to directly help the learner perform the behavior."
+ },
+ {
+  "unit": "rbt19",
+  "type": "short",
+  "q": "Name the four stimulus prompts with an example of each, and explain how a position prompt relates to side bias.",
+  "answer": "Gesture prompt — a movement drawing attention to the correct option, such as a point, glance, hover hand, tap or head tilt. Position prompt — placing the correct item closest to the learner, in the centre, or in front of the others. Redundancy prompt — changing a feature of the correct stimulus so it stands out, such as color, size, bolding, or auditory emphasis. Visual prompt — any added image, symbol, icon or text, such as a picture schedule or a star on the correct card. A position prompt is a deliberate, faded version of side bias: side bias is the accidental version, where the learner picks a location because the right answer kept being there. The same mechanism, differing in whether it was planned and faded, which is why random rotation matters once the prompt is removed.",
+  "explain": "Fully faded means equally spaced items with no location advantage."
+ },
+ {
+  "unit": "rbt20",
+  "type": "mc",
+  "q": "A learner pulls away during a physical prompt. What does this signal?",
+  "choices": [
+   "Noncompliance that should be prompted through",
+   "They may not be giving assent",
+   "The prompt is not intrusive enough",
+   "The task is too easy"
+  ],
+  "answer": 1,
+  "explain": "If a learner pulls away, resists, or shows discomfort during physical prompting, that's a signal they may not be giving assent. Physical prompts should be gentle, respectful, and responsive to the learner's signals."
+ },
+ {
+  "unit": "rbt20",
+  "type": "mc",
+  "q": "SD: 'Clean up.' Prompt: 'Where do the blocks go?' Which type of verbal prompt?",
+  "choices": [
+   "Direct",
+   "Indirect",
+   "Clarifying",
+   "Echoic"
+  ],
+  "answer": 1,
+  "explain": "Indirect verbal prompts are hints that help the learner figure it out. Direct tells them exactly what to do or say; clarifying states the instructions or steps of a task."
+ },
+ {
+  "unit": "rbt20",
+  "type": "mc",
+  "q": "Which prompt type does graduated guidance apply to?",
+  "choices": [
+   "Verbal prompts",
+   "Model prompts",
+   "Physical prompts",
+   "Visual prompts"
+  ],
+  "answer": 2,
+  "explain": "Graduated guidance uses physical prompts, faded moment-by-moment based on the learner's behavior within the same trial."
+ },
+ {
+  "unit": "rbt20",
+  "type": "short",
+  "q": "Name the three types of verbal prompt with an SD and prompt for each, and explain why a verbal prompt must be separable from the SD.",
+  "answer": "Direct — tell the learner exactly what to do or say: SD 'What is your name?', prompt 'Say, Max.' Indirect — a hint that helps them figure it out: SD 'Clean up', prompt 'Where do the blocks go?' Clarifying — state the instructions or steps of a task: SD 'Go potty', prompt 'First, close the stall door.' A verbal prompt is by definition given IN ADDITION to the SD, so if you can't separate the instruction from the help, neither can the learner — and you have effectively changed the SD, which is a procedural integrity violation.",
+  "explain": "The SD must stay constant trial to trial; only the prompt changes."
+ },
+ {
+  "unit": "rbt21",
+  "type": "mc",
+  "q": "Which is an unconditioned reinforcer?",
+  "choices": [
+   "Praise",
+   "A token",
+   "Warmth",
+   "A grade"
+  ],
+  "answer": 2,
+  "explain": "Unconditioned (primary) reinforcers increase behavior without any prior learning history and are tied to biological needs: food, water, warmth, sleep, relief from pain. Praise, tokens and grades are conditioned."
+ },
+ {
+  "unit": "rbt21",
+  "type": "mc",
+  "q": "Which is listed as a PITFALL of token economies?",
+  "choices": [
+   "Pairing tokens with praise",
+   "Involving client choice in backup reinforcers",
+   "Taking tokens away",
+   "Starting with easy, frequent learning"
+  ],
+  "answer": 2,
+  "explain": "Taking tokens away is a pitfall — it is actually response cost, a punishment procedure, which requires documentation in a plan and verified competence."
+ },
+ {
+  "unit": "rbt21",
+  "type": "mc",
+  "q": "A client has had no access to their favourite toy all morning, making it highly valuable. What is this, and what should you do about it?",
+  "choices": [
+   "Satiation / AO; switch reinforcers",
+   "Deprivation / EO; use the Premack Principle or behavioral momentum",
+   "Satiation / EO; enrich the environment",
+   "Deprivation / AO; fade the schedule"
+  ],
+  "answer": 1,
+  "explain": "Deprivation is an EO that increases a reinforcer's value. RBT34's table says that when the reinforcer is really valuable, use the Premack Principle or behavioral momentum."
+ },
+ {
+  "unit": "rbt21",
+  "type": "tf",
+  "q": "A token has reinforcing value on its own.",
+  "answer": false,
+  "explain": "A token is a neutral item — a sticker, chip or point — that has no value on its own but becomes reinforcing when it can be exchanged for backup reinforcers."
+ },
+ {
+  "unit": "rbt21",
+  "type": "short",
+  "q": "List the four steps for establishing a conditioned reinforcer through pairing.",
+  "answer": "1. Pair the neutral stimulus with an existing reinforcer. 2. Deliver the neutral item immediately after the reinforcer. 3. Be consistent and frequent with pairing at first. 4. Gradually fade reliance on the unconditioned reinforcer. And remember that a reinforcer's effectiveness can change day to day, so always assess and adapt to what your client needs in the moment.",
+  "explain": "Presession pairing is this same procedure, where the neutral stimulus is you."
+ },
+ {
+  "unit": "rbt21",
+  "type": "short",
+  "q": "Define token, backup reinforcer and exchange rate, and say what fading means in a token economy.",
+  "answer": "A token is a neutral item like a sticker, chip or point that has no value alone but becomes reinforcing when exchangeable. A backup reinforcer is the actual item or activity tokens are exchanged for, such as a toy, snack or activity. The exchange rate is the number of tokens required to trade for a backup reinforcer. Fading is the gradual reduction of tokens so clients move toward more natural reinforcement, like praise.",
+  "explain": "Not fading is listed as a pitfall — the system is meant to be temporary."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "What are the three components of a discrete trial?",
+  "choices": [
+   "Antecedent, behavior, consequence",
+   "Instruction/SD, learner's response, consequence",
+   "Prompt, response, reinforcement",
+   "SD, prompt, data"
+  ],
+  "answer": 1,
+  "explain": "A discrete trial has three components: instruction/SD, learner's response, and consequence (reinforcement or error correction)."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "Which is listed as a DISADVANTAGE of DTT?",
+  "choices": [
+   "Reduces confusion",
+   "Easier data collection",
+   "Harder to generalize",
+   "Learners know what to expect"
+  ],
+  "answer": 2,
+  "explain": "The four disadvantages are rote responding, harder to generalize, risk of prompt dependency, and not as motivating."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "A learner responds correctly after a prompt. What consequence do you deliver?",
+  "choices": [
+   "The biggest reinforcer available",
+   "A milder reinforcer, e.g. 'That's right!'",
+   "Nothing — prompted responses are never reinforced",
+   "Error correction"
+  ],
+  "answer": 1,
+  "explain": "Correct/independent gets a BIG reinforcer and descriptive praise; prompted gets a milder reinforcer; incorrect gets error correction and withheld reinforcement."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "When should DTT data be recorded?",
+  "choices": [
+   "At the end of the session, from memory",
+   "During the intertrial interval, right after the learner responds",
+   "Before delivering the consequence",
+   "Once per hour"
+  ],
+  "answer": 1,
+  "explain": "Take data right after the learner responds, during the intertrial interval — the 3 to 5 second pause before the next trial. Don't wait until the end; real-time recording keeps it accurate and objective."
+ },
+ {
+  "unit": "rbt22",
+  "type": "tf",
+  "q": "Changing the wording of the SD slightly is a minor issue that does not affect procedural integrity.",
+  "answer": false,
+  "explain": "If you change part of the trial — even something small like the wording of the instruction or how quickly you prompt — you are no longer running the program as intended, and any change can affect how effective treatment is."
+ },
+ {
+  "unit": "rbt22",
+  "type": "short",
+  "q": "Describe the error correction sequence in DTT, including the transfer trial.",
+  "answer": "Trial 1: present the SD; the learner responds with an error; correct the error and do not reinforce. Then run a transfer trial: a new trial with the SD plus a prompt, which produces a correct response and earns mild reinforcement. Then run an independent trial: the SD alone, learner behavior, consequence. Then intermix easy tasks. You can fade the prompt instead of immediately trying for independence if you think the chance of another error is high.",
+  "explain": "A transfer trial is a second chance to respond correctly right after an error correction, using less help if possible."
+ },
+ {
+  "unit": "rbt22",
+  "type": "short",
+  "q": "Name the four unique features of DTT and explain which one most distinguishes it from naturalistic teaching.",
+  "answer": "DTT is teacher led; reinforcers are not related to the task; it has a predictable, structured routine; and it is designed to go quickly and offer many opportunities to learn. The feature that most distinguishes it from naturalistic teaching is that reinforcers are not related to the task — in DTT you label a card and get a token, while in NT you ask for the green car and receive the green car. That difference is also why DTT generalizes less well and NT is better for generalization.",
+  "explain": "Compare the consequence column of the DTT vs NT colors example."
+ },
+ {
+  "unit": "rbt23",
+  "type": "mc",
+  "q": "Which prompting procedure is typically used during naturalistic teaching?",
+  "choices": [
+   "Most-to-least",
+   "Least-to-most",
+   "Graduated guidance",
+   "Full physical prompting"
+  ],
+  "answer": 1,
+  "explain": "Typically you will use least-to-most prompting during naturalistic teaching — start small and increase help only if needed. This fits NT because it is built on the learner initiating."
+ },
+ {
+  "unit": "rbt23",
+  "type": "mc",
+  "q": "Intentionally omitting or altering part of an activity to encourage communication is which NT strategy?",
+  "choices": [
+   "Pregnant pauses",
+   "Gentle sabotage",
+   "Expectant looks",
+   "Reciprocal commenting"
+  ],
+  "answer": 1,
+  "explain": "Gentle sabotage intentionally omits or alters part of an activity to encourage communication — for example giving a bowl with no spoon."
+ },
+ {
+  "unit": "rbt23",
+  "type": "mc",
+  "q": "Teaching opportunities that are set up by the RBT but initiated by the learner describes:",
+  "choices": [
+   "Natural Environment Training",
+   "Incidental teaching",
+   "Activity-based instruction",
+   "Mand training"
+  ],
+  "answer": 1,
+  "explain": "Incidental teaching: opportunities set up by the RBT but initiated by the learner — such as placing animal figures on a high shelf to encourage requesting."
+ },
+ {
+  "unit": "rbt23",
+  "type": "tf",
+  "q": "Because naturalistic teaching happens during play, it is acceptable to skip data collection when the session feels too casual.",
+  "answer": false,
+  "explain": "'No data collected because it felt too casual' is listed explicitly as what a BCBA does NOT want to see on an NT procedural integrity check."
+ },
+ {
+  "unit": "rbt23",
+  "type": "short",
+  "q": "Name five of the ten strategies for effective naturalistic teaching and say what each does.",
+  "answer": "Any five of: expectant looks — eye contact, facial expression and an intentional pause to encourage a response; pregnant pauses — provide only part of a phrase or leave out predictable labels so the learner fills it in; entice with objects — engage with items in fun or unexpected ways to increase desire; gentle sabotage — intentionally omit or alter part of an activity to encourage communication; offer choices — two or more options to promote decision-making and language; reciprocal commenting — make casual comments and wait for the child to respond or expand; narrate the session — describe what's happening in clear natural language; negations and absurdities — silly or incorrect statements to spark correction or attention; shared control — follow the child's lead AND contribute; reinforce attempts — acknowledge even approximations to build momentum.",
+  "explain": "All ten work by creating a reason for the learner to communicate."
+ },
+ {
+  "unit": "rbt24",
+  "type": "mc",
+  "q": "The learner is taught the last step of the chain first while the RBT guides all the earlier steps. Which procedure?",
+  "choices": [
+   "Forward chaining",
+   "Backward chaining",
+   "Total task presentation",
+   "Shaping"
+  ],
+  "answer": 1,
+  "explain": "Backward chaining teaches the last step first, then adds the previous step, moving backward through the chain."
+ },
+ {
+  "unit": "rbt24",
+  "type": "mc",
+  "q": "Who creates the task analysis and who implements it?",
+  "choices": [
+   "RBTs create it; BCBAs implement it",
+   "BCBAs create it; RBTs implement it",
+   "Both create it together",
+   "Caregivers create it"
+  ],
+  "answer": 1,
+  "explain": "The manual states it directly: BCBAs create the TA, RBTs implement them."
+ },
+ {
+  "unit": "rbt24",
+  "type": "mc",
+  "q": "Where should reinforcement be delivered during a chaining procedure?",
+  "choices": [
+   "Always after the entire chain",
+   "Always after every step",
+   "After every independent response, after the target step, or after the entire chain — check the SAP",
+   "Reinforcement is not used in chaining"
+  ],
+  "answer": 2,
+  "explain": "Reinforcement can occur at different parts in the chain. Always check the SAP to see which applies — guessing is a procedural integrity failure."
+ },
+ {
+  "unit": "rbt24",
+  "type": "short",
+  "q": "Give the three steps for creating a task analysis, the three ways to identify the steps, and the three factors affecting its detail.",
+  "answer": "The three creation steps: identify the goal or end product; identify the instruction or SD; list each step of the behavior chain in order. The three ways to identify steps: observe someone perform the task; ask caregivers how they perform the task; try it yourself. The three factors affecting detail: the learner's skill level and familiarity with the task; cultural and contextual information; and generalization. Every learner is unique, so the task analysis should be too.",
+  "explain": "BCBAs create the TA; RBTs implement it."
+ },
+ {
+  "unit": "rbt25",
+  "type": "mc",
+  "q": "Which procedure reinforces gradual improvements to the SAME behavior?",
+  "choices": [
+   "Chaining",
+   "Shaping",
+   "Prompting",
+   "Discrimination training"
+  ],
+  "answer": 1,
+  "explain": "Shaping reinforces gradual improvements to the same behavior. Chaining teaches distinctly different steps of a skill in order; prompting helps the learner do the desired behavior right away with assistance."
+ },
+ {
+  "unit": "rbt25",
+  "type": "mc",
+  "q": "During shaping, a learner performs at a level that was the target two steps ago. What should happen?",
+  "choices": [
+   "Reinforce it — it is still a correct response",
+   "Nothing / extinction — only the current target level or better earns reinforcement",
+   "Deliver a smaller reinforcer",
+   "Return to the previous step"
+  ],
+  "answer": 1,
+  "explain": "When a new step is introduced, the previous step is no longer the target and does not earn reinforcement — that is extinction. Only behaviors at the current target level or better should be reinforced."
+ },
+ {
+  "unit": "rbt25",
+  "type": "mc",
+  "q": "Reinforcing a learner for sitting for progressively longer stretches shapes which dimension?",
+  "choices": [
+   "Magnitude",
+   "Rate",
+   "Duration",
+   "Latency"
+  ],
+  "answer": 2,
+  "explain": "Duration is how long the behavior happens. Latency would be the time between the SD and the onset of the behavior."
+ },
+ {
+  "unit": "rbt25",
+  "type": "tf",
+  "q": "Progress faster than expected during shaping is something you should simply continue with.",
+  "answer": false,
+  "explain": "If progress is faster than expected, check in with the BCBA — they may want to skip a step or set bigger jumps. Changing the step yourself is outside scope."
+ },
+ {
+  "unit": "rbt25",
+  "type": "short",
+  "q": "Explain how extinction operates inside a shaping procedure and what side effects to expect.",
+  "answer": "Shaping works by reinforcing successive approximations that move the learner closer to the terminal goal while placing previously reinforced levels of the behavior on extinction. Every time the bar moves to a new target step, the old approximation stops earning reinforcement. Because that is extinction, you should expect its side effects: an extinction burst (a temporary increase in frequency, intensity or duration), emotional responding, extinction-induced variability, and possibly aggression. This is one reason the BCBA controls when the bar moves.",
+  "explain": "Only behaviors at the current target level or better should be reinforced."
+ },
+ {
+  "unit": "rbt26",
+  "type": "mc",
+  "q": "In self-monitoring, who records the behavior?",
+  "choices": [
+   "The RBT",
+   "The learner",
+   "The BCBA",
+   "The caregiver"
+  ],
+  "answer": 1,
+  "explain": "Self-monitoring is when the learner keeps track of their own behavior, which is what builds independence."
+ },
+ {
+  "unit": "rbt26",
+  "type": "mc",
+  "q": "A self-monitoring target must be observable and measurable to whom?",
+  "choices": [
+   "The RBT only",
+   "The BCBA only",
+   "The RBT and the learner",
+   "Anyone in the room"
+  ],
+  "answer": 2,
+  "explain": "The target behavior should be observable and measurable — meaning the RBT can see it AND the learner can too. The learner is the observer here."
+ },
+ {
+  "unit": "rbt26",
+  "type": "tf",
+  "q": "In self-monitoring you reinforce only the target behavior, not the recording of it.",
+  "answer": false,
+  "explain": "The strategies list says to pair self-monitoring with reinforcement, not just the target behavior, and to shape accurate recording. There are two behaviors in play: doing the thing and recording it."
+ },
+ {
+  "unit": "rbt26",
+  "type": "short",
+  "q": "Name the RBT's three responsibilities in implementing self-monitoring.",
+  "answer": "Understand the plan — know what behavior is being tracked, know how the client is supposed to track it, and ask the BCBA if anything is unclear. Run the system — make sure materials are ready, prompt and reinforce the target behavior and the tracking, and pay attention to accuracy while looking for teaching opportunities. Support independence — fade prompts, shift to natural cues, then thin reinforcement schedules, collect data, and communicate progress or barriers to the BCBA.",
+  "explain": "Tools include timers, visual schedules, activity schedules and token boards."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "When is generalization programmed?",
+  "choices": [
+   "After the skill is mastered",
+   "During acquisition",
+   "Only during maintenance probes",
+   "At discharge"
+  ],
+  "answer": 1,
+  "explain": "Generalization is worked on DURING acquisition, which is why you vary stimuli and people while you teach. Maintenance is the one that comes after mastery."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "A client learns to say 'help please', then later raises their hand or says 'can you help me?' to get the same result. Which type of generalization?",
+  "choices": [
+   "Stimulus generalization",
+   "Response generalization",
+   "Overgeneralization",
+   "Maintenance"
+  ],
+  "answer": 1,
+  "explain": "Response generalization: the learner produces different responses that serve the same function. The response changes, the function stays the same."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "How should a maintenance probe be run?",
+  "choices": [
+   "With full prompting to ensure success",
+   "Without prompting",
+   "With a new reinforcer",
+   "Only when the client requests it"
+  ],
+  "answer": 1,
+  "explain": "You probe the skill without prompting and record whether the client still engages in it independently. A prompted probe only tells you the prompt still works."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "Maintenance data for a mastered skill shows a downward trend over four weeks. What do you do?",
+  "choices": [
+   "Re-teach the skill from the beginning",
+   "Alert your supervisor",
+   "Add prompts back in",
+   "Continue probing without change"
+  ],
+  "answer": 1,
+  "explain": "If you see a downward trend or inconsistent performance, that's a sign to alert your supervisor. Re-teaching or changing the program is outside your scope."
+ },
+ {
+  "unit": "rbt28",
+  "type": "short",
+  "q": "List the four ways RBTs promote generalization and the six ways they promote maintenance.",
+  "answer": "Generalization: varying stimuli; varying people and setting; programming common stimuli; and teaching multiple exemplars. Maintenance: use natural reinforcers; fade reinforcement over time; build fluency; use varied and intermittent practice; conduct maintenance probes; and involve caregivers.",
+  "explain": "Four for generalization, six for maintenance."
+ },
+ {
+  "unit": "rbt30",
+  "type": "mc",
+  "q": "Which barrier to procedural integrity is the one you are least likely to notice happening?",
+  "choices": [
+   "Not having the materials you need",
+   "Getting mixed messages from team members",
+   "Gradually starting to do things differently over time",
+   "Panicking when a client acts out"
+  ],
+  "answer": 2,
+  "explain": "Procedural drift feels like competence, which is why the fix is an external check — a weekly fidelity checklist and periodic observation — rather than self-assessment."
+ },
+ {
+  "unit": "rbt30",
+  "type": "mc",
+  "q": "You believe a program is unnecessary. What is the correct course of action?",
+  "choices": [
+   "Shorten it so it takes less session time",
+   "Stop running it and tell the BCBA afterwards",
+   "Ask the BCBA for data on the plan's effectiveness and share your feedback respectfully",
+   "Ask another RBT what they would do"
+  ],
+  "answer": 2,
+  "explain": "Ask your BCBA for data on the plan's effectiveness, share your feedback respectfully, and trust the data rather than assumptions. Changing the program yourself is outside scope and corrupts the data."
+ },
+ {
+  "unit": "rbt30",
+  "type": "short",
+  "q": "Name four barriers to procedural integrity and give the manual's solution to each.",
+  "answer": "Any four of: unclear protocol — before the session, ask for clarification, get a step-by-step visual or checklist, practice out loud, use visual reminders. Not enough practice — ask for hands-on practice, review video examples or modeling, role-play with a peer, start with simpler versions. Drift over time — check yourself weekly with a fidelity checklist, seek occasional observation and feedback, compare current practice to training. Program seems unnecessary — ask for data, share feedback respectfully, trust data over assumptions. Mixed messages — go to the BCBA, take notes, use team communication tools. Missing materials — use a session prep checklist, keep a go bag, inform your BCBA or lead tech. Panic during challenging behavior — review the behavior plan beforehand, use a quick-reference card, seek in-the-moment coaching, debrief after. New setting — keep portable copies, set up consistently, practice generalizing with your supervisor. New staff or switching clients — ask for a walkthrough, focus on what you can do with fidelity, request a written plan, speak up about your comfort level.",
+  "explain": "Almost every solution is either preparation before the session or asking your supervisor."
+ },
+ {
+  "unit": "rbt33",
+  "type": "mc",
+  "q": "What determines which interventions go into a BIP?",
+  "choices": [
+   "The topography of the behavior",
+   "The function of the behavior, as identified by the FBA",
+   "The severity of the behavior",
+   "Caregiver preference"
+  ],
+  "answer": 1,
+  "explain": "The FBA is used by the BCBA to identify the function, which is then used to develop the BIP. Interventions in the BIP match the function identified in the FBA."
+ },
+ {
+  "unit": "rbt33",
+  "type": "mc",
+  "q": "Which BIP section describes how interfering behavior may escalate from least to most intense?",
+  "choices": [
+   "Operational definition",
+   "Progression of behaviors / precursors",
+   "Criteria to move to crisis plan",
+   "Replacement behaviors"
+  ],
+  "answer": 1,
+  "explain": "The progression of behaviors / precursors section describes how interfering behavior may progress from least to most intense — which is what makes early prevention possible."
+ },
+ {
+  "unit": "rbt33",
+  "type": "mc",
+  "q": "You notice a new behavior that isn't in the BIP. What do you do?",
+  "choices": [
+   "Apply the closest matching strategy in the plan",
+   "Communicate immediately with your BCBA",
+   "Collect a week of data first, then report",
+   "Ask the caregiver how they handle it"
+  ],
+  "answer": 1,
+  "explain": "If you are unsure about any step or notice a new behavior, communicate immediately with your BCBA. Never change the plan on your own."
+ },
+ {
+  "unit": "rbt33",
+  "type": "tf",
+  "q": "A BIP can be written to reduce a problem behavior without specifying a replacement behavior.",
+  "answer": false,
+  "explain": "Replacement behaviors are a required component. We must teach our clients how to get their needs met in a safe and acceptable way — we cannot teach them what not to do only."
+ },
+ {
+  "unit": "rbt33",
+  "type": "short",
+  "q": "Name the three things included in the behavioral crisis plan section of a BIP.",
+  "answer": "Topography-specific steps for what to do for each behavior targeted for reduction; the criteria for when you can return to regular BIP procedures; and the session termination criteria. It is also where you request your BCBA's support on how to move forward once behaviors have escalated to meet crisis criteria.",
+  "explain": "The separate 'criteria to move to crisis plan' section defines the thresholds that trigger it."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "'First math, then iPad' is which antecedent strategy?",
+  "choices": [
+   "Behavioral momentum",
+   "Premack Principle",
+   "Noncontingent reinforcement",
+   "Demand fading"
+  ],
+  "answer": 1,
+  "explain": "The Premack Principle, also called Grandma's Law: access to a preferred activity or item is provided only after the client completes a less preferred activity or task."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "You deliver three easy tasks the client always does, reinforce each, then present a hard task. Which strategy?",
+  "choices": [
+   "Premack Principle",
+   "Behavioral momentum",
+   "Demand fading",
+   "Pairing"
+  ],
+  "answer": 1,
+  "explain": "Behavioral momentum: deliver 2–3 high-probability tasks in a row and reinforce, then present the low-probability task, then provide great reinforcement for it."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "Why does noncontingent reinforcement reduce problem behavior even though it is delivered regardless of behavior?",
+  "choices": [
+   "It punishes the behavior",
+   "It removes the motivation by supplying the reinforcer for free, acting as an abolishing operation",
+   "It distracts the client",
+   "It teaches a replacement behavior"
+  ],
+  "answer": 1,
+  "explain": "NCR works as an AO — if attention is the function, giving plenty of attention on a timer means attention-seeking behavior no longer has a job to do. The reinforcer must be functionally related."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "A behavior is escape-maintained. Which set of antecedent strategies fits best?",
+  "choices": [
+   "NCR and pairing",
+   "Behavioral momentum, choice-making, demand fading",
+   "Premack Principle and choice-making",
+   "Response cost and planned ignoring"
+  ],
+  "answer": 1,
+  "explain": "The manual's function table: escape → behavioral momentum, choice-making, demand fading. NCR and pairing are the attention and automatic answers; Premack and choices are the tangible answers."
+ },
+ {
+  "unit": "rbt34",
+  "type": "tf",
+  "q": "If you offer a client a choice and they pick an option you'd rather they didn't, you may redirect them to the other one.",
+  "answer": false,
+  "explain": "Step four of the choices procedure is 'honor the choice.' Offering a choice and then overriding it teaches the learner that choices are fake, damaging assent and rapport. Only offer options you are willing to deliver."
+ },
+ {
+  "unit": "rbt34",
+  "type": "short",
+  "q": "Name the four types of environmental modification and explain why 'meet basic needs' is really a setting-event intervention.",
+  "answer": "Meet basic needs — make sure they've eaten, offer movement or sensory breaks, provide water, rest or bathroom access. Ensure safety — remove sharp or breakable items, secure heavy objects, check for hazards. Visual supports — picture schedules, first-then boards, labels, timers, which add structure and predictability without relying only on verbal instructions. Enriched environment — rotate items to keep them novel, offer choices, match enrichment to preferences, and balance stimulation. 'Meet basic needs' is a setting-event intervention because hunger, tiredness and needing the bathroom are textbook setting events: they don't cause the behavior but they make it far more likely, so addressing them changes the probability of everything that follows.",
+  "explain": "It is often the answer to 'why was today so hard?'"
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "A behavior is escape-maintained. What does extinction look like?",
+  "choices": [
+   "Ignoring the behavior",
+   "Continuing the task and not letting the behavior lead to escape",
+   "Removing the task calmly",
+   "Giving a break after the behavior stops"
+  ],
+  "answer": 1,
+  "explain": "Extinction means withholding the specific reinforcer that maintains the behavior. For escape, that means continuing the task. Ignoring an escape-maintained behavior while the demand is removed actually delivers escape."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "After starting an extinction procedure the behavior gets noticeably worse. What is happening?",
+  "choices": [
+   "The procedure has failed and should be stopped",
+   "An extinction burst — a temporary increase in frequency, intensity or duration",
+   "Spontaneous recovery",
+   "The function was misidentified"
+  ],
+  "answer": 1,
+  "explain": "An extinction burst is a temporary increase once the behavior no longer produces reinforcement. It looks like failure but is evidence the contingency has changed. The danger is giving in during the burst, which reinforces a more intense version."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "A learner earns a token every 2 minutes they go without yelling out. Which procedure?",
+  "choices": [
+   "DRO",
+   "DRA",
+   "DRI",
+   "DRL"
+  ],
+  "answer": 0,
+  "explain": "DRO reinforces the ABSENCE of the problem behavior during a set time interval. O for Other, or Omission."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "A learner who often leaves their seat is reinforced for sitting in their chair. Which procedure?",
+  "choices": [
+   "DRO",
+   "DRA",
+   "DRI",
+   "DRL"
+  ],
+  "answer": 2,
+  "explain": "DRI reinforces a behavior that physically cannot happen at the same time as the problem behavior. You cannot be seated and out of your seat simultaneously."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "Which differential reinforcement procedure still reinforces the problem behavior itself?",
+  "choices": [
+   "DRO",
+   "DRA",
+   "DRI",
+   "DRL"
+  ],
+  "answer": 3,
+  "explain": "DRL reinforces the behavior only when it occurs at a lower, more acceptable rate. It suits behaviors that aren't harmful but happen too often, like interrupting."
+ },
+ {
+  "unit": "rbt35",
+  "type": "tf",
+  "q": "Differential reinforcement procedures can be run without placing the problem behavior on extinction.",
+  "answer": false,
+  "explain": "The manual states it directly: all DR procedures require that the target challenging behavior is placed on extinction. DR is reinforcement of one thing plus extinction of another."
+ },
+ {
+  "unit": "rbt35",
+  "type": "short",
+  "q": "Define FERB and explain why extinction alone is not enough.",
+  "answer": "A functionally equivalent replacement behavior is a new behavior that serves the same purpose, or the same function, as the challenging behavior. Extinction alone only teaches the learner what NOT to do: their needs are still unmet, which can lead to frustration, acting out, or other challenging behaviors. With extinction plus a FERB, the child has a clear and appropriate way to meet the same need, so they know what is expected, their needs are satisfied, and the outcome is more positive for everyone.",
+  "explain": "Common FERBs: raising a hand for attention, a break card for escape, asking for a toy for tangible, a fidget for automatic."
+ },
+ {
+  "unit": "rbt35",
+  "type": "short",
+  "q": "Name the four risks of extinction and define each.",
+  "answer": "Extinction burst — a temporary increase in the frequency, intensity, or duration of a behavior once it no longer produces reinforcement. Spontaneous recovery — a behavior that had decreased or even stopped suddenly reappears after some time has passed. Extinction-induced variability — the original problem behavior stops working and the learner begins trying out different behaviors to get the same outcome. And aggression and emotional responding.",
+  "explain": "These are why extinction procedures need a documented plan and a team that will hold the line."
+ },
+ {
+  "unit": "rbt36",
+  "type": "mc",
+  "q": "What makes FCT a specific kind of DRA?",
+  "choices": [
+   "It is only used for escape behavior",
+   "The replacement behavior is always a communicative response",
+   "It does not require extinction",
+   "It is implemented by the BCBA"
+  ],
+  "answer": 1,
+  "explain": "FCT is a special type of DRA in which the FERB is always a communicative response that results in the same reinforcement as the challenging behavior."
+ },
+ {
+  "unit": "rbt36",
+  "type": "mc",
+  "q": "A learner used to hit to get the iPad. You now reinforce them handing you an iPad picture — with praise. Hitting returns. What went wrong?",
+  "choices": [
+   "The picture was the wrong modality",
+   "The FERB did not earn the same reinforcer",
+   "Extinction was not used",
+   "The learner needs more prompting"
+  ],
+  "answer": 1,
+  "explain": "Step 4 requires providing the SAME reinforcer that used to maintain the problem behavior. If hitting produced the iPad and the picture produces only praise, hitting still works better."
+ },
+ {
+  "unit": "rbt36",
+  "type": "mc",
+  "q": "Which is NOT one of the four named FCT targets?",
+  "choices": [
+   "Picture exchange",
+   "Sign language",
+   "Gestures",
+   "Written essays"
+  ],
+  "answer": 3,
+  "explain": "The four named FCT targets are picture exchange, sign language, gestures, and speech."
+ },
+ {
+  "unit": "rbt36",
+  "type": "short",
+  "q": "List the five steps of implementing FCT.",
+  "answer": "1. Know the function of the behavior you are replacing. 2. Know the target response — a picture exchange, ASL or gestures, or a spoken word or phrase. 3. Teach the target response using shaping and prompting/fading so the client practices it correctly. 4. Reinforce the target response with the same reinforcer that used to maintain the problem behavior. 5. Use extinction — withhold reinforcement for the inappropriate behavior.",
+  "explain": "Then embed it throughout the session by asking what the client wants right now."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A teacher reprimands a student for crumpling paper, and crumpling decreases. What is this?",
+  "choices": [
+   "Positive reinforcement",
+   "Negative reinforcement",
+   "Positive punishment",
+   "Negative punishment"
+  ],
+  "answer": 2,
+  "explain": "Something aversive was added and the behavior decreased. Added = positive; behavior down = punishment."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A student loses one token for yelling out an answer. Which procedure?",
+  "choices": [
+   "Non-exclusionary time-out",
+   "Response cost",
+   "Planned ignoring",
+   "Restitutional overcorrection"
+  ],
+  "answer": 1,
+  "explain": "Response cost happens when something the learner has already earned is taken away after a behavior. It is a form of negative punishment."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A child scribbles on one desk and must clean all the desks. Which procedure?",
+  "choices": [
+   "Positive practice overcorrection",
+   "Restitutional overcorrection",
+   "Exclusionary time-out",
+   "Response cost"
+  ],
+  "answer": 1,
+  "explain": "Restitutional overcorrection means restoring the environment to a better condition than before the behavior occurred. Positive practice would be repeatedly practising the correct behavior."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A child's yelling decreases at school after punishment procedures but increases at home. Which risk of punishment is this?",
+  "choices": [
+   "Emotional responding",
+   "Escape or avoidance",
+   "Behavioral contrast",
+   "Strained therapeutic rapport"
+  ],
+  "answer": 2,
+  "explain": "Behavioral contrast is when a behavior decreases in one setting but increases in another."
+ },
+ {
+  "unit": "rbt37",
+  "type": "tf",
+  "q": "Punishment procedures are a standard part of RBT practice and may be used at your discretion.",
+  "answer": false,
+  "explain": "Punishment strategies should be AVOIDED when working with clients. If medically necessary, the BCBA must write a detailed description into the BIP, seek approval from clinical leadership, and directly train the technician before they may implement it."
+ },
+ {
+  "unit": "rbt37",
+  "type": "short",
+  "q": "List the three things the BCBA must do before a punishment procedure may be implemented.",
+  "answer": "1. Write a detailed description of the punishment procedure in the client's Behavior Intervention Plan. 2. Seek approval from clinical leadership before implementing the plan. 3. Directly train the technician or technicians on implementation of the punishment procedure BEFORE the technician may implement the plan. And if you have questions or concerns regarding punishment, reach out to your BCBA immediately.",
+  "explain": "This sits on top of RBT11 responsibility #5: documented plan plus verified competence."
+ },
+ {
+  "unit": "rbt37",
+  "type": "short",
+  "q": "Distinguish planned ignoring from extinction.",
+  "answer": "Planned ignoring is listed as a punishment procedure: an adult withholds attention following a behavior in order to reduce it. Extinction is withholding the specific reinforcer that maintains the behavior. When a behavior is attention-maintained, ignoring it IS extinction, because attention is the maintaining reinforcer. When a behavior is escape-maintained, ignoring it is not extinction at all — if the demand stops while you ignore, you have accidentally delivered escape and reinforced the behavior.",
+  "explain": "This is why identifying the function comes first."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "A client bites you. What should you do first?",
+  "choices": [
+   "Pull away quickly to break contact",
+   "Call for help and do not pull away",
+   "Push the client's shoulder backward",
+   "Cover their face to interrupt the bite"
+  ],
+  "answer": 1,
+  "explain": "Call for help, do not pull away. Then place an open palm on the back of the client's head avoiding the neck, gently push the bitten area INTO the client's mouth until the jaw opens, remove yourself once released, and seek medical attention."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "Which is one of the three boundaries you may NOT cross when managing severe behavior?",
+  "choices": [
+   "Blocking a hit with your forearm",
+   "Calling for help",
+   "Putting a client in seclusion",
+   "Stepping back out of range"
+  ],
+  "answer": 2,
+  "explain": "The three boundaries: do NOT restrain clients, never put a client in seclusion, and never yell at, shame, or intentionally harm a client."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "What is the difference between stabilizing and restraint?",
+  "choices": [
+   "There is none",
+   "Stabilizing uses calm, steady pressure or positioning to stop unsafe movement without preventing the client from moving freely",
+   "Restraint is shorter in duration",
+   "Stabilizing requires two staff members"
+  ],
+  "answer": 1,
+  "explain": "Restraint is any action that prevents a client from freely moving their body. Stabilizing uses calm, steady pressure or positioning to stop unsafe movement WITHOUT restraining the client."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "You need to leave a learner to use the bathroom. What must happen?",
+  "choices": [
+   "Make sure the door is open",
+   "Tell another person to watch the learner and have them confirm they understand they are responsible",
+   "Finish the current program first",
+   "Nothing, as long as you are quick"
+  ],
+  "answer": 1,
+  "explain": "You MUST specifically tell another person to watch the learner and they MUST respond that they understand they are responsible for the learner."
+ },
+ {
+  "unit": "rbt38",
+  "type": "tf",
+  "q": "If a client grabs your clothing, you should pull away firmly to break the grip.",
+  "answer": false,
+  "explain": "Call for assistance immediately, do NOT pull away, hold the part of your clothing or body being grabbed close to your body, and wait for support to arrive to help release the hold."
+ },
+ {
+  "unit": "rbt38",
+  "type": "short",
+  "q": "List the five steps of the appropriate response to severe behavior.",
+  "answer": "1. Get in a safe stance — feet shoulder-width apart, one slightly forward, body angled toward the client, hands open, elbows bent, eyes on the client. 2. Secure the environment — calmly remove dangerous or breakable items, ask peers to leave, position yourself between the client and others, call for help if needed. 3. Step back, don't grab — get out of the way rather than holding the client or pushing against their body; many clients will not follow you, so once you are out of range the behavior will stop. 4. Block only when necessary — if you cannot get out of the way, use your forearms or calves and thighs to stop contact before it lands. 5. Use safe stabilization and release techniques — if a client grabs or bites, stay calm and stabilize rather than pulling away, call for help, hold steady and use the correct release method.",
+  "explain": "Afterwards: follow the BIP, record data (ABC if no formal system), contact the BCBA if behavior is new or intensifying, and check the client for injuries and document."
+ },
+ {
+  "unit": "rbt38",
+  "type": "short",
+  "q": "Name the four things to do after severe behavior occurs.",
+  "answer": "If there is a BIP in place, always follow that as trained. Record data after severe behavior — if formal data aren't set up, collect ABC data. If new behavior occurs or behavior intensifies, contact the BCBA immediately. And always check the client for injuries after severe behavior and document appropriately.",
+  "explain": "The documentation step matters as much as the response."
+ },
+ {
+  "unit": "rbt39",
+  "type": "mc",
+  "q": "At which ISE level is it described as 'not a teachable moment'?",
+  "choices": [
+   "Happy, Connected, Progress",
+   "Precursor behavior",
+   "Disruption",
+   "Crisis"
+  ],
+  "answer": 3,
+  "explain": "At crisis the client's behavior poses an immediate risk of serious harm, teaching is not possible, and the goal is to keep everyone safe and stop the behavior as soon as possible."
+ },
+ {
+  "unit": "rbt39",
+  "type": "mc",
+  "q": "A client begins whining and pushing materials away — generally harmless, but a signal the session is no longer going well. Which level?",
+  "choices": [
+   "Happy, Connected, Progress",
+   "Precursor behavior",
+   "Disruption",
+   "Crisis"
+  ],
+  "answer": 1,
+  "explain": "Precursor behaviors are generally harmless behaviors warning you the session is no longer HCP, and usually precede more severe challenging behaviors. The goal is to prevent escalation and return to HCP quickly."
+ },
+ {
+  "unit": "rbt39",
+  "type": "mc",
+  "q": "Which is listed as a DON'T at the precursor behavior level?",
+  "choices": [
+   "Offering choices",
+   "Using behavioral momentum",
+   "Continuing to introduce new or difficult demands",
+   "Redirecting to something preferred"
+  ],
+  "answer": 2,
+  "explain": "At precursor level, don't continue to introduce new or difficult demands, don't yell, reprimand or threaten, and don't remove preferred items unless necessary for safety."
+ },
+ {
+  "unit": "rbt39",
+  "type": "tf",
+  "q": "Challenging behavior is defined only as behavior that creates a risk of harm.",
+  "answer": false,
+  "explain": "Challenging behavior is any behavior that interferes with learning opportunities, stigmatizes a client, OR creates a risk of harm for the client or others. There are three tests, not one."
+ },
+ {
+  "unit": "rbt39",
+  "type": "short",
+  "q": "List the four steps for returning a client to Happy, Connected Progress after challenging behavior.",
+  "answer": "1. Recognize signs of de-escalation — assess the client's behavior and recognize when they are calming down and may be ready to re-engage. 2. Rebuild rapport — take time to mindfully rebuild it using preference assessments and pairing strategies, demonstrate positive regard, and avoid triggering challenging behavior. 3. Plan for success with antecedents — make your best guess at what went wrong and use antecedent strategies to reduce the need for challenging behavior by improving the environment and prompting a replacement behavior. 4. Reintroduce instruction — when you and the client are both ready, start with easy or preferred activities, keep reinforcement rates high, and frequently assess the response to treatment.",
+  "explain": "Stopping challenging behavior is only the first step; returning to HCP is the goal."
+ },
+ {
+  "unit": "rbt40",
+  "type": "mc",
+  "q": "What are the four steps for managing your own emotional responding, in order?",
+  "choices": [
+   "Choose, pause, reflect, breathe",
+   "Pause, breathe and regulate, reflect, choose",
+   "Reflect, pause, choose, breathe",
+   "Breathe, choose, pause, reflect"
+  ],
+  "answer": 1,
+  "explain": "Pause → Breathe & Regulate → Reflect → Choose. You choose last, after you have paused, regulated and reflected — not first, while dysregulated."
+ },
+ {
+  "unit": "rbt40",
+  "type": "tf",
+  "q": "Quality sleep and balanced nutrition are listed as daily buffer habits for RBTs.",
+  "answer": true,
+  "explain": "The six daily buffer habits are nurturing connections, balanced nutrition, physical activity, quality sleep, mental health support, and mindfulness."
+ },
+ {
+  "unit": "rbt40",
+  "type": "short",
+  "q": "Name the six daily buffer habits and explain how they relate to a concept from RBT04.",
+  "answer": "Nurturing connections, balanced nutrition, physical activity, quality sleep, mental health support, and mindfulness. They are your own setting events: like a client's poor sleep or missed breakfast, they do not directly cause your reaction to a difficult session, but they make a dysregulated response much more or much less likely. Addressing them in advance is the same prevention logic as antecedent intervention, applied to yourself.",
+  "explain": "The module sits right after severe behavior and ISE for exactly this reason."
+ },
+ {
+  "unit": "rbt42",
+  "type": "mc",
+  "q": "What does the O in the NOTES acronym stand for, and what does it require?",
+  "choices": [
+   "Objective — write only approved phrases",
+   "Observation — describe what you saw, not what you felt, in measurable terms",
+   "Outcome — state whether the session succeeded",
+   "Order — record events chronologically"
+  ],
+  "answer": 1,
+  "explain": "Observation: describe what you saw, not what you felt. Use measurable terms. It's the observable-language rule from RBT06 applied to prose."
+ },
+ {
+  "unit": "rbt42",
+  "type": "mc",
+  "q": "Which is a NON-billable activity under CPT 97153?",
+  "choices": [
+   "Collecting data",
+   "Delivering reinforcement",
+   "Travel time",
+   "Managing behaviors per plan"
+  ],
+  "answer": 2,
+  "explain": "Non-billable means anything that pauses, interrupts, or falls outside intervention delivery: waiting for client arrival, off-the-clock parent conversations, travel time, and a client napping or off-task due to external factors."
+ },
+ {
+  "unit": "rbt42",
+  "type": "mc",
+  "q": "Within what timeframe must a session note be signed and submitted?",
+  "choices": [
+   "Before leaving the building",
+   "Within 24 hours",
+   "Within 72 hours",
+   "By the end of the pay period"
+  ],
+  "answer": 1,
+  "explain": "The high-quality documentation checklist asks: did I sign and submit within 24 hours? Late or incomplete notes may delay client progress and data analysis."
+ },
+ {
+  "unit": "rbt42",
+  "type": "mc",
+  "q": "Which should you report as a variable affecting the session?",
+  "choices": [
+   "The client wore a new jacket",
+   "The client's medication changed this week",
+   "The client seemed slightly quieter than usual with no impact on programs",
+   "The client got a haircut"
+  ],
+  "answer": 1,
+  "explain": "Report illness or fatigue, medication changes, family or schedule disruptions, environmental distractions, and major behavioral or mood changes. Do not report clothing, hairstyles, minor mood shifts, or typical fluctuations without impact on progress."
+ },
+ {
+  "unit": "rbt42",
+  "type": "short",
+  "q": "Give the NOTES acronym in full and the single test of whether a note is good enough.",
+  "answer": "N — Novel: each note should be unique to that day's session, avoid copying. O — Observation: describe what you saw, not what you felt, using measurable terms. T — Treatment plan: connect actions to specific client goals and programs. E — Evaluation: summarize how the client responded to interventions. S — Summary: provide a clear close-out of the session and next steps. The test: if someone else read this, would they know what happened today and what to do next?",
+  "explain": "Billable means active, face-to-face intervention aligned with the treatment plan."
+ },
+ {
+  "unit": "rbt44",
+  "type": "mc",
+  "q": "Who on the client's team makes clinical decisions and modifies programs?",
+  "choices": [
+   "The Lead RBT",
+   "The Clinical Supervisor",
+   "The Operations Leader",
+   "The Intern"
+  ],
+  "answer": 1,
+  "explain": "The Clinical Supervisor makes clinical decisions, analyzes data, modifies programs, and provides supervision. Lead RBTs and interns explicitly do not make independent treatment decisions."
+ },
+ {
+  "unit": "rbt44",
+  "type": "mc",
+  "q": "A caregiver reports a new medication their child has started. Which category of supervisor communication is this?",
+  "choices": [
+   "Program concerns",
+   "Caregiver concerns",
+   "Data irregularities",
+   "Supervision and training needs"
+  ],
+  "answer": 1,
+  "explain": "Caregiver concerns include a caregiver disagreeing with the plan, requesting changes, seeming overwhelmed, or reporting new medical issues and/or medications."
+ },
+ {
+  "unit": "rbt44",
+  "type": "mc",
+  "q": "Which is NOT one of the four solutions to communication barriers?",
+  "choices": [
+   "Be proactive",
+   "Stay professional",
+   "Listen actively",
+   "Escalate to the Center Director immediately"
+  ],
+  "answer": 3,
+  "explain": "The four solutions are be proactive, stay professional, listen actively, and check your understanding."
+ },
+ {
+  "unit": "rbt44",
+  "type": "tf",
+  "q": "A Lead RBT may authorise you to change how you run a program.",
+  "answer": false,
+  "explain": "Lead RBTs provide mentoring and guidance on basic session procedures and routine logistics, but do not make independent treatment decisions. Go to the BCBA for clarification."
+ },
+ {
+  "unit": "rbt44",
+  "type": "short",
+  "q": "List the six steps for accepting and applying feedback, and say which step the Ethics Code actually requires.",
+  "answer": "1. Receive the feedback professionally. 2. Clarify and confirm understanding. 3. Reflect on the feedback. 4. Apply the feedback in sessions. 5. Ask for follow-up or coaching. 6. Keep a growth mindset. Step 4 is the one the Ethics Code requires: RBT11 responsibility #3 says RBTs conduct themselves professionally and take action to improve their performance following feedback from supervisors — so applying it, not just receiving it politely, is the obligation.",
+  "explain": "Feedback response is an ethics requirement, not just good manners."
+ },
+ {
+  "unit": "rbt45",
+  "type": "mc",
+  "q": "Your supervisor asks you to run a procedure you have only read about. Which sign of ethical supervision is missing?",
+  "choices": [
+   "Regular feedback",
+   "Training and observation before being asked to use a procedure",
+   "Regular supervision meetings",
+   "Clear task assignment"
+  ],
+  "answer": 1,
+  "explain": "Your supervisor should train and observe you before asking you to use a procedure — RBT 2.05 and BA 4.06."
+ },
+ {
+  "unit": "rbt45",
+  "type": "mc",
+  "q": "What is the five-step sequence of effective hands-on training?",
+  "choices": [
+   "Read, watch, practice, test, certify",
+   "Model, practice, observe, feedback, verify competence",
+   "Explain, demonstrate, rehearse, apply, review",
+   "Observe, shadow, assist, lead, supervise"
+  ],
+  "answer": 1,
+  "explain": "Your supervisor models the skill, you practice the skill, your supervisor observes you, provides feedback, and verifies your competence."
+ },
+ {
+  "unit": "rbt45",
+  "type": "short",
+  "q": "Name the five signs of ethical supervision and four ways to advocate for it.",
+  "answer": "The five signs: your supervisor trains and observes you before asking you to use a procedure; you receive regular feedback; you have regular and meaningful supervision meetings; you clearly know which tasks are assigned to you; and your supervisor encourages you to ask questions and express concerns, and follows up on them. Four ways to advocate: ask questions; request observation; follow up on missed supervision; and use the codes as a reference.",
+  "explain": "Each sign has a code citation, so these are requirements you can point at rather than preferences."
+ },
+ {
+  "unit": "rbt46",
+  "type": "mc",
+  "q": "You witness something that may be an ethical violation. What is the first step?",
+  "choices": [
+   "Interview coworkers to find out more",
+   "Gather and document only what you directly observed, without investigating",
+   "Report it to the BACB",
+   "Confront the person involved"
+  ],
+  "answer": 1,
+  "explain": "Write down only what you directly observed — dates, events, and facts — without investigating or adding assumptions. Investigating yourself is not your role and can compromise a legitimate process."
+ },
+ {
+  "unit": "rbt46",
+  "type": "mc",
+  "q": "Who do you report a suspected ethical violation to first?",
+  "choices": [
+   "The BACB",
+   "Your supervisor or BCBA",
+   "Human Resources",
+   "The client's caregiver"
+  ],
+  "answer": 1,
+  "explain": "Report suspected ethical concerns promptly and privately to your Supervisor or BCBA, as required by the Ethics Code. This ensures proper guidance before any external reporting."
+ },
+ {
+  "unit": "rbt46",
+  "type": "mc",
+  "q": "Which is one of the BACB's considerations before you report to them?",
+  "choices": [
+   "Whether the person has been reported before",
+   "Whether it occurred, or you were made aware, in the last 6 months",
+   "Whether you have a witness",
+   "Whether your employer approves"
+  ],
+  "answer": 1,
+  "explain": "The considerations include whether it can be resolved directly, whether the BACB has jurisdiction, whether a specific ethics requirement was violated, whether there is supporting documentation, whether it occurred or you were made aware in the last 6 months, and whether it should go to other agencies first."
+ },
+ {
+  "unit": "rbt46",
+  "type": "tf",
+  "q": "Reporting an ethical violation to the BACB always results in punishment for the person reported.",
+  "answer": false,
+  "explain": "Outcomes may be no further action, initiation of a Consent Agreement, or prescribed consequences, and the manual notes the outcome isn't always punishment — it's often an opportunity to improve and prevent future issues."
+ },
+ {
+  "unit": "rbt46",
+  "type": "short",
+  "q": "List the four steps of the ethical decision-making process.",
+  "answer": "1. Recognize and describe the concern — identify what's happening and why it might matter, focusing on facts not assumptions, considering who is involved and whether there is risk to the client or anyone else. 2. Check the code — look to the Ethics Code for guidance and work out which areas apply, such as client safety, boundaries, honesty, or competence. 3. Talk to the right people — share your concern with your supervisor or BCBA, who will help review the situation and support next steps. 4. Act, document and follow up — work with your BCBA on next steps, keep clear notes while maintaining confidentiality, and stay involved until the issue is fully resolved.",
+  "explain": "You are responsible for knowing when to report violations by yourself, other RBTs, and behavior analysts."
+ },
+ {
+  "unit": "rbt46",
+  "type": "short",
+  "q": "Name your three ongoing responsibilities after making a report to the BACB.",
+  "answer": "Remain confidential; provide honest and factual follow-up information; and document future observations.",
+  "explain": "The process continues after the report is filed."
+ },
+ {
+  "unit": "rbt01",
+  "type": "mc",
+  "q": "You are a trainee who has not yet sat the certification exam. Which statement is true?",
+  "choices": [
+   "The Ethics Code applies to you once you pass the exam",
+   "The Ethics Code applies to you now",
+   "The Ethics Code applies only when a supervisor is present",
+   "The Ethics Code applies only to paid sessions"
+  ],
+  "answer": 1,
+  "explain": "The manual states it twice: you are expected to follow these guidelines now, even before you are certified."
+ },
+ {
+  "unit": "rbt02",
+  "type": "mc",
+  "q": "A program is dropped because the data show it is not working for this particular learner. Which dimension of ABA is being honoured?",
+  "choices": [
+   "Applied",
+   "Effective",
+   "Technological",
+   "Generalized"
+  ],
+  "answer": 1,
+  "explain": "Effective means ABA only uses strategies that actually work for the individual receiving services."
+ },
+ {
+  "unit": "rbt02",
+  "type": "tf",
+  "q": "Compassionate care is sometimes described as an eighth dimension of ABA.",
+  "answer": true,
+  "explain": "The module is titled '7–8 dimensions' because compassionate care — understanding and respecting the client's needs, preferences and emotions while implementing interventions — is increasingly treated as an eighth."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "You praise a child within two seconds of them sharing a toy. Which dimension of reinforcement are you manipulating?",
+  "choices": [
+   "Magnitude",
+   "Quality",
+   "Immediacy",
+   "Rate"
+  ],
+  "answer": 2,
+  "explain": "Immediacy is how quickly reinforcement is delivered after the behavior."
+ },
+ {
+  "unit": "rbt03",
+  "type": "mc",
+  "q": "What is 'descriptive praise'?",
+  "choices": [
+   "Praising in an enthusiastic tone",
+   "Telling the learner exactly what they did right as you deliver the reinforcer",
+   "Describing the reinforcer before delivering it",
+   "Praising every third response"
+  ],
+  "answer": 1,
+  "explain": "Use descriptive praise by telling the learner exactly what they did right when you deliver the reinforcer — 'Nice job putting the blocks in the bin!' rather than 'good job.' It turns the reinforcer into teaching."
+ },
+ {
+  "unit": "rbt04",
+  "type": "mc",
+  "q": "Which question does the manual ask you to replace 'How do I stop this?!' with?",
+  "choices": [
+   "Who is responsible for this?",
+   "What is this behavior trying to achieve?",
+   "How often does this happen?",
+   "What does the plan say?"
+  ],
+  "answer": 1,
+  "explain": "All behavior is functional and always serves a purpose, so the mindset shift is from stopping the behavior to understanding what it is trying to achieve."
+ },
+ {
+  "unit": "rbt05",
+  "type": "mc",
+  "q": "Which verbal operant is the only one controlled by a motivating operation?",
+  "choices": [
+   "Mand",
+   "Tact",
+   "Echoic",
+   "Intraverbal"
+  ],
+  "answer": 0,
+  "explain": "Mands are controlled by MOs — the client must want something before they can mand for it — and are the only operant reinforced by access to the item requested."
+ },
+ {
+  "unit": "rbt06",
+  "type": "mc",
+  "q": "Which of the six data hot tips addresses when to record?",
+  "choices": [
+   "Use the client's operational definitions",
+   "Record data immediately after the behavior",
+   "Keep data objective and observable",
+   "Be consistent with the data system in place"
+  ],
+  "answer": 1,
+  "explain": "Record data immediately after the behavior — recording in real time keeps it accurate and objective."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "You record the time between one instance of hand-flapping and the next. Which measure?",
+  "choices": [
+   "Latency",
+   "Duration",
+   "Interresponse time",
+   "Rate"
+  ],
+  "answer": 2,
+  "explain": "Interresponse time (IRT) is the time between two responses, and it is great for measuring the pace of a behavior."
+ },
+ {
+  "unit": "rbt07",
+  "type": "mc",
+  "q": "A behavior occurs at a very high rate with an unclear start and stop. Which measures become difficult?",
+  "choices": [
+   "Frequency, rate, duration and IRT",
+   "Partial interval and MTS",
+   "Permanent product",
+   "Trial-by-trial only"
+  ],
+  "answer": 0,
+  "explain": "The manual lists 'difficult with high-rate behavior or behavior with unclear start/stop' against frequency, rate, duration and IRT. Interval systems exist partly to handle exactly that problem."
+ },
+ {
+  "unit": "rbt08",
+  "type": "mc",
+  "q": "Which graph element identifies which data path is which when two behaviors are plotted together?",
+  "choices": [
+   "The condition label",
+   "The legend/key",
+   "The phase change line",
+   "The axis title"
+  ],
+  "answer": 1,
+  "explain": "The legend/key for data paths identifies each plotted series — for example pinching versus light shoulder tap on the functional communication graph."
+ },
+ {
+  "unit": "rbt09",
+  "type": "mc",
+  "q": "Which SAP component tells you which prompts to use, how to fade them, and how to correct errors?",
+  "choices": [
+   "Instructions and teaching procedures",
+   "Prompting and error correction",
+   "Reinforcers and reinforcement schedule",
+   "Targets and examples"
+  ],
+  "answer": 1,
+  "explain": "Prompting and error correction is its own component of the SAP."
+ },
+ {
+  "unit": "rbt10",
+  "type": "mc",
+  "q": "Which is the FIRST step of presession pairing?",
+  "choices": [
+   "Join the learner's activity",
+   "Observe and approach with no demands",
+   "Add value to their play",
+   "Be the giver of good stuff"
+  ],
+  "answer": 1,
+  "explain": "Step one: observe and approach (no demands!). Join their space calmly and let them get used to your presence, paying attention to what they are choosing to play with."
+ },
+ {
+  "unit": "rbt11",
+  "type": "mc",
+  "q": "A coworker asks you to describe a client's session in a group chat with staff who are not on that client's team. What does the code require?",
+  "choices": [
+   "Share it — they are all staff",
+   "Only discuss confidential client information under the direction of your supervisor, and share only necessary information",
+   "Share it but remove the client's name",
+   "Refuse and report the coworker to the BACB"
+  ],
+  "answer": 1,
+  "explain": "Responsibility #10: RBTs only discuss confidential client information under the direction of their supervisor unless allowed by law for a valid reason, and only share necessary client information in job-related communications."
+ },
+ {
+  "unit": "rbt12",
+  "type": "tf",
+  "q": "RBTs select which assessments will be used with a client.",
+  "answer": false,
+  "explain": "BCBAs select assessments, interpret results and design treatment. RBTs follow procedures, collect data and report observations."
+ },
+ {
+  "unit": "rbt13",
+  "type": "mc",
+  "q": "Which of these are you still allowed to do during a skill-based assessment?",
+  "choices": [
+   "Give a hint when the learner hesitates",
+   "Offer a short break",
+   "Make the task easier",
+   "Model the correct response"
+  ],
+  "answer": 1,
+  "explain": "You may pause if needed, offer short breaks, and help them stay calm and engaged. Hints, easier tasks and modelling are teaching behaviors that contaminate the assessment."
+ },
+ {
+  "unit": "rbt14",
+  "type": "mc",
+  "q": "Which preference assessment presents the largest number of items at once?",
+  "choices": [
+   "Paired choice",
+   "Free operant and MSWO",
+   "Indirect",
+   "Trial-by-trial"
+  ],
+  "answer": 1,
+  "explain": "Free operant gives free access to a variety of items at once; MSWO presents an array of roughly 5–8. Paired choice presents exactly two."
+ },
+ {
+  "unit": "rbt15",
+  "type": "mc",
+  "q": "Which FBA step are RBTs most likely to assist with alongside implementing and monitoring?",
+  "choices": [
+   "Formulate hypotheses",
+   "Conduct descriptive assessment",
+   "Develop function-based intervention",
+   "Evaluate and revise"
+  ],
+  "answer": 1,
+  "explain": "RBTs will likely assist with step 4 (conduct descriptive assessment) and step 8 (implement and monitor intervention). The supervisor leads steps 5–7 and 9."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "You reinforce a correct response. How quickly?",
+  "choices": [
+   "Within 1–2 seconds",
+   "Within 3–5 seconds",
+   "At the end of the trial block",
+   "During the next intertrial interval"
+  ],
+  "answer": 0,
+  "explain": "Reinforce correct responses within 1–2 seconds to strengthen the behavior, including prompted responses, saving the best reinforcers for independent responses."
+ },
+ {
+  "unit": "rbt17",
+  "type": "mc",
+  "q": "Which phase of discrimination training has NO S-delta present?",
+  "choices": [
+   "Mass trials",
+   "Simple discrimination",
+   "Complex discrimination",
+   "Conditional discrimination"
+  ],
+  "answer": 0,
+  "explain": "Mass trials present one target SD repeated over and over, with no S-deltas and no distractors."
+ },
+ {
+  "unit": "rbt17",
+  "type": "tf",
+  "q": "During discrimination training you should avoid giving unintentional cues such as eye gaze or subtle gestures.",
+  "answer": true,
+  "explain": "Step 5: watch for any response, not just correct ones, and avoid giving unintentional cues like eye gaze or subtle gestures — these create prompt dependency on cues nobody planned."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "A learner consistently waits for a prompt before responding even when they may know the answer. What is this called, and what causes it?",
+  "choices": [
+   "Scrolling; too many targets",
+   "Prompt dependency; not fading prompts",
+   "Side bias; fixed positions",
+   "Overselectivity; narrow stimuli"
+  ],
+  "answer": 1,
+  "explain": "If we keep giving the same prompt every time, the learner may start relying on it — that is prompt dependency, and fading is what prevents it."
+ },
+ {
+  "unit": "rbt18",
+  "type": "mc",
+  "q": "Which fading procedure suits a learner who already has some familiarity with the skill?",
+  "choices": [
+   "Most-to-least",
+   "Least-to-most",
+   "Errorless learning",
+   "Full physical prompting"
+  ],
+  "answer": 1,
+  "explain": "Use least-to-most when the learner has some familiarity with the skill and might not need much help."
+ },
+ {
+  "unit": "rbt19",
+  "type": "mc",
+  "q": "Which two stimulus prompts can be faded using time delay?",
+  "choices": [
+   "Position and redundancy",
+   "Gesture and visual",
+   "Position and visual",
+   "Gesture and redundancy"
+  ],
+  "answer": 1,
+  "explain": "The manual lists time delay as a fading option for gesture prompts and visual prompts, alongside MTL and LTM. Position and redundancy prompts are listed with MTL and LTM only."
+ },
+ {
+  "unit": "rbt20",
+  "type": "mc",
+  "q": "Which response prompt is the most intrusive?",
+  "choices": [
+   "Model",
+   "Verbal",
+   "Partial physical",
+   "Full physical"
+  ],
+  "answer": 3,
+  "explain": "Full physical is hand-over-hand guidance and sits at the most intrusive end of the hierarchy."
+ },
+ {
+  "unit": "rbt21",
+  "type": "mc",
+  "q": "Which schedule provides reinforcement often, and which provides it less often?",
+  "choices": [
+   "Continuous and intermittent",
+   "Rich and lean",
+   "Fixed and variable",
+   "Ratio and interval"
+  ],
+  "answer": 1,
+  "explain": "Rich provides reinforcement often; lean provides it less often. Thinning from rich to lean promotes independence and durability of skills in natural environments."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "What happens during the intertrial interval?",
+  "choices": [
+   "You deliver the consequence",
+   "You pause 3–5 seconds, record data, and prepare for the next instruction",
+   "You present the next SD immediately",
+   "You offer a reinforcer choice"
+  ],
+  "answer": 1,
+  "explain": "Step eight: take a short pause of about 3–5 seconds, record your data, and prepare for the next instruction."
+ },
+ {
+  "unit": "rbt22",
+  "type": "mc",
+  "q": "Which four components does procedural integrity focus on during DTT?",
+  "choices": [
+   "Instructions, prompts, reinforcement, data collection",
+   "Materials, seating, timing, tone",
+   "Goals, targets, mastery, generalization",
+   "Pairing, SD, response, consequence"
+  ],
+  "answer": 0,
+  "explain": "Procedural integrity refers to all aspects of the SAP, but during DTT pay particular attention to instructions, prompts, reinforcement and data collection."
+ },
+ {
+  "unit": "rbt23",
+  "type": "mc",
+  "q": "How long do you wait after delivering a natural SD in naturalistic teaching?",
+  "choices": [
+   "1–2 seconds",
+   "3–5 seconds",
+   "10 seconds",
+   "Until they respond"
+  ],
+  "answer": 1,
+  "explain": "Step six: after giving the cue, pause for 3–5 seconds. That short pause gives the learner a fair chance to respond on their own."
+ },
+ {
+  "unit": "rbt23",
+  "type": "mc",
+  "q": "Which NT step comes last?",
+  "choices": [
+   "Embed additional targets",
+   "Take data",
+   "End positively",
+   "Reinforce naturally"
+  ],
+  "answer": 2,
+  "explain": "Step eleven is end positively — wrap up on a good note so the learner is happy to transition and willing to work with you again later."
+ },
+ {
+  "unit": "rbt24",
+  "type": "mc",
+  "q": "In which chaining procedure does the learner attempt every step during each session?",
+  "choices": [
+   "Forward chaining",
+   "Backward chaining",
+   "Total task presentation",
+   "Shaping"
+  ],
+  "answer": 2,
+  "explain": "Total task presentation gives the learner the chance to try every step of the chain during each teaching session, with prompts or assistance as needed."
+ },
+ {
+  "unit": "rbt24",
+  "type": "tf",
+  "q": "The task analysis should be kept in front of you during teaching and used as a checklist.",
+  "answer": true,
+  "explain": "Keep the TA in front of you during teaching and use it as a checklist so you don't accidentally skip or combine steps."
+ },
+ {
+  "unit": "rbt25",
+  "type": "mc",
+  "q": "Reinforcing versions of a behavior that look increasingly like the final desired form shapes which dimension?",
+  "choices": [
+   "Topography",
+   "Magnitude",
+   "Rate",
+   "Latency"
+  ],
+  "answer": 0,
+  "explain": "Topography is the form or appearance of the behavior, so shaping it means reinforcing versions that look more and more like the final desired form."
+ },
+ {
+  "unit": "rbt25",
+  "type": "mc",
+  "q": "Who chooses the terminal behavior in a shaping procedure?",
+  "choices": [
+   "The RBT",
+   "The BCBA",
+   "The caregiver",
+   "The learner"
+  ],
+  "answer": 1,
+  "explain": "Step 1: the BCBA sets a goal for a new skill, considering assessment data, program goals and developmental appropriateness. The RBT and BCBA identify the baseline together."
+ },
+ {
+  "unit": "rbt26",
+  "type": "mc",
+  "q": "Which is listed as a tool for self-monitoring?",
+  "choices": [
+   "A functional analysis",
+   "A token board",
+   "A preference assessment",
+   "A fidelity checklist"
+  ],
+  "answer": 1,
+  "explain": "The four tools are timers (visual or auditory), visual schedules, activity schedules, and token boards."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "A client learns to call a golden retriever 'dog', then later calls a poodle 'dog'. Which type of generalization?",
+  "choices": [
+   "Response generalization",
+   "Stimulus generalization",
+   "Overgeneralization",
+   "Maintenance"
+  ],
+  "answer": 1,
+  "explain": "Stimulus generalization: the same response to different but similar stimuli. The stimulus changes while the response stays the same."
+ },
+ {
+  "unit": "rbt28",
+  "type": "mc",
+  "q": "Which is a maintenance strategy rather than a generalization strategy?",
+  "choices": [
+   "Varying people and setting",
+   "Programming common stimuli",
+   "Building fluency",
+   "Teaching multiple exemplars"
+  ],
+  "answer": 2,
+  "explain": "Building fluency is one of the six maintenance strategies. The four generalization strategies are varying stimuli, varying people and setting, programming common stimuli, and teaching multiple exemplars."
+ },
+ {
+  "unit": "rbt30",
+  "type": "mc",
+  "q": "Which solution does the manual give for 'I don't always have what I need'?",
+  "choices": [
+   "Improvise with whatever is available",
+   "Use a session prep checklist, keep a go bag, and inform your BCBA or lead tech if materials run low",
+   "Cancel the session",
+   "Borrow from another client's materials"
+  ],
+  "answer": 1,
+  "explain": "Use a session prep checklist, keep a small go bag with common tools, and inform your BCBA or lead tech if materials run low."
+ },
+ {
+  "unit": "rbt33",
+  "type": "mc",
+  "q": "Which BIP component defines the thresholds of behavior that may pose a risk of harm?",
+  "choices": [
+   "Progression of behaviors / precursors",
+   "Criteria to move to crisis plan",
+   "Behavioral crisis plan",
+   "Strategies to respond to interfering behavior"
+  ],
+  "answer": 1,
+  "explain": "The criteria to move to crisis plan section outlines specific thresholds of behavior that may pose a risk of harm; if met, staff should immediately contact the BCBA and implement the crisis plan as directed."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "Which strategy gradually increases the amount, length, or difficulty of demands over time?",
+  "choices": [
+   "Behavioral momentum",
+   "Demand fading",
+   "Premack Principle",
+   "NCR"
+  ],
+  "answer": 1,
+  "explain": "Demand fading: start small, reinforce success, gradually increase expectations, and continue fading in demands until the client reaches target level."
+ },
+ {
+  "unit": "rbt34",
+  "type": "mc",
+  "q": "A reinforcer has become less valuable because the client has had a lot of access to it. What should you do?",
+  "choices": [
+   "Use behavioral momentum",
+   "Use the Premack Principle",
+   "Switch reinforcers or enrich the environment",
+   "Increase the magnitude"
+  ],
+  "answer": 2,
+  "explain": "Satiation is an AO that decreases the value of a reinforcer. The manual's answer is to switch reinforcers or try to enrich the environment."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "A behavior that had stopped suddenly reappears two weeks later. What is this?",
+  "choices": [
+   "Extinction burst",
+   "Spontaneous recovery",
+   "Extinction-induced variability",
+   "Behavioral contrast"
+  ],
+  "answer": 1,
+  "explain": "Spontaneous recovery: a behavior that had decreased or even stopped can suddenly reappear after some time has passed."
+ },
+ {
+  "unit": "rbt35",
+  "type": "mc",
+  "q": "Which is a common FERB for an escape-maintained behavior?",
+  "choices": [
+   "Raising a hand",
+   "Handing a break card",
+   "Asking a friend to share",
+   "Using a fidget toy"
+  ],
+  "answer": 1,
+  "explain": "Escape FERBs include handing a break card, saying 'Break, please', and asking for more time to play. Raising a hand is attention; asking a friend to share is tangible; a fidget is automatic."
+ },
+ {
+  "unit": "rbt36",
+  "type": "mc",
+  "q": "Which of these is listed as a way people with autism may communicate?",
+  "choices": [
+   "Behavior",
+   "Only speech",
+   "Only pictures",
+   "Only formal sign language"
+  ],
+  "answer": 0,
+  "explain": "The five listed modalities are sounds/speech, hand or body movement, facial expression, pictures/visuals, and behavior. Listing behavior is the premise of FCT — the challenging behavior IS communication."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A child runs down the hall and must walk back and forth several times. Which procedure?",
+  "choices": [
+   "Restitutional overcorrection",
+   "Positive practice overcorrection",
+   "Response cost",
+   "Non-exclusionary time-out"
+  ],
+  "answer": 1,
+  "explain": "Positive practice overcorrection requires the learner to repeatedly practice the correct behavior."
+ },
+ {
+  "unit": "rbt37",
+  "type": "mc",
+  "q": "A red 'X' is placed on a child's desk indicating reinforcement is temporarily unavailable, while the child keeps participating. Which procedure?",
+  "choices": [
+   "Exclusionary time-out",
+   "Non-exclusionary time-out",
+   "Planned ignoring",
+   "Reprimand"
+  ],
+  "answer": 1,
+  "explain": "Non-exclusionary time-out: the learner stays in the environment but loses access to reinforcement."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "A client tries to kick you while you are standing. What should you do?",
+  "choices": [
+   "Step backward quickly",
+   "Step slightly into the kick, turn your body sideways, and keep your front foot grounded",
+   "Block with your hands",
+   "Sit down"
+  ],
+  "answer": 1,
+  "explain": "From a standing position: step slightly into the kick, turn your body sideways, and keep your front foot grounded for stability."
+ },
+ {
+  "unit": "rbt38",
+  "type": "mc",
+  "q": "When walking with a learner who may elope, how should you hold their hand?",
+  "choices": [
+   "Grip their wrist firmly",
+   "Rest their hand closest to you in your hand, with their hand on top of yours",
+   "Hold both of their hands",
+   "Hold their upper arm"
+  ],
+  "answer": 1,
+  "explain": "Place an open palm gently on their upper back or opposite shoulder, rest their hand closest to you in your hand with THEIR hand on top of yours, and do not grab or wrap your fingers around their wrist or arm."
+ },
+ {
+  "unit": "rbt38",
+  "type": "tf",
+  "q": "Technicians may pick up or carry a learner during play.",
+  "answer": false,
+  "explain": "Technicians should NEVER pick up or carry a learner — even during play."
+ },
+ {
+  "unit": "rbt39",
+  "type": "mc",
+  "q": "At the disruption level, you have tried the precursor strategies and they haven't worked. What does ISE say to do?",
+  "choices": [
+   "Hold the line so the behavior isn't reinforced",
+   "Give the client what they want and will stop the behavior",
+   "Remove all preferred items",
+   "Terminate the session immediately"
+  ],
+  "answer": 1,
+  "explain": "At disruption, try the precursor strategies first; if they are not effective, give the client what they want and will stop the behavior. If you can't, wait for them to calm down and model calming strategies. Safety and de-escalation outweigh the teaching contingency at this level."
+ },
+ {
+  "unit": "rbt39",
+  "type": "mc",
+  "q": "Which ISE level is described as the best level for meaningful learning to occur?",
+  "choices": [
+   "Precursor behavior",
+   "Happy, Connected, Progress",
+   "Disruption",
+   "Crisis"
+  ],
+  "answer": 1,
+  "explain": "HCP: strong rapport, active and happy participation, many learning opportunities. The goal is to maintain the session at this level."
+ },
+ {
+  "unit": "rbt40",
+  "type": "mc",
+  "q": "Which is listed as a post-incident recovery practice rather than a reflection tool?",
+  "choices": [
+   "Name what you feel",
+   "Reframe the behavior",
+   "Brief peer debriefs",
+   "Practice self-compassion"
+  ],
+  "answer": 2,
+  "explain": "Recovery practices are brief peer debriefs, a micro-break, and an emotional reflection log. The reflection tools are naming what you feel, reframing the behavior, reconnecting to your values, practising self-compassion, and using HERO skills."
+ },
+ {
+  "unit": "rbt42",
+  "type": "mc",
+  "q": "What does the N in NOTES require?",
+  "choices": [
+   "Neutral tone",
+   "Novel — each note unique to that day's session, never copied",
+   "Numbered programs",
+   "Named staff"
+  ],
+  "answer": 1,
+  "explain": "Novel: each note should be unique to that day's session. Avoid copying."
+ },
+ {
+  "unit": "rbt42",
+  "type": "tf",
+  "q": "Waiting for a client to arrive is billable under CPT 97153.",
+  "answer": false,
+  "explain": "Waiting for client arrival is explicitly non-billable. Billable means active, face-to-face intervention aligned with the treatment plan."
+ },
+ {
+  "unit": "rbt44",
+  "type": "mc",
+  "q": "Who handles broader clinical, organizational and ethical concerns at the center?",
+  "choices": [
+   "The Lead RBT",
+   "The Clinical Supervisor",
+   "The Center Director",
+   "The Operations Leader"
+  ],
+  "answer": 2,
+  "explain": "The Center Director oversees the Clinical Supervisors, handles broader clinical, organizational and/or ethical concerns, and works with operations staff to manage and lead the center."
+ },
+ {
+  "unit": "rbt44",
+  "type": "mc",
+  "q": "Data is trending low for a previously mastered skill. Which category of supervisor communication is this?",
+  "choices": [
+   "Program concerns",
+   "Caregiver concerns",
+   "Data irregularities",
+   "Supervision and training needs"
+  ],
+  "answer": 2,
+  "explain": "Data irregularities include inconsistent responding across sessions or days, and data trending low for previously mastered skills."
+ },
+ {
+  "unit": "rbt45",
+  "type": "tf",
+  "q": "Watching a training video counts as having been trained on a procedure.",
+  "answer": false,
+  "explain": "Effective hands-on training is model → practice → observe → feedback → verify competence. If you have only watched a video, your competence has not been verified."
+ },
+ {
+  "unit": "rbt46",
+  "type": "mc",
+  "q": "Which is NOT part of step 1 of reporting an ethical violation?",
+  "choices": [
+   "Write down dates, events and facts",
+   "Record only what you directly observed",
+   "Interview others who may have seen it",
+   "Avoid adding assumptions"
+  ],
+  "answer": 2,
+  "explain": "Step 1 says to document only what you directly observed, WITHOUT investigating. Interviewing colleagues is not your role and can compromise a legitimate process."
+ },
+ {
+  "unit": "rbt46",
+  "type": "tf",
+  "q": "You are responsible for knowing when to report ethical violations by yourself, by other RBTs, and by behavior analysts.",
+  "answer": true,
+  "explain": "YOU are responsible for being knowledgeable on when to report ethical violations towards yourself, other RBTs, and behavior analysts — which means knowing both the RBT Ethics Code and the Ethics Code for Behavior Analysts."
+ },
+ {
+  "unit": "rbt04",
+  "type": "short",
+  "q": "A client throws materials only when worksheets are presented, and you always remove the worksheet. Identify the function, the type of reinforcement, and what extinction would look like.",
+  "answer": "The function is escape — the behavior allows the learner to avoid or get out of a task. The consequence is negative reinforcement, because something aversive (the worksheet) was removed and the behavior increased. Extinction for an escape-maintained behavior means continuing the task and not letting the throwing lead to escape — ignoring the behavior while the demand stays removed is not extinction, it actually delivers escape and reinforces the behavior.",
+  "explain": "Escape function and negative reinforcement are the same event described from two sides."
+ },
+ {
+  "unit": "rbt22",
+  "type": "short",
+  "q": "A learner responds incorrectly during DTT. Walk through exactly what you do next, and say what you must not do.",
+  "answer": "Withhold reinforcement and stay neutral — no emotional reaction and no negative language such as 'no' or 'that's wrong'. Say 'Let's try again', then run a transfer trial: present the SD together with a prompt so the learner responds correctly, and give mild reinforcement. Then run an independent trial with the SD alone. Then intermix easy tasks. If you think the chance of another error is high, fade the prompt gradually rather than going straight for independence. What you must not do is reinforce the incorrect response, react emotionally, or change the wording of the SD.",
+  "explain": "Prompted responses get a milder reinforcer; independent responses get the big one."
+ },
+ {
+  "unit": "rbt35",
+  "type": "short",
+  "q": "Your client's grabbing is maintained by access to toys. Design the consequence side of a plan using the terms extinction, FERB and DRA.",
+  "answer": "Identify the function first: tangible. Put grabbing on extinction by no longer handing over the toy when grabbing occurs. Teach a functionally equivalent replacement behavior — a communicative one, such as asking for the toy with words, exchanging a picture of it, or asking a friend to share — and reinforce it with the same reinforcer the grabbing used to produce, which is access to the toy. Reinforcing a same-function alternative while withholding reinforcement for the problem behavior is DRA, and because the replacement is communication it is also Functional Communication Training. Prompt and reinforce the new behavior every time it happens, and keep good data so the BCBA can evaluate the plan.",
+  "explain": "Extinction alone would only teach the client what not to do."
+ },
+ {
+  "unit": "rbt39",
+  "type": "short",
+  "q": "A session is going well, then the client starts whining and pushing materials away. Describe what you should and should not do, and why the teaching goal changes.",
+  "answer": "This is precursor behavior — generally harmless, but a warning that the session is no longer at Happy, Connected Progress, and usually preceding more severe behavior. Do: prompt and reinforce an easy response to get what they want; or redirect to something similar and preferred, offering choices and using visual cues; or redirect to an easy or incompatible behavior, considering behavioral momentum. It may be an appropriate time to work on manding, but pause and assess first. Don't: continue introducing new or difficult demands; yell, reprimand or threaten; or remove preferred items unless necessary for safety. The goal changes because as behavior escalates your priority shifts from teaching to preventing escalation and returning to HCP — pushing a demand here makes things worse.",
+  "explain": "Read the teaching column down the ISE table: best level for learning, pause and assess, unlikely to learn, not a teachable moment."
+ },
+ {
+  "unit": "rbt11",
+  "type": "short",
+  "q": "You see a colleague implementing a procedure you believe is outside what the BIP describes. Walk through what you do.",
+  "answer": "Document only what you directly observed — dates, events and facts, without investigating or adding assumptions. Report it promptly and privately to your supervisor or BCBA, as the Ethics Code requires, before any external reporting. Report factually and professionally: who, what, when and where, avoiding opinions, using respectful language and keeping the information confidential. Then follow the agreed response plan with your supervisor and stay engaged throughout; it may involve HR, compliance or client services, and may result in training or re-training, documentation corrections, or protocol revisions. If the issue is not resolved or is egregious, it may be appropriate to escalate to the BACB through a Notice of Alleged Violation, with your supervisor and compliance department supporting you.",
+  "explain": "Responsibility #6 also applies: direct any questions or concerns about behavior-technician services to your supervisor."
+ }
+]

@@ -43,6 +43,15 @@ Caden brings slides (PowerPoints/PDFs) or an existing notes document.
 
 When adding lectures to an in-progress class, append sections to its notes and questions the same way.
 
+## Whose course is whose
+
+Everything except `rbt` is Caden's GSU coursework. **`rbt` is Judah Smith's** Registered Behavior
+Technician training (BlueSprig *RBT Training TCO-3*, 47 modules, source PDF by Rachel Huckfeldt) —
+same format and features as the rest of the site, with the emphasis on practice: inline "Check
+yourself" retrieval boxes in every module, a terminology table per module that merges into the A–Z
+glossary, and a large saved question bank. The home page kicker still reads "Georgia State
+University"; if more non-GSU courses get added, that line in `site/shell.html` needs rewording.
+
 ## Printable study guide (PDF)
 
 `python3 tools/make_study_guide.py <course-id> ~/Downloads/<CODE>_Study_Guide.pdf` renders a course's notes as a PDF in the style of Caden's CSC 4320 guide (cover, how-to page, contents with page numbers, colored panels, "改善 · Complete Exam Study Notes" footer). It needs `courses/<id>/guide.json` (cover text, header, study order) and uses Word's Cambria/Calibri fonts plus Chrome headless. Regenerate it whenever that course's notes change and Caden wants an updated copy. Each lecture should end with an "<code> in one breath" `box proc` summary; the guide relies on it.
